@@ -91,5 +91,4 @@
   margin-top: 48rpx;
   width: 320rpx;
   height: 88rpx;
-  line-height: 88rpx;
 }

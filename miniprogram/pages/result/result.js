@@ -1,5 +1,6 @@
 var bazi = require('../../utils/bazi.js');
 var store = require('../../utils/store.js');
+var shiShenInfo = require('../../utils/shishen-info.js');
 
 Page({
   data: {
@@ -14,7 +15,8 @@ Page({
     dyIndex: -1,
     liuNianBar: [],
     lnIndex: -1,
-    selLiuNian: null
+    selLiuNian: null,
+    ssCard: null
   },
 
   onLoad: function (options) {
@@ -56,6 +58,7 @@ Page({
     this.setData({
       loaded: true,
       fromRecord: options.from === 'record',
+      saved: options.from === 'record',
       meta: chart.meta,
       wuXing: chart.wuXing,
       daYunBar: daYunBar
@@ -122,24 +125,53 @@ Page({
     this.updateTable();
   },
 
-  // 基础盘 = 四柱；详盘 = 四柱 + 选中大运、流年并为第5、6柱（六柱同表）
+  // 基础盘 = 四柱；详盘 = 选中大运、流年作为最左两柱 + 四柱（六柱同表）
   updateTable: function () {
     var pillars = this._chart.pillars.slice(0);
     if (this.data.tab === 'detail') {
+      var extras = [];
       var dy = this._chart.daYun[this.data.dyIndex];
       if (dy) {
         if (dy.isQian) {
-          pillars.push({ label: '大运', sub: '童限', empty: true });
+          extras.push({ label: '大运', sub: '童限', empty: true });
         } else {
-          pillars.push(this.extraColumn(dy, '大运', dy.startAge + '-' + dy.endAge + '岁'));
+          extras.push(this.extraColumn(dy, '大运', dy.startAge + '-' + dy.endAge + '岁'));
         }
         var ln = dy.liuNian[this.data.lnIndex];
         if (ln) {
-          pillars.push(this.extraColumn(ln, '流年', ln.year + '年'));
+          extras.push(this.extraColumn(ln, '流年', ln.year + '年'));
         }
       }
+      pillars = extras.concat(pillars);
     }
     this.setData({ tablePillars: pillars });
+  },
+
+  // 点击十神弹出喜忌性格卡
+  onShiShenTap: function (e) {
+    var ss = e.currentTarget.dataset.ss;
+    var info = shiShenInfo[ss];
+    if (!info) return;
+    this.setData({
+      ssCard: { name: ss, brief: info.brief, xi: info.xi, ji: info.ji }
+    });
+  },
+
+  closeSsCard: function () {
+    this.setData({ ssCard: null });
+  },
+
+  noop: function () {},
+
+  // 详批：人格动力分析（开发中）
+  onXiangPi: function () {
+    wx.showModal({
+      title: '详批 · 人格动力分析',
+      content: '基于命盘的人格动力深度分析系统正在打磨中，上线后将为您解读性格底层动力与运势走向，敬请期待。',
+      showCancel: false,
+      confirmText: '期待上线',
+      confirmColor: '#A78BFA'
+    });
   },
 
   extraColumn: function (p, label, sub) {

@@ -36,8 +36,11 @@ page {
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.35);
 }
 
-/* 主按钮：紫色渐变柔光 */
+/* 主按钮：紫色渐变柔光（flex 保证文字垂直水平居中） */
 .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(135deg, #9D78F8, #6C4BD9);
   color: #FBF9FF;
   border-radius: 20rpx;
@@ -45,6 +48,8 @@ page {
   font-weight: 600;
   letter-spacing: 8rpx;
   text-indent: 8rpx;
+  line-height: 1;
+  padding: 0;
   box-shadow: 0 10rpx 28rpx rgba(124, 92, 224, 0.45);
 }
 .btn-primary::after {

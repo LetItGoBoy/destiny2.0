@@ -125,7 +125,6 @@
 .btn-paipan {
   margin-top: 36rpx;
   height: 96rpx;
-  line-height: 96rpx;
 }
 
 /* 配对模块 */
