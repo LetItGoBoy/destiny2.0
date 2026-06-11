@@ -7,17 +7,17 @@
     "pages/match/match"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#F6F1E7",
+    "navigationBarBackgroundColor": "#221A3D",
     "navigationBarTitleText": "同乐八字",
-    "navigationBarTextStyle": "black",
-    "backgroundColor": "#F6F1E7",
-    "backgroundTextStyle": "dark"
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#14101F",
+    "backgroundTextStyle": "light"
   },
   "tabBar": {
-    "color": "#9A917F",
-    "selectedColor": "#B3402A",
-    "backgroundColor": "#FFFDF8",
-    "borderStyle": "white",
+    "color": "#6F6791",
+    "selectedColor": "#A78BFA",
+    "backgroundColor": "#1B1531",
+    "borderStyle": "black",
     "list": [
       { "pagePath": "pages/index/index", "text": "排盘" },
       { "pagePath": "pages/records/records", "text": "记录" },

@@ -63,6 +63,7 @@
   text-align: right;
   font-size: 30rpx;
   margin-left: 24rpx;
+  color: var(--ink);
 }
 .ph {
   color: var(--ink-3);
@@ -92,10 +93,10 @@
   font-size: 26rpx;
   color: var(--ink-2);
   margin-left: 16rpx;
-  background: #FBF7EE;
+  background: var(--fill);
 }
 .chip-on {
-  background: #FBEDE8;
+  background: var(--tint);
   border-color: var(--primary);
   color: var(--primary);
   font-weight: 600;
@@ -104,8 +105,9 @@
 /* 历法 segmented */
 .seg {
   display: flex;
-  background: #F0E9DA;
-  border-radius: 12rpx;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  border-radius: 14rpx;
   padding: 4rpx;
 }
 .seg-item {
@@ -115,10 +117,9 @@
   color: var(--ink-2);
 }
 .seg-on {
-  background: var(--card);
-  color: var(--primary);
+  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
+  color: #FBF9FF;
   font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(90, 70, 40, 0.12);
 }
 
 .btn-paipan {
@@ -147,20 +148,22 @@
 .mod-ico {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 14rpx;
+  border-radius: 18rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 42rpx;
   font-weight: 700;
-  color: #FFF6E8;
+  color: #FBF9FF;
   flex-shrink: 0;
 }
 .mod-ico-red {
-  background: linear-gradient(135deg, #C24E33, #9E3422);
+  background: linear-gradient(135deg, #F285AE, #C9508A);
+  box-shadow: 0 6rpx 16rpx rgba(201, 80, 138, 0.35);
 }
 .mod-ico-gold {
-  background: linear-gradient(135deg, #C9A059, #A1763B);
+  background: linear-gradient(135deg, #7FA8F2, #5470D9);
+  box-shadow: 0 6rpx 16rpx rgba(84, 112, 217, 0.35);
 }
 .mod-body {
   margin-left: 18rpx;
@@ -183,10 +186,11 @@
   top: 0;
   right: 0;
   font-size: 18rpx;
-  color: #FFF;
+  color: #1A142E;
   background: var(--gold);
   padding: 4rpx 14rpx;
-  border-radius: 0 18rpx 0 14rpx;
+  border-radius: 0 22rpx 0 14rpx;
+  font-weight: 600;
 }
 
 /* 最近排盘 */
@@ -225,10 +229,11 @@
   padding: 2rpx 10rpx;
   border-radius: 6rpx;
   margin-left: 12rpx;
-  color: #FFF;
+  color: #1A142E;
+  font-weight: 600;
 }
-.g-m { background: #3D6F9E; }
-.g-f { background: #C0432B; }
+.g-m { background: #6FB6FF; }
+.g-f { background: #F2A7C3; }
 .recent-bazi {
   margin-left: auto;
   font-size: 26rpx;

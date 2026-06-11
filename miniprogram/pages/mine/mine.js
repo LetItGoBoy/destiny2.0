@@ -72,7 +72,7 @@ Page({
       title: '切换用户',
       content: '将清除当前昵称与头像，重新设置个人信息。八字记录不受影响。',
       confirmText: '切换',
-      confirmColor: '#B3402A',
+      confirmColor: '#A78BFA',
       success: function (res) {
         if (res.confirm) {
           wx.removeStorageSync(PROFILE_KEY);
@@ -89,7 +89,7 @@ Page({
       title: '退出登录',
       content: '将清除本机上的个人信息与本地八字记录' + (this.data.cloudEnabled ? '（云端记录保留）' : '') + '，确定退出吗？',
       confirmText: '退出',
-      confirmColor: '#B3402A',
+      confirmColor: '#A78BFA',
       success: function (res) {
         if (res.confirm) {
           wx.removeStorageSync(PROFILE_KEY);

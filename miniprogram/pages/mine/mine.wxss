@@ -74,20 +74,20 @@
   display: flex;
   align-items: center;
   padding: 30rpx 32rpx;
-  border-bottom: 1rpx solid #F2EBDC;
+  border-bottom: 1rpx solid var(--line);
 }
 .cell:last-child {
   border-bottom: none;
 }
 .cell-hover {
-  background: #FBF7EE;
+  background: var(--fill);
 }
 .cell-ico {
   width: 56rpx;
   height: 56rpx;
-  border-radius: 12rpx;
-  background: #6E87A0;
-  color: #FFF;
+  border-radius: 14rpx;
+  background: linear-gradient(135deg, #7FA8F2, #5470D9);
+  color: #FBF9FF;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,17 +95,17 @@
   margin-right: 22rpx;
 }
 .cell-ico-gold {
-  background: var(--gold);
+  background: linear-gradient(135deg, #E8C886, #C09A4E);
 }
 .cell-ico-red {
-  background: var(--primary);
+  background: linear-gradient(135deg, #F285AE, #C9508A);
 }
 .cell-title {
   flex: 1;
   font-size: 30rpx;
 }
 .cell-danger {
-  color: var(--primary);
+  color: var(--pink);
 }
 .cell-arrow {
   color: var(--ink-3);

@@ -66,7 +66,7 @@
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>
       </view>
-      <switch checked="{{useTrueSolar}}" color="#B3402A" bindchange="onTrueSolarChange" />
+      <switch checked="{{useTrueSolar}}" color="#A78BFA" bindchange="onTrueSolarChange" />
     </view>
 
     <button class="btn-primary btn-paipan" bindtap="onPaiPan">开始排盘</button>

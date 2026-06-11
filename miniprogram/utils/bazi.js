@@ -63,6 +63,7 @@ function buildPillarView(ctx, gan, zhi, isDayPillar) {
     xingYun: changSheng(ctx.dayGan, zhi),
     ziZuo: changSheng(gan, zhi),
     naYin: LunarUtil.NAYIN[gan + zhi],
+    xunKong: LunarUtil.getXunKong(gan + zhi),
     shenSha: shensha.getPillarShenSha(ctx, gan, zhi, !!isDayPillar)
   };
 }
@@ -114,13 +115,11 @@ function computeChart(input) {
   var labels = ['年柱', '月柱', '日柱', '时柱'];
   var gans = [ec.getYearGan(), ec.getMonthGan(), ec.getDayGan(), ec.getTimeGan()];
   var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
-  var xunKongs = [ec.getYearXunKong(), ec.getMonthXunKong(), ec.getDayXunKong(), ec.getTimeXunKong()];
   var pillars = [];
   var wuXingCount = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
   for (var i = 0; i < 4; i++) {
     var p = buildPillarView(ctx, gans[i], zhis[i], i === 2);
     p.label = labels[i];
-    p.xunKong = xunKongs[i];
     pillars.push(p);
     wuXingCount[p.gan.wx]++;
     wuXingCount[p.zhi.wx]++;

@@ -17,12 +17,12 @@
   color: #FFF6E8;
 }
 .hero-red {
-  background: linear-gradient(135deg, #C24E33, #9E3422);
-  box-shadow: 0 12rpx 32rpx rgba(158, 52, 34, 0.3);
+  background: linear-gradient(135deg, #F285AE, #C9508A);
+  box-shadow: 0 12rpx 40rpx rgba(201, 80, 138, 0.4);
 }
 .hero-gold {
-  background: linear-gradient(135deg, #C9A059, #A1763B);
-  box-shadow: 0 12rpx 32rpx rgba(161, 118, 59, 0.3);
+  background: linear-gradient(135deg, #7FA8F2, #5470D9);
+  box-shadow: 0 12rpx 40rpx rgba(84, 112, 217, 0.4);
 }
 
 .title {

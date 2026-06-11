@@ -37,7 +37,7 @@ Page({
     var rec = this.data.list[e.currentTarget.dataset.index];
     wx.showActionSheet({
       itemList: ['删除该记录'],
-      itemColor: '#B3402A',
+      itemColor: '#F2A7C3',
       success: function (res) {
         if (res.tapIndex === 0) {
           store.removeRecord(rec._id).then(function () {

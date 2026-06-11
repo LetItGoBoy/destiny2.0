@@ -8,11 +8,10 @@ Page({
     fromRecord: false,
     saved: false,
     meta: {},
-    pillars: [],
+    tablePillars: [],
     wuXing: [],
     daYunBar: [],
     dyIndex: -1,
-    selDaYun: null,
     liuNianBar: [],
     lnIndex: -1,
     selLiuNian: null
@@ -58,7 +57,6 @@ Page({
       loaded: true,
       fromRecord: options.from === 'record',
       meta: chart.meta,
-      pillars: chart.pillars,
       wuXing: chart.wuXing,
       daYunBar: daYunBar
     });
@@ -77,6 +75,7 @@ Page({
 
   onTab: function (e) {
     this.setData({ tab: e.currentTarget.dataset.tab });
+    this.updateTable();
   },
 
   onDaYunTap: function (e) {
@@ -86,16 +85,6 @@ Page({
   selectDaYun: function (index) {
     var dy = this._chart.daYun[index];
     if (!dy) return;
-    var sel = null;
-    if (!dy.isQian) {
-      sel = {
-        ganZhi: dy.ganZhi, gan: dy.gan, zhi: dy.zhi,
-        shiShenGan: dy.shiShenGan, hideGans: dy.hideGans,
-        xingYun: dy.xingYun, ziZuo: dy.ziZuo, naYin: dy.naYin,
-        shenSha: dy.shenSha,
-        rangeText: dy.startYear + ' - ' + dy.endYear + '年 · ' + dy.startAge + '-' + dy.endAge + '岁'
-      };
-    }
     var liuNianBar = dy.liuNian.map(function (n) {
       return {
         index: n.index, year: n.year, age: n.age,
@@ -104,7 +93,6 @@ Page({
     });
     this.setData({
       dyIndex: index,
-      selDaYun: sel,
       liuNianBar: liuNianBar
     });
 
@@ -129,14 +117,41 @@ Page({
     if (!ln) return;
     this.setData({
       lnIndex: lnIndex,
-      selLiuNian: {
-        year: ln.year, age: ln.age,
-        ganZhi: ln.ganZhi, gan: ln.gan, zhi: ln.zhi,
-        shiShenGan: ln.shiShenGan, hideGans: ln.hideGans,
-        xingYun: ln.xingYun, ziZuo: ln.ziZuo, naYin: ln.naYin,
-        shenSha: ln.shenSha, liuYue: ln.liuYue
-      }
+      selLiuNian: { year: ln.year, age: ln.age, liuYue: ln.liuYue }
     });
+    this.updateTable();
+  },
+
+  // 基础盘 = 四柱；详盘 = 四柱 + 选中大运、流年并为第5、6柱（六柱同表）
+  updateTable: function () {
+    var pillars = this._chart.pillars.slice(0);
+    if (this.data.tab === 'detail') {
+      var dy = this._chart.daYun[this.data.dyIndex];
+      if (dy) {
+        if (dy.isQian) {
+          pillars.push({ label: '大运', sub: '童限', empty: true });
+        } else {
+          pillars.push(this.extraColumn(dy, '大运', dy.startAge + '-' + dy.endAge + '岁'));
+        }
+        var ln = dy.liuNian[this.data.lnIndex];
+        if (ln) {
+          pillars.push(this.extraColumn(ln, '流年', ln.year + '年'));
+        }
+      }
+    }
+    this.setData({ tablePillars: pillars });
+  },
+
+  extraColumn: function (p, label, sub) {
+    return {
+      label: label,
+      sub: sub,
+      extra: true,
+      ganZhi: p.ganZhi, gan: p.gan, zhi: p.zhi,
+      shiShenGan: p.shiShenGan, hideGans: p.hideGans,
+      xingYun: p.xingYun, ziZuo: p.ziZuo,
+      xunKong: p.xunKong, naYin: p.naYin, shenSha: p.shenSha
+    };
   },
 
   onSave: function () {
@@ -168,7 +183,7 @@ Page({
   onShareAppMessage: function () {
     var meta = this.data.meta;
     return {
-      title: (meta.name || '八字') + ' · ' + this.data.pillars.map(function (p) { return p.ganZhi; }).join(' '),
+      title: (meta.name || '八字') + ' · ' + this._chart.pillars.map(function (p) { return p.ganZhi; }).join(' '),
       path: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(this._input))
     };
   }

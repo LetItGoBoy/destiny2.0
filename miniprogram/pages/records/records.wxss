@@ -33,13 +33,14 @@
 }
 .rec-gender {
   font-size: 20rpx;
-  color: #FFF;
+  color: #1A142E;
+  font-weight: 600;
   padding: 2rpx 12rpx;
   border-radius: 6rpx;
   margin-left: 14rpx;
 }
-.g-m { background: #3D6F9E; }
-.g-f { background: #C0432B; }
+.g-m { background: #6FB6FF; }
+.g-f { background: #F2A7C3; }
 .rec-true {
   margin-left: auto;
   font-size: 20rpx;

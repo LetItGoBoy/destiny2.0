@@ -23,90 +23,98 @@
     <view class="info-row"><text class="info-label">起　运</text><text>{{meta.qiYun}}<text class="info-note">（{{meta.qiYunDate}} 交运）</text></text></view>
   </view>
 
-  <!-- 四柱命盘 -->
+  <!-- 命盘表：基础盘四柱 / 详盘六柱（四柱 + 大运 + 流年） -->
   <view class="card chart">
     <view class="chart-row head-row">
       <view class="cell label-cell"></view>
-      <view class="cell head-cell serif" wx:for="{{pillars}}" wx:key="label">{{item.label}}</view>
+      <view class="cell head-cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <view class="serif head-name">{{item.label}}</view>
+        <view class="head-sub" wx:if="{{item.sub}}">{{item.sub}}</view>
+      </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">主星</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label">
-        <text class="{{item.shiShenGan === '日主' ? 'rizhu' : 'shishen'}}">{{item.shiShenGan}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">—</text>
+        <text wx:else class="{{item.shiShenGan === '日主' ? 'rizhu' : 'shishen'}}">{{item.shiShenGan}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">天干</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label">
-        <view class="big-char serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
-        <view class="wx-mark wx-{{item.gan.cls}}">{{item.gan.wx}}</view>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <block wx:if="{{!item.empty}}">
+          <view class="big-char serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
+          <view class="wx-mark wx-{{item.gan.cls}}">{{item.gan.wx}}</view>
+        </block>
+        <text wx:else class="dim">—</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">地支</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label">
-        <view class="big-char serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
-        <view class="wx-mark wx-{{item.zhi.cls}}">{{item.zhi.wx}}</view>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <block wx:if="{{!item.empty}}">
+          <view class="big-char serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
+          <view class="wx-mark wx-{{item.zhi.cls}}">{{item.zhi.wx}}</view>
+        </block>
+        <text wx:else class="dim">—</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">藏干</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
           <text class="hg-ss">{{hg.shiShen}}</text>
         </view>
+        <text wx:if="{{item.empty}}" class="dim">—</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">星运</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label"><text class="plain">{{item.xingYun}}</text></view>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text class="plain">{{item.empty ? '—' : item.xingYun}}</text>
+      </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">自坐</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label"><text class="plain">{{item.ziZuo}}</text></view>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text class="plain">{{item.empty ? '—' : item.ziZuo}}</text>
+      </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">空亡</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label"><text class="plain dim">{{item.xunKong}}</text></view>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text class="plain dim">{{item.empty ? '—' : item.xunKong}}</text>
+      </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">纳音</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label"><text class="plain dim">{{item.naYin}}</text></view>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text class="plain dim naying">{{item.empty ? '—' : item.naYin}}</text>
+      </view>
     </view>
 
     <view class="chart-row no-line shensha-row">
       <view class="cell label-cell">神煞</view>
-      <view class="cell" wx:for="{{pillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text class="ss-item" wx:for="{{item.shenSha}}" wx:for-item="ss" wx:key="*this">{{ss}}</text>
-        <text class="ss-none" wx:if="{{item.shenSha.length === 0}}">—</text>
+        <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">—</text>
       </view>
     </view>
   </view>
 
-  <!-- 五行 -->
-  <view class="card wuxing">
-    <view class="section-title serif">五行</view>
-    <view class="wx-bar">
-      <view class="wx-item" wx:for="{{wuXing}}" wx:key="wx">
-        <view class="wx-dot bg-{{item.cls}}">{{item.wx}}</view>
-        <view class="wx-count {{item.count === 0 ? 'wx-lack' : ''}}">{{item.count === 0 ? '缺' : item.count}}</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 详盘：大运 / 流年 / 流月 -->
+  <!-- 详盘：大运/流年选择条 + 流月 -->
   <block wx:if="{{tab === 'detail'}}">
     <view class="card yun-card">
-      <view class="section-title serif">大运 <text class="section-note">{{meta.qiYun}}</text></view>
+      <view class="section-title serif">大运 <text class="section-note">{{meta.qiYun}} · 点击切换上表大运柱</text></view>
       <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
         <view class="yun-strip">
           <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
@@ -127,39 +135,10 @@
           </view>
         </view>
       </scroll-view>
-
-      <!-- 选中大运详情 -->
-      <view class="sel-detail" wx:if="{{selDaYun}}">
-        <view class="sel-head">
-          <text class="sel-gz serif">
-            <text class="wx-{{selDaYun.gan.cls}}">{{selDaYun.gan.text}}</text><text class="wx-{{selDaYun.zhi.cls}}">{{selDaYun.zhi.text}}</text>
-          </text>
-          <text class="sel-range">{{selDaYun.rangeText}}</text>
-        </view>
-        <view class="sel-grid">
-          <view class="sel-item"><text class="sel-label">十神</text>{{selDaYun.shiShenGan}}</view>
-          <view class="sel-item"><text class="sel-label">星运</text>{{selDaYun.xingYun}}</view>
-          <view class="sel-item"><text class="sel-label">自坐</text>{{selDaYun.ziZuo}}</view>
-          <view class="sel-item"><text class="sel-label">纳音</text>{{selDaYun.naYin}}</view>
-          <view class="sel-item sel-wide">
-            <text class="sel-label">藏干</text>
-            <text class="hg-inline" wx:for="{{selDaYun.hideGans}}" wx:key="text">
-              <text class="wx-{{item.cls}}">{{item.text}}</text>·{{item.shiShen}}
-            </text>
-          </view>
-          <view class="sel-item sel-wide">
-            <text class="sel-label">神煞</text>
-            <text wx:if="{{selDaYun.shenSha.length === 0}}" class="dim">—</text>
-            <text class="ss-tag" wx:for="{{selDaYun.shenSha}}" wx:key="*this">{{item}}</text>
-          </view>
-        </view>
-      </view>
-      <view class="sel-detail qian-tip" wx:else>童限：尚未起运，自出生至交运前</view>
     </view>
 
-    <!-- 流年 -->
     <view class="card yun-card">
-      <view class="section-title serif">流年</view>
+      <view class="section-title serif">流年 <text class="section-note">点击切换上表流年柱</text></view>
       <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
         <view class="yun-strip">
           <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
@@ -174,33 +153,6 @@
           </view>
         </view>
       </scroll-view>
-
-      <!-- 选中流年详情 -->
-      <view class="sel-detail" wx:if="{{selLiuNian}}">
-        <view class="sel-head">
-          <text class="sel-gz serif">
-            <text class="wx-{{selLiuNian.gan.cls}}">{{selLiuNian.gan.text}}</text><text class="wx-{{selLiuNian.zhi.cls}}">{{selLiuNian.zhi.text}}</text>
-          </text>
-          <text class="sel-range">{{selLiuNian.year}}年 · {{selLiuNian.age}}岁</text>
-        </view>
-        <view class="sel-grid">
-          <view class="sel-item"><text class="sel-label">十神</text>{{selLiuNian.shiShenGan}}</view>
-          <view class="sel-item"><text class="sel-label">星运</text>{{selLiuNian.xingYun}}</view>
-          <view class="sel-item"><text class="sel-label">自坐</text>{{selLiuNian.ziZuo}}</view>
-          <view class="sel-item"><text class="sel-label">纳音</text>{{selLiuNian.naYin}}</view>
-          <view class="sel-item sel-wide">
-            <text class="sel-label">藏干</text>
-            <text class="hg-inline" wx:for="{{selLiuNian.hideGans}}" wx:key="text">
-              <text class="wx-{{item.cls}}">{{item.text}}</text>·{{item.shiShen}}
-            </text>
-          </view>
-          <view class="sel-item sel-wide">
-            <text class="sel-label">神煞</text>
-            <text wx:if="{{selLiuNian.shenSha.length === 0}}" class="dim">—</text>
-            <text class="ss-tag" wx:for="{{selLiuNian.shenSha}}" wx:key="*this">{{item}}</text>
-          </view>
-        </view>
-      </view>
     </view>
 
     <!-- 流月 -->
@@ -217,6 +169,17 @@
       </view>
     </view>
   </block>
+
+  <!-- 五行 -->
+  <view class="card wuxing">
+    <view class="section-title serif">五行</view>
+    <view class="wx-bar">
+      <view class="wx-item" wx:for="{{wuXing}}" wx:key="wx">
+        <view class="wx-dot bg-{{item.cls}}">{{item.wx}}</view>
+        <view class="wx-count {{item.count === 0 ? 'wx-lack' : ''}}">{{item.count === 0 ? '缺' : item.count}}</view>
+      </view>
+    </view>
+  </view>
 
   <view class="bottom-space"></view>
 
