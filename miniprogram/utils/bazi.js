@@ -1,0 +1,251 @@
+// 八字排盘核心
+// 干支/农历/节气/大运流年流月 基于 lunar-javascript
+// 子时口径：23点换日（晚子时日柱算次日，流派1）
+
+var lunarLib = require('./lunar.js');
+var Solar = lunarLib.Solar;
+var Lunar = lunarLib.Lunar;
+var LunarMonth = lunarLib.LunarMonth;
+var LunarYear = lunarLib.LunarYear;
+var LunarUtil = lunarLib.LunarUtil;
+var solartime = require('./solartime.js');
+var shensha = require('./shensha.js');
+
+var GAN = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+var ZHI = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+var WX_CLS = { 木: 'mu', 火: 'huo', 土: 'tu', 金: 'jin', 水: 'shui' };
+var LUNAR_MONTH_NAME = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '腊'];
+
+function pad(n) {
+  return (n < 10 ? '0' : '') + n;
+}
+
+// 某天干在某地支上的十二长生状态（星运/自坐通用）
+function changSheng(gan, zhi) {
+  var offset = LunarUtil.CHANG_SHENG_OFFSET[gan];
+  var gi = GAN.indexOf(gan);
+  var zi = ZHI.indexOf(zhi);
+  var idx = offset + (gi % 2 === 0 ? zi : -zi);
+  idx = ((idx % 12) + 12) % 12;
+  return LunarUtil.CHANG_SHENG[idx];
+}
+
+function ganView(gan) {
+  var wx = LunarUtil.WU_XING_GAN[gan];
+  return { text: gan, wx: wx, cls: WX_CLS[wx] };
+}
+
+function zhiView(zhi) {
+  var wx = LunarUtil.WU_XING_ZHI[zhi];
+  return { text: zhi, wx: wx, cls: WX_CLS[wx] };
+}
+
+// 地支藏干及其十神
+function hideGanViews(dayGan, zhi) {
+  var gans = LunarUtil.ZHI_HIDE_GAN[zhi];
+  var list = [];
+  for (var i = 0; i < gans.length; i++) {
+    var g = gans[i];
+    var wx = LunarUtil.WU_XING_GAN[g];
+    list.push({ text: g, wx: wx, cls: WX_CLS[wx], shiShen: LunarUtil.SHI_SHEN[dayGan + g] });
+  }
+  return list;
+}
+
+// 构建一柱通用视图（大运、流年也复用）
+function buildPillarView(ctx, gan, zhi, isDayPillar) {
+  return {
+    gan: ganView(gan),
+    zhi: zhiView(zhi),
+    ganZhi: gan + zhi,
+    shiShenGan: isDayPillar ? '日主' : LunarUtil.SHI_SHEN[ctx.dayGan + gan],
+    hideGans: hideGanViews(ctx.dayGan, zhi),
+    xingYun: changSheng(ctx.dayGan, zhi),
+    ziZuo: changSheng(gan, zhi),
+    naYin: LunarUtil.NAYIN[gan + zhi],
+    shenSha: shensha.getPillarShenSha(ctx, gan, zhi, !!isDayPillar)
+  };
+}
+
+/**
+ * 排盘
+ * @param {object} input {
+ *   name, gender: 1男|0女, calendar: 'solar'|'lunar',
+ *   year, month, day, hour, minute,  // 农历闰月 month 传负数
+ *   province, city, lng, useTrueSolar
+ * }
+ */
+function computeChart(input) {
+  // 1. 统一换算为公历钟表时间
+  var clockDate;
+  if (input.calendar === 'lunar') {
+    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, input.hour, input.minute, 0);
+    var sd = ld.getSolar();
+    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), input.hour, input.minute, 0);
+  } else {
+    clockDate = new Date(input.year, input.month - 1, input.day, input.hour, input.minute, 0);
+  }
+
+  // 2. 真太阳时修正
+  var useTrueSolar = !!(input.useTrueSolar && typeof input.lng === 'number');
+  var chartDate = clockDate;
+  var offsetMinutes = 0;
+  if (useTrueSolar) {
+    var t = solartime.toTrueSolarTime(clockDate, input.lng);
+    chartDate = t.date;
+    offsetMinutes = t.offsetMinutes;
+  }
+
+  // 3. 起盘
+  var solar = Solar.fromDate(chartDate);
+  var lunar = solar.getLunar();
+  var ec = lunar.getEightChar();
+  ec.setSect(1); // 23点换日
+
+  var ctx = {
+    yearGan: ec.getYearGan(),
+    dayGan: ec.getDayGan(),
+    yearZhi: ec.getYearZhi(),
+    dayZhi: ec.getDayZhi(),
+    monthZhi: ec.getMonthZhi()
+  };
+
+  // 4. 四柱
+  var labels = ['年柱', '月柱', '日柱', '时柱'];
+  var gans = [ec.getYearGan(), ec.getMonthGan(), ec.getDayGan(), ec.getTimeGan()];
+  var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
+  var xunKongs = [ec.getYearXunKong(), ec.getMonthXunKong(), ec.getDayXunKong(), ec.getTimeXunKong()];
+  var pillars = [];
+  var wuXingCount = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
+  for (var i = 0; i < 4; i++) {
+    var p = buildPillarView(ctx, gans[i], zhis[i], i === 2);
+    p.label = labels[i];
+    p.xunKong = xunKongs[i];
+    pillars.push(p);
+    wuXingCount[p.gan.wx]++;
+    wuXingCount[p.zhi.wx]++;
+  }
+  var wuXingList = ['木', '火', '土', '金', '水'].map(function (wx) {
+    return { wx: wx, cls: WX_CLS[wx], count: wuXingCount[wx] };
+  });
+
+  // 5. 大运 / 流年 / 流月
+  var yun = ec.getYun(input.gender ? 1 : 0);
+  var daYunRaw = yun.getDaYun();
+  var daYunList = [];
+  for (var d = 0; d < daYunRaw.length; d++) {
+    var dy = daYunRaw[d];
+    var gz = dy.getGanZhi();
+    var item = {
+      index: d,
+      startYear: dy.getStartYear(),
+      endYear: dy.getEndYear(),
+      startAge: dy.getStartAge(),
+      endAge: dy.getEndAge(),
+      isQian: !gz // 起运前（童限）
+    };
+    if (gz) {
+      var pv = buildPillarView(ctx, gz.charAt(0), gz.charAt(1), false);
+      for (var k in pv) item[k] = pv[k];
+    } else {
+      item.ganZhi = '童限';
+    }
+    // 流年
+    var liuNianRaw = dy.getLiuNian();
+    var liuNianList = [];
+    for (var n = 0; n < liuNianRaw.length; n++) {
+      var ln = liuNianRaw[n];
+      var lgz = ln.getGanZhi();
+      var lnItem = buildPillarView(ctx, lgz.charAt(0), lgz.charAt(1), false);
+      lnItem.index = n;
+      lnItem.year = ln.getYear();
+      lnItem.age = ln.getAge();
+      // 流月
+      var liuYueRaw = ln.getLiuYue();
+      var liuYueList = [];
+      for (var m = 0; m < liuYueRaw.length; m++) {
+        var ly = liuYueRaw[m];
+        var ygz = ly.getGanZhi();
+        liuYueList.push({
+          name: ly.getMonthInChinese() + '月',
+          ganZhi: ygz,
+          gan: ganView(ygz.charAt(0)),
+          zhi: zhiView(ygz.charAt(1)),
+          shiShenGan: LunarUtil.SHI_SHEN[ctx.dayGan + ygz.charAt(0)]
+        });
+      }
+      lnItem.liuYue = liuYueList;
+      liuNianList.push(lnItem);
+    }
+    item.liuNian = liuNianList;
+    daYunList.push(item);
+  }
+
+  // 6. 元数据
+  var timeZhiName = ec.getTimeZhi() + '时';
+  var meta = {
+    name: input.name || '',
+    gender: input.gender ? 1 : 0,
+    genderText: input.gender ? '男' : '女',
+    shengXiao: lunar.getYearShengXiaoByLiChun(),
+    clockStr: formatDate(clockDate),
+    chartStr: formatDate(chartDate),
+    lunarStr: lunar.toString() + ' ' + timeZhiName,
+    useTrueSolar: useTrueSolar,
+    offsetMinutes: offsetMinutes,
+    location: (input.province || '') + (input.city && input.city !== input.province ? ' ' + input.city : ''),
+    lng: input.lng,
+    qiYun: '出生后' + yun.getStartYear() + '年' + yun.getStartMonth() + '个月' + yun.getStartDay() + '天起运',
+    qiYunDate: yun.getStartSolar().toYmd(),
+    dayGan: ctx.dayGan,
+    dayGanWx: LunarUtil.WU_XING_GAN[ctx.dayGan]
+  };
+
+  return {
+    meta: meta,
+    pillars: pillars,
+    wuXing: wuXingList,
+    daYun: daYunList
+  };
+}
+
+function formatDate(date) {
+  return date.getFullYear() + '年' + pad(date.getMonth() + 1) + '月' + pad(date.getDate()) + '日 ' +
+    pad(date.getHours()) + ':' + pad(date.getMinutes());
+}
+
+// ---- 农历选择器辅助 ----
+
+// 某农历年的月份列表（含闰月，value 闰月为负）
+function getLunarMonths(year) {
+  var leap = LunarYear.fromYear(year).getLeapMonth();
+  var list = [];
+  for (var m = 1; m <= 12; m++) {
+    list.push({ label: LUNAR_MONTH_NAME[m - 1] + '月', value: m });
+    if (leap === m) {
+      list.push({ label: '闰' + LUNAR_MONTH_NAME[m - 1] + '月', value: -m });
+    }
+  }
+  return list;
+}
+
+var LUNAR_DAY_NAME = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+  '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+  '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+
+// 某农历月的日列表
+function getLunarDays(year, month) {
+  var count = LunarMonth.fromYm(year, month).getDayCount();
+  var list = [];
+  for (var d = 1; d <= count; d++) {
+    list.push({ label: LUNAR_DAY_NAME[d - 1], value: d });
+  }
+  return list;
+}
+
+module.exports = {
+  computeChart: computeChart,
+  getLunarMonths: getLunarMonths,
+  getLunarDays: getLunarDays,
+  changSheng: changSheng
+};

@@ -1,0 +1,113 @@
+<view class="page">
+  <!-- 头部：LOGO + 标题 -->
+  <view class="hero">
+    <view class="seal logo">同乐</view>
+    <view class="hero-right">
+      <view class="hero-title serif">八字排盘</view>
+      <view class="hero-sub">四柱八字 · 真太阳时 · 大运流年</view>
+    </view>
+  </view>
+
+  <!-- 排盘表单 -->
+  <view class="card form">
+    <view class="form-row">
+      <view class="form-label">姓名</view>
+      <input class="form-input" placeholder="选填" placeholder-class="ph"
+        value="{{name}}" bindinput="onNameInput" maxlength="12" />
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">性别</view>
+      <view class="chips">
+        <view class="chip {{gender === 1 ? 'chip-on' : ''}}" bindtap="onGenderTap" data-gender="1">乾造 · 男</view>
+        <view class="chip {{gender === 0 ? 'chip-on' : ''}}" bindtap="onGenderTap" data-gender="0">坤造 · 女</view>
+      </view>
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">历法</view>
+      <view class="seg">
+        <view class="seg-item {{calendar === 'solar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="solar">公历</view>
+        <view class="seg-item {{calendar === 'lunar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="lunar">农历</view>
+      </view>
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">出生日期</view>
+      <picker wx:if="{{calendar === 'solar'}}" class="form-picker" mode="date"
+        value="{{solarDate}}" start="1901-01-01" end="{{maxDate}}" bindchange="onSolarDateChange">
+        <view class="picker-value">{{solarDate}}<text class="arrow">›</text></view>
+      </picker>
+      <picker wx:else class="form-picker" mode="multiSelector"
+        range="{{lunarRange}}" value="{{lunarIndex}}"
+        bindcolumnchange="onLunarColumnChange" bindchange="onLunarChange">
+        <view class="picker-value">{{lunarText}}<text class="arrow">›</text></view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">出生时间</view>
+      <picker class="form-picker" mode="time" value="{{time}}" bindchange="onTimeChange">
+        <view class="picker-value">{{time}}<text class="arrow">›</text></view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <view class="form-label">出生地点</view>
+      <picker class="form-picker" mode="multiSelector"
+        range="{{regionRange}}" value="{{regionIndex}}"
+        bindcolumnchange="onRegionColumnChange" bindchange="onRegionChange">
+        <view class="picker-value">{{regionText}}<text class="arrow">›</text></view>
+      </picker>
+    </view>
+
+    <view class="form-row no-line">
+      <view class="form-label">
+        真太阳时
+        <view class="form-note">按出生地经度与均时差修正</view>
+      </view>
+      <switch checked="{{useTrueSolar}}" color="#B3402A" bindchange="onTrueSolarChange" />
+    </view>
+
+    <button class="btn-primary btn-paipan" bindtap="onPaiPan">开始排盘</button>
+  </view>
+
+  <!-- 配对模块入口 -->
+  <view class="mods">
+    <view class="mod card" hover-class="mod-hover" bindtap="goMatch" data-type="marriage">
+      <view class="mod-ico mod-ico-red serif">囍</view>
+      <view class="mod-body">
+        <view class="mod-title serif">婚配</view>
+        <view class="mod-sub">双盘合婚 · 姻缘相合</view>
+      </view>
+      <view class="mod-tag">即将上线</view>
+    </view>
+    <view class="mod card" hover-class="mod-hover" bindtap="goMatch" data-type="partner">
+      <view class="mod-ico mod-ico-gold serif">合</view>
+      <view class="mod-body">
+        <view class="mod-title serif">合作伙伴配</view>
+        <view class="mod-sub">事业相合 · 共谋发展</view>
+      </view>
+      <view class="mod-tag">即将上线</view>
+    </view>
+  </view>
+
+  <!-- 最近排盘 -->
+  <view class="recent" wx:if="{{recent.length > 0}}">
+    <view class="recent-head">
+      <view class="recent-title serif">最近排盘</view>
+      <view class="recent-more" bindtap="goRecords">全部记录 ›</view>
+    </view>
+    <view class="recent-item card" wx:for="{{recent}}" wx:key="_id"
+      hover-class="mod-hover" bindtap="goRecord" data-index="{{index}}">
+      <view class="recent-line1">
+        <text class="recent-name">{{item.name || '未署名'}}</text>
+        <text class="recent-gender {{item.gender === 1 ? 'g-m' : 'g-f'}}">{{item.gender === 1 ? '乾' : '坤'}}</text>
+        <text class="recent-bazi serif">{{item.baZi}}</text>
+      </view>
+      <view class="recent-line2">{{item.solarStr}}</view>
+    </view>
+  </view>
+
+  <view class="footer">同乐八字 · 仅供传统文化研究参考</view>
+</view>

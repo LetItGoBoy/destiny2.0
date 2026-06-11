@@ -1,0 +1,369 @@
+.page {
+  padding: 24rpx 24rpx 160rpx;
+}
+
+/* 选项卡 */
+.tabs {
+  display: flex;
+  background: #F0E9DA;
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 24rpx;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+  color: var(--ink-2);
+  border-radius: 12rpx;
+}
+.tab-on {
+  background: var(--card);
+  color: var(--primary);
+  font-weight: 700;
+  box-shadow: 0 2rpx 10rpx rgba(90, 70, 40, 0.12);
+}
+
+/* 命主信息 */
+.info {
+  padding: 28rpx 32rpx;
+  margin-bottom: 24rpx;
+}
+.info-head {
+  display: flex;
+  align-items: center;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx dashed var(--line);
+  margin-bottom: 16rpx;
+}
+.info-name {
+  font-size: 38rpx;
+  font-weight: 700;
+}
+.info-tag {
+  font-size: 22rpx;
+  color: #FFF;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+  margin-left: 16rpx;
+}
+.tag-m { background: #3D6F9E; }
+.tag-f { background: #C0432B; }
+.info-sx {
+  margin-left: auto;
+  font-size: 26rpx;
+  color: var(--gold);
+}
+.info-row {
+  display: flex;
+  font-size: 26rpx;
+  padding: 6rpx 0;
+  color: var(--ink);
+}
+.info-label {
+  width: 150rpx;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+.info-note {
+  color: var(--ink-3);
+  font-size: 24rpx;
+}
+
+/* 四柱命盘表 */
+.chart {
+  padding: 20rpx 16rpx;
+  margin-bottom: 24rpx;
+}
+.chart-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1rpx solid #F2EBDC;
+  padding: 14rpx 0;
+}
+.chart-row.no-line {
+  border-bottom: none;
+}
+.cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.label-cell {
+  flex: 0 0 96rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+  justify-content: center;
+}
+.head-row {
+  padding: 6rpx 0 16rpx;
+}
+.head-cell {
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  color: var(--ink);
+}
+.shishen {
+  font-size: 26rpx;
+  color: var(--ink-2);
+}
+.rizhu {
+  font-size: 24rpx;
+  color: var(--primary);
+  border: 1rpx solid var(--primary);
+  border-radius: 8rpx;
+  padding: 2rpx 12rpx;
+}
+.big-char {
+  font-size: 64rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.wx-mark {
+  font-size: 20rpx;
+  opacity: 0.75;
+}
+.hide-gan {
+  display: flex;
+  align-items: baseline;
+  padding: 2rpx 0;
+}
+.hg-char {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.hg-ss {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  margin-left: 8rpx;
+}
+.plain {
+  font-size: 26rpx;
+}
+.dim {
+  color: var(--ink-3);
+}
+.shensha-row .cell {
+  justify-content: flex-start;
+}
+.ss-item {
+  font-size: 22rpx;
+  color: var(--ink-2);
+  padding: 2rpx 0;
+  text-align: center;
+}
+.ss-none {
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+
+/* 五行 */
+.wuxing {
+  padding: 24rpx 32rpx 28rpx;
+  margin-bottom: 24rpx;
+}
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  margin-bottom: 18rpx;
+}
+.section-note {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  font-weight: 400;
+  margin-left: 12rpx;
+}
+.wx-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12rpx;
+}
+.wx-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.wx-dot {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.wx-count {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: var(--ink-2);
+}
+.wx-lack {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* 大运/流年 */
+.yun-card {
+  padding: 24rpx 24rpx 28rpx;
+  margin-bottom: 24rpx;
+}
+.yun-scroll {
+  white-space: nowrap;
+}
+.yun-strip {
+  display: inline-flex;
+}
+.yun-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14rpx 0;
+  width: 124rpx;
+  margin-right: 12rpx;
+  border-radius: 14rpx;
+  border: 1rpx solid var(--line);
+  background: #FBF7EE;
+  flex-shrink: 0;
+}
+.yun-on {
+  background: #FBEDE8;
+  border-color: var(--primary);
+  box-shadow: 0 4rpx 12rpx rgba(179, 64, 42, 0.15);
+}
+.yun-ss {
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+.yun-gz {
+  font-size: 36rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  margin: 4rpx 0;
+}
+.yun-year {
+  font-size: 22rpx;
+  color: var(--ink-2);
+}
+.yun-age {
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+
+/* 选中详情 */
+.sel-detail {
+  margin-top: 20rpx;
+  background: #FBF7EE;
+  border: 1rpx solid var(--line);
+  border-radius: 14rpx;
+  padding: 20rpx 24rpx;
+}
+.sel-head {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+.sel-gz {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+}
+.sel-range {
+  margin-left: 20rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+.sel-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.sel-item {
+  width: 50%;
+  font-size: 26rpx;
+  padding: 6rpx 0;
+  box-sizing: border-box;
+}
+.sel-wide {
+  width: 100%;
+}
+.sel-label {
+  color: var(--ink-3);
+  margin-right: 16rpx;
+  font-size: 24rpx;
+}
+.hg-inline {
+  margin-right: 20rpx;
+  font-size: 26rpx;
+}
+.ss-tag {
+  display: inline-block;
+  font-size: 22rpx;
+  color: var(--primary);
+  background: #FBEDE8;
+  border: 1rpx solid #EBCDC4;
+  border-radius: 8rpx;
+  padding: 2rpx 12rpx;
+  margin: 4rpx 10rpx 4rpx 0;
+}
+.qian-tip {
+  font-size: 24rpx;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* 流月 */
+.liuyue-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.liuyue-cell {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14rpx 0;
+  box-sizing: border-box;
+}
+.ly-name {
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.ly-gz {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin: 2rpx 0;
+}
+.ly-ss {
+  font-size: 20rpx;
+  color: var(--ink-2);
+}
+
+/* 保存栏 */
+.bottom-space {
+  height: 20rpx;
+}
+.savebar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: rgba(246, 241, 231, 0.96);
+  border-top: 1rpx solid var(--line);
+}
+.btn-save {
+  height: 92rpx;
+  line-height: 92rpx;
+}
+.btn-saved {
+  background: #C8BFA9;
+  box-shadow: none;
+}

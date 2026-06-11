@@ -1,0 +1,121 @@
+.page {
+  padding: 32rpx 28rpx 48rpx;
+}
+
+/* 用户卡片 */
+.profile {
+  display: flex;
+  align-items: center;
+  padding: 36rpx 32rpx;
+  margin-bottom: 28rpx;
+}
+.avatar-btn {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  line-height: 1;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.avatar-btn::after {
+  border: none;
+}
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+}
+.avatar-default {
+  border-radius: 50%;
+  font-size: 52rpx;
+}
+.profile-body {
+  margin-left: 26rpx;
+  flex: 1;
+  min-width: 0;
+}
+.nickname {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+.nick-ph {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.profile-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.profile-stat {
+  text-align: center;
+  padding-left: 24rpx;
+  border-left: 1rpx solid var(--line);
+}
+.stat-num {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--primary);
+}
+.stat-label {
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+
+/* 功能列表 */
+.cells {
+  margin-bottom: 28rpx;
+  overflow: hidden;
+}
+.cell {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 32rpx;
+  border-bottom: 1rpx solid #F2EBDC;
+}
+.cell:last-child {
+  border-bottom: none;
+}
+.cell-hover {
+  background: #FBF7EE;
+}
+.cell-ico {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 12rpx;
+  background: #6E87A0;
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  margin-right: 22rpx;
+}
+.cell-ico-gold {
+  background: var(--gold);
+}
+.cell-ico-red {
+  background: var(--primary);
+}
+.cell-title {
+  flex: 1;
+  font-size: 30rpx;
+}
+.cell-danger {
+  color: var(--primary);
+}
+.cell-arrow {
+  color: var(--ink-3);
+  font-size: 34rpx;
+}
+
+.footer {
+  margin-top: 24rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
