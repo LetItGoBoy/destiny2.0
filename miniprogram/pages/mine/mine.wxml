@@ -1,0 +1,52 @@
+<view class="page">
+  <!-- 用户卡片 -->
+  <view class="card profile">
+    <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image wx:if="{{avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
+      <view wx:else class="avatar avatar-default seal serif">乐</view>
+    </button>
+    <view class="profile-body">
+      <input class="nickname" type="nickname" placeholder="点击设置昵称" placeholder-class="nick-ph"
+        value="{{nickname}}" bindchange="onNicknameChange" bindblur="onNicknameChange" />
+      <view class="profile-sub">{{cloudEnabled ? '记录云端同步中' : '记录存储于本机'}}</view>
+    </view>
+    <view class="profile-stat" bindtap="goRecords">
+      <view class="stat-num serif">{{recordCount}}</view>
+      <view class="stat-label">八字记录</view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="card cells">
+    <view class="cell" hover-class="cell-hover" bindtap="goRecords">
+      <text class="cell-ico serif">录</text>
+      <text class="cell-title">我的八字记录</text>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" hover-class="cell-hover" bindtap="onContact">
+      <text class="cell-ico serif">联</text>
+      <text class="cell-title">联系方式</text>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" hover-class="cell-hover" bindtap="onAbout">
+      <text class="cell-ico serif">同</text>
+      <text class="cell-title">关于同乐八字</text>
+      <text class="cell-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="card cells">
+    <view class="cell" hover-class="cell-hover" bindtap="onSwitchUser">
+      <text class="cell-ico cell-ico-gold serif">换</text>
+      <text class="cell-title">切换用户</text>
+      <text class="cell-arrow">›</text>
+    </view>
+    <view class="cell" hover-class="cell-hover" bindtap="onLogout">
+      <text class="cell-ico cell-ico-red serif">退</text>
+      <text class="cell-title cell-danger">退出登录</text>
+      <text class="cell-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="footer">同乐八字 v{{version}} · 仅供传统文化研究参考</view>
+</view>

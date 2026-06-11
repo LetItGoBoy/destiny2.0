@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/result/result",
+    "pages/records/records",
+    "pages/mine/mine",
+    "pages/match/match"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#221A3D",
+    "navigationBarTitleText": "同乐八字",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#14101F",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#6F6791",
+    "selectedColor": "#A78BFA",
+    "backgroundColor": "#1B1531",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "排盘" },
+      { "pagePath": "pages/records/records", "text": "记录" },
+      { "pagePath": "pages/mine/mine", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,24 @@
+{
+  "description": "同乐八字 - 四柱八字排盘微信小程序",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "tongle-bazi",
+  "libVersion": "3.7.0",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "minified": true,
+    "postcss": true,
+    "ignoreUploadUnusedFiles": true,
+    "babelSetting": {
+      "ignore": ["utils/lunar.js"],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+}

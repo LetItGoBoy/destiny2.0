@@ -1,0 +1,30 @@
+<view class="page">
+  <view class="head">
+    <view class="head-title serif">八字记录</view>
+    <view class="head-sub">{{source === 'cloud' ? '云端同步 · 跟随微信账号' : '存储于本机'}} · 长按可删除</view>
+  </view>
+
+  <block wx:if="{{list.length > 0}}">
+    <view class="rec card" wx:for="{{list}}" wx:key="_id"
+      hover-class="rec-hover"
+      bindtap="onItemTap" bindlongpress="onItemLongPress" data-index="{{index}}">
+      <view class="rec-line1">
+        <text class="rec-name">{{item.name || '未署名'}}</text>
+        <text class="rec-gender {{item.gender === 1 ? 'g-m' : 'g-f'}}">{{item.gender === 1 ? '乾造' : '坤造'}}</text>
+        <text class="rec-true" wx:if="{{item.useTrueSolar}}">真太阳时</text>
+      </view>
+      <view class="rec-bazi serif">{{item.baZi}}</view>
+      <view class="rec-line3">
+        <text>{{item.solarStr}}</text>
+        <text class="rec-loc" wx:if="{{item.city}}">{{item.city}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="empty" wx:if="{{!loading && list.length === 0}}">
+    <view class="empty-seal seal serif">命</view>
+    <view class="empty-text">还没有保存的八字记录</view>
+    <view class="empty-sub">排盘后点击「保存到记录」即可留存</view>
+    <button class="btn-primary empty-btn" bindtap="goIndex">去排盘</button>
+  </view>
+</view>

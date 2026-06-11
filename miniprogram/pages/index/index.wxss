@@ -1,0 +1,255 @@
+.page {
+  padding: 32rpx 28rpx 48rpx;
+}
+
+/* 头部 */
+.hero {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 8rpx 36rpx;
+}
+.logo {
+  width: 104rpx;
+  height: 104rpx;
+  font-size: 38rpx;
+  line-height: 1.15;
+  padding: 6rpx;
+  box-sizing: border-box;
+  writing-mode: vertical-rl;
+  letter-spacing: 2rpx;
+}
+.hero-right {
+  margin-left: 26rpx;
+}
+.hero-title {
+  font-size: 52rpx;
+  font-weight: 700;
+  letter-spacing: 6rpx;
+  color: var(--ink);
+}
+.hero-sub {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
+
+/* 表单 */
+.form {
+  padding: 8rpx 32rpx 36rpx;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 104rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.form-row.no-line {
+  border-bottom: none;
+}
+.form-label {
+  font-size: 30rpx;
+  color: var(--ink);
+  font-weight: 500;
+}
+.form-note {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.form-input {
+  flex: 1;
+  text-align: right;
+  font-size: 30rpx;
+  margin-left: 24rpx;
+  color: var(--ink);
+}
+.ph {
+  color: var(--ink-3);
+}
+.form-picker {
+  flex: 1;
+  margin-left: 24rpx;
+}
+.picker-value {
+  text-align: right;
+  font-size: 30rpx;
+  color: var(--ink);
+}
+.arrow {
+  margin-left: 12rpx;
+  color: var(--ink-3);
+}
+
+/* 性别 chips */
+.chips {
+  display: flex;
+}
+.chip {
+  padding: 10rpx 28rpx;
+  border-radius: 100rpx;
+  border: 1rpx solid var(--line);
+  font-size: 26rpx;
+  color: var(--ink-2);
+  margin-left: 16rpx;
+  background: var(--fill);
+}
+.chip-on {
+  background: var(--tint);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* 历法 segmented */
+.seg {
+  display: flex;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  border-radius: 14rpx;
+  padding: 4rpx;
+}
+.seg-item {
+  padding: 8rpx 36rpx;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  color: var(--ink-2);
+}
+.seg-on {
+  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
+  color: #FBF9FF;
+  font-weight: 600;
+}
+
+.btn-paipan {
+  margin-top: 36rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+}
+
+/* 配对模块 */
+.mods {
+  display: flex;
+  margin-top: 28rpx;
+  gap: 24rpx;
+}
+.mod {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 28rpx 24rpx;
+  position: relative;
+  overflow: hidden;
+}
+.mod-hover {
+  opacity: 0.85;
+}
+.mod-ico {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42rpx;
+  font-weight: 700;
+  color: #FBF9FF;
+  flex-shrink: 0;
+}
+.mod-ico-red {
+  background: linear-gradient(135deg, #F285AE, #C9508A);
+  box-shadow: 0 6rpx 16rpx rgba(201, 80, 138, 0.35);
+}
+.mod-ico-gold {
+  background: linear-gradient(135deg, #7FA8F2, #5470D9);
+  box-shadow: 0 6rpx 16rpx rgba(84, 112, 217, 0.35);
+}
+.mod-body {
+  margin-left: 18rpx;
+  min-width: 0;
+}
+.mod-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.mod-sub {
+  font-size: 20rpx;
+  color: var(--ink-3);
+  margin-top: 4rpx;
+  white-space: nowrap;
+}
+.mod-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 18rpx;
+  color: #1A142E;
+  background: var(--gold);
+  padding: 4rpx 14rpx;
+  border-radius: 0 22rpx 0 14rpx;
+  font-weight: 600;
+}
+
+/* 最近排盘 */
+.recent {
+  margin-top: 40rpx;
+}
+.recent-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 8rpx 18rpx;
+}
+.recent-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+.recent-more {
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+.recent-item {
+  padding: 22rpx 28rpx;
+  margin-bottom: 18rpx;
+}
+.recent-line1 {
+  display: flex;
+  align-items: center;
+}
+.recent-name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+.recent-gender {
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  margin-left: 12rpx;
+  color: #1A142E;
+  font-weight: 600;
+}
+.g-m { background: #6FB6FF; }
+.g-f { background: #F2A7C3; }
+.recent-bazi {
+  margin-left: auto;
+  font-size: 26rpx;
+  color: var(--primary);
+  letter-spacing: 2rpx;
+}
+.recent-line2 {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+.footer {
+  margin-top: 56rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
