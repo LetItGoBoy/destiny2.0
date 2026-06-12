@@ -1,4 +1,4 @@
-<view class="page" wx:if="{{loaded}}">
+<view class="page fs-{{fs}}" wx:if="{{loaded}}">
 
   <!-- 选项卡 -->
   <view class="tabs">

@@ -1,5 +1,6 @@
 var store = require('../../utils/store.js');
 var bazi = require('../../utils/bazi.js');
+var prefs = require('../../utils/prefs.js');
 
 var GZ_CHARS = '甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥';
 var PILLAR_LABELS = ['年柱', '月柱', '日柱', '时柱'];
@@ -37,19 +38,24 @@ Page({
     groups: [],
     total: 0,
     source: 'local',
-    loading: true
+    loading: true,
+    fs: 'std'
   },
 
   onShow: function () {
+    this.setData({ fs: prefs.getFontSize() });
     this.load();
   },
 
   load: function () {
     var that = this;
+    var self = prefs.getSelf();
+    var selfId = self ? self._id : null;
     store.listRecords().then(function (res) {
       that._all = res.list.map(function (r) {
         r.bz = bazi.colorizeBaZi(r.baZi);
         r.pillarArr = (r.baZi || '').split(' ');
+        r.isSelf = r._id === selfId;
         return r;
       });
       that.setData({ source: res.source, loading: false, total: that._all.length });
@@ -135,14 +141,41 @@ Page({
     var that = this;
     var rec = this.findById(e.currentTarget.dataset.id);
     if (!rec) return;
+    var selfItem = rec.isSelf ? '取消本人命盘' : '设为本人命盘';
     wx.showActionSheet({
-      itemList: ['修改姓名', '删除该记录'],
+      itemList: [selfItem, '修改姓名', '删除该记录'],
       itemColor: '#A78BFA',
       success: function (res) {
-        if (res.tapIndex === 0) that.editName(rec);
-        if (res.tapIndex === 1) that.deleteRec(rec);
+        if (res.tapIndex === 0) that.toggleSelf(rec);
+        if (res.tapIndex === 1) that.editName(rec);
+        if (res.tapIndex === 2) that.deleteRec(rec);
       }
     });
+  },
+
+  // 绑定/取消本人命盘（用于首页今日运势）
+  toggleSelf: function (rec) {
+    if (rec.isSelf) {
+      prefs.clearSelf();
+      wx.showToast({ title: '已取消绑定', icon: 'none' });
+    } else {
+      prefs.setSelf({
+        _id: rec._id,
+        name: rec.name || '',
+        gender: rec.gender,
+        baZi: rec.baZi,
+        dayGan: (rec.pillarArr[2] || '').charAt(0),
+        input: {
+          name: rec.name, gender: rec.gender, calendar: rec.calendar,
+          year: rec.year, month: rec.month, day: rec.day,
+          hour: rec.hour, minute: rec.minute,
+          province: rec.province, city: rec.city, lng: rec.lng,
+          useTrueSolar: rec.useTrueSolar
+        }
+      });
+      wx.showToast({ title: '已设为本人命盘', icon: 'success' });
+    }
+    this.load();
   },
 
   editName: function (rec) {
@@ -157,6 +190,14 @@ Page({
         if (!res.confirm) return;
         var name = (res.content || '').trim();
         store.updateRecord(rec._id, { name: name }).then(function () {
+          if (rec.isSelf) {
+            var self = prefs.getSelf();
+            if (self) {
+              self.name = name;
+              self.input.name = name;
+              prefs.setSelf(self);
+            }
+          }
           wx.showToast({ title: '已修改', icon: 'success' });
           that.load();
         });
@@ -174,6 +215,7 @@ Page({
       success: function (res) {
         if (!res.confirm) return;
         store.removeRecord(rec._id).then(function () {
+          if (rec.isSelf) prefs.clearSelf();
           wx.showToast({ title: '已删除', icon: 'success' });
           that.load();
         });

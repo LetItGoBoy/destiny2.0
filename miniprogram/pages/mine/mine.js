@@ -1,5 +1,6 @@
 var config = require('../../config.js');
 var store = require('../../utils/store.js');
+var prefs = require('../../utils/prefs.js');
 
 var PROFILE_KEY = 'tl_profile';
 var DEFAULT_AVATAR = '';
@@ -10,6 +11,7 @@ Page({
     avatar: DEFAULT_AVATAR,
     recordCount: 0,
     cloudEnabled: false,
+    fs: 'std',
     version: config.version
   },
 
@@ -19,11 +21,19 @@ Page({
     this.setData({
       nickname: profile.nickname || '',
       avatar: profile.avatar || DEFAULT_AVATAR,
-      cloudEnabled: getApp().globalData.cloudEnabled
+      cloudEnabled: getApp().globalData.cloudEnabled,
+      fs: prefs.getFontSize()
     });
     store.listRecords().then(function (res) {
       that.setData({ recordCount: res.list.length });
     });
+  },
+
+  // 切换显示字号（全局生效）
+  onFontSize: function (e) {
+    var fs = e.currentTarget.dataset.fs;
+    prefs.setFontSize(fs);
+    this.setData({ fs: fs });
   },
 
   saveProfile: function () {
@@ -94,6 +104,7 @@ Page({
         if (res.confirm) {
           wx.removeStorageSync(PROFILE_KEY);
           store.clearLocal();
+          prefs.clearSelf();
           that.setData({ nickname: '', avatar: DEFAULT_AVATAR, recordCount: 0 });
           wx.showToast({ title: '已退出', icon: 'success' });
         }

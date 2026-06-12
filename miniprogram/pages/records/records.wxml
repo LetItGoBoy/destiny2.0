@@ -5,6 +5,7 @@
     <view class="rec-line1">
       <text class="rec-name">{{name || '未署名'}}</text>
       <text class="rec-gender {{gender === 1 ? 'g-m' : 'g-f'}}">{{gender === 1 ? '乾造' : '坤造'}}</text>
+      <text class="rec-self" wx:if="{{isSelf}}">本人</text>
       <text class="rec-true" wx:if="{{useTrueSolar}}">真太阳时</text>
     </view>
     <view class="rec-bazi serif">
@@ -17,10 +18,10 @@
   </view>
 </template>
 
-<view class="page">
+<view class="page fs-{{fs}}">
   <view class="head">
     <view class="head-title serif">八字记录</view>
-    <view class="head-sub">{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按可改名/删除</view>
+    <view class="head-sub">{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按设本人/改名/删除</view>
   </view>
 
   <!-- 搜索栏 -->

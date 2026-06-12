@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page fs-{{fs}}">
   <!-- 头部：LOGO + 标题 -->
   <view class="hero">
     <view class="seal logo">同乐</view>
@@ -6,6 +6,33 @@
       <view class="hero-title serif">八字排盘</view>
       <view class="hero-sub">四柱八字 · 真太阳时 · 大运流年</view>
     </view>
+  </view>
+
+  <!-- 今日运势卡 -->
+  <view class="card today" hover-class="mod-hover" bindtap="onTodayTap" wx:if="{{daily}}">
+    <view class="today-head">
+      <text class="today-title serif">今日运势</text>
+      <text class="today-date">{{daily.dateStr}} · {{daily.lunarStr}}</text>
+    </view>
+    <block wx:if="{{daily.bound}}">
+      <view class="today-body">
+        <view class="today-gz serif">
+          <text class="wx-{{daily.ganZhi[0].cls}}">{{daily.ganZhi[0].text}}</text><text class="wx-{{daily.ganZhi[1].cls}}">{{daily.ganZhi[1].text}}</text>
+        </view>
+        <view class="today-tags">
+          <view class="today-tag">{{daily.shiShen}}</view>
+          <view class="today-tag today-tag-2">{{daily.xingYun}}</view>
+        </view>
+        <view class="today-who">{{daily.name}} ›</view>
+      </view>
+      <view class="today-advice">{{daily.advice}}</view>
+    </block>
+    <block wx:else>
+      <view class="today-unbound">
+        <text>绑定本人命盘后，每天为你解读当日能量</text>
+        <text class="today-bind">去绑定 ›</text>
+      </view>
+    </block>
   </view>
 
   <!-- 排盘表单 -->

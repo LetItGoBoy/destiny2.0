@@ -1,6 +1,7 @@
 var bazi = require('../../utils/bazi.js');
 var store = require('../../utils/store.js');
 var baike = require('../../utils/baike.js');
+var prefs = require('../../utils/prefs.js');
 
 Page({
   data: {
@@ -17,10 +18,12 @@ Page({
     lnIndex: -1,
     selLiuNian: null,
     termCard: null,
-    baZiStr: ''
+    baZiStr: '',
+    fs: 'std'
   },
 
   onLoad: function (options) {
+    this.setData({ fs: prefs.getFontSize() });
     var input = null;
     try {
       input = JSON.parse(decodeURIComponent(options.input));
