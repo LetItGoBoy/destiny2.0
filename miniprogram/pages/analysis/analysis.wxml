@@ -1,0 +1,102 @@
+<view class="page fs-{{fs}}" wx:if="{{loaded}}">
+
+  <!-- 命主信息 + 八字 -->
+  <view class="card head-card">
+    <view class="head-row">
+      <text class="head-name serif">{{meta.name || '未署名'}}</text>
+      <text class="head-meta">{{meta.genderText}} · {{meta.lunarShort}}</text>
+    </view>
+    <view class="bz-row">
+      <view class="bz-col" wx:for="{{pillars}}" wx:key="label">
+        <view class="bz-label">{{item.label}}</view>
+        <view class="bz-gan serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
+        <view class="bz-zhi serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
+      </view>
+    </view>
+    <view class="summary serif">{{summary}}</view>
+  </view>
+
+  <!-- 旺衰 -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-ws">旺衰</text>
+      <text class="sec-title serif">日主{{wangShuai.special || wangShuai.level}}</text>
+    </view>
+    <view class="ws-bar">
+      <view class="ws-same" style="width: {{wangShuai.samePct}}%;"></view>
+    </view>
+    <view class="ws-legend">
+      <text class="ws-lg-same">生扶 {{wangShuai.samePct}}%</text>
+      <text class="ws-lg-diff">克泄耗 {{wangShuai.diffPct}}%</text>
+    </view>
+    <view class="sec-line" wx:for="{{wangShuai.lines}}" wx:key="*this">{{item}}</view>
+    <view class="sec-verdict">{{wangShuai.verdict}}</view>
+    <view class="chip-row" wx:if="{{wangShuai.xiYong.length}}">
+      <text class="chip-label">喜用</text>
+      <text class="wx-chip wx-{{item.cls}}" wx:for="{{wangShuai.xiYong}}" wx:key="wx">{{item.wx}}</text>
+      <block wx:if="{{wangShuai.jiShen.length}}">
+        <text class="chip-label chip-label-ji">忌</text>
+        <text class="wx-chip wx-chip-ji" wx:for="{{wangShuai.jiShen}}" wx:key="wx">{{item.wx}}</text>
+      </block>
+    </view>
+    <view class="sec-note">{{wangShuai.xiNote}}</view>
+  </view>
+
+  <!-- 调候 -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-th">调候</text>
+      <text class="sec-title serif">气候{{tiaoHou.climate}} · {{tiaoHou.deLi}}</text>
+    </view>
+    <view class="chip-row" wx:if="{{tiaoHou.yong.length}}">
+      <text class="chip-label">用神</text>
+      <view class="yong-chip" wx:for="{{tiaoHou.yong}}" wx:key="gan">
+        <text class="yong-gan serif wx-{{item.cls}}">{{item.gan}}</text>
+        <text class="yong-status {{item.status === '透干' ? 'st-tou' : (item.status === '藏支' ? 'st-cang' : 'st-none')}}">{{item.status}}</text>
+      </view>
+    </view>
+    <view class="sec-line" wx:for="{{tiaoHou.lines}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <!-- 格局 -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-gj">格局</text>
+      <text class="sec-title serif">{{geJu.name}}</text>
+      <text class="sec-kind">{{geJu.kind}}</text>
+    </view>
+    <view class="sec-line">{{geJu.how}}</view>
+    <view class="sec-line" wx:if="{{geJu.desc !== geJu.personality}}">{{geJu.desc}}</view>
+  </view>
+
+  <!-- 性格特点 -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-xg">性格</text>
+      <text class="sec-title serif">性格特点</text>
+    </view>
+    <view class="xg-item" wx:for="{{xingGe.sections}}" wx:key="title">
+      <view class="xg-title serif {{item.cls ? 'wx-' + item.cls : ''}}">{{item.title}}</view>
+      <view class="xg-text">{{item.text}}</view>
+    </view>
+  </view>
+
+  <!-- 健康提示 -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-jk">健康</text>
+      <text class="sec-title serif">身体易感提示</text>
+    </view>
+    <view class="jk-item" wx:for="{{jianKang.items}}" wx:key="organ">
+      <view class="jk-head">
+        <text class="jk-level lv-{{item.level === '高' ? 'high' : (item.level === '中' ? 'mid' : 'low')}}">{{item.level}}</text>
+        <text class="jk-organ serif">{{item.organ}}</text>
+        <text class="jk-parts" wx:if="{{item.parts}}">{{item.parts}}</text>
+      </view>
+      <view class="jk-reason">{{item.reason}}</view>
+      <view class="jk-advice">{{item.advice}}</view>
+    </view>
+  </view>
+
+  <view class="footer">命理分析仅供传统文化研究参考 · 健康问题请以现代医学诊断为准</view>
+</view>

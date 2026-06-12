@@ -398,7 +398,6 @@
 .btn-xiangpi {
   flex: 1.4;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 96rpx;
@@ -408,25 +407,17 @@
   background: linear-gradient(135deg, #F6D98B, #E0A653);
   border-radius: 20rpx;
   box-shadow: 0 8rpx 28rpx rgba(224, 166, 83, 0.45);
-}
-.btn-xiangpi::after {
-  border: none;
-}
-.btn-xiangpi.button-hover {
-  opacity: 0.88;
-}
-.xp-main {
   color: #34250C;
   font-size: 34rpx;
   font-weight: 800;
   letter-spacing: 8rpx;
   text-indent: 8rpx;
 }
-.xp-sub {
-  color: rgba(52, 37, 12, 0.7);
-  font-size: 18rpx;
-  margin-top: 4rpx;
-  letter-spacing: 2rpx;
+.btn-xiangpi::after {
+  border: none;
+}
+.btn-xiangpi.button-hover {
+  opacity: 0.88;
 }
 
 /* 词条解读卡 */
@@ -504,3 +495,43 @@
   color: var(--primary);
   font-weight: 600;
 }
+
+/* 字号档位：大 */
+.fs-l .big-char { font-size: 60rpx; }
+.fs-l .plain, .fs-l .shishen { font-size: 28rpx; }
+.fs-l .rizhu { font-size: 25rpx; }
+.fs-l .hg-char { font-size: 30rpx; }
+.fs-l .hg-ss { font-size: 23rpx; }
+.fs-l .ss-item, .fs-l .ss-none { font-size: 23rpx; }
+.fs-l .naying { font-size: 22rpx; }
+.fs-l .label-cell { font-size: 24rpx; }
+.fs-l .head-name { font-size: 31rpx; }
+.fs-l .info-row, .fs-l .birth-main { font-size: 29rpx; }
+.fs-l .birth-lunar { font-size: 26rpx; }
+.fs-l .wx-mark { font-size: 22rpx; }
+.fs-l .yun-gz { font-size: 40rpx; }
+.fs-l .yun-year, .fs-l .yun-ss { font-size: 24rpx; }
+.fs-l .ly-gz { font-size: 36rpx; }
+.fs-l .ly-name, .fs-l .ly-ss { font-size: 24rpx; }
+.fs-l .ss-block-text { font-size: 29rpx; }
+.fs-l .section-note { font-size: 24rpx; }
+
+/* 字号档位：特大 */
+.fs-xl .big-char { font-size: 66rpx; }
+.fs-xl .plain, .fs-xl .shishen { font-size: 31rpx; }
+.fs-xl .rizhu { font-size: 28rpx; }
+.fs-xl .hg-char { font-size: 33rpx; }
+.fs-xl .hg-ss { font-size: 26rpx; }
+.fs-xl .ss-item, .fs-xl .ss-none { font-size: 26rpx; }
+.fs-xl .naying { font-size: 24rpx; }
+.fs-xl .label-cell { font-size: 26rpx; }
+.fs-xl .head-name { font-size: 33rpx; }
+.fs-xl .info-row, .fs-xl .birth-main { font-size: 32rpx; }
+.fs-xl .birth-lunar { font-size: 28rpx; }
+.fs-xl .wx-mark { font-size: 24rpx; }
+.fs-xl .yun-gz { font-size: 44rpx; }
+.fs-xl .yun-year, .fs-xl .yun-ss { font-size: 26rpx; }
+.fs-xl .ly-gz { font-size: 40rpx; }
+.fs-xl .ly-name, .fs-xl .ly-ss { font-size: 26rpx; }
+.fs-xl .ss-block-text { font-size: 32rpx; }
+.fs-xl .section-note { font-size: 26rpx; }

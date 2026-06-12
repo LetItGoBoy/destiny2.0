@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page fs-{{fs}}">
   <!-- 用户卡片 -->
   <view class="card profile">
     <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
@@ -6,7 +6,7 @@
       <view wx:else class="avatar avatar-default seal serif">乐</view>
     </button>
     <view class="profile-body">
-      <input class="nickname" type="nickname" placeholder="点击设置昵称" placeholder-class="nick-ph"
+      <input class="nickname" type="nickname" placeholder="设置昵称" placeholder-class="nick-ph"
         value="{{nickname}}" bindchange="onNicknameChange" bindblur="onNicknameChange" />
       <view class="profile-sub">{{cloudEnabled ? '记录云端同步中' : '记录存储于本机'}}</view>
     </view>
@@ -14,6 +14,20 @@
       <view class="stat-num serif">{{recordCount}}</view>
       <view class="stat-label">八字记录</view>
     </view>
+  </view>
+
+  <!-- 显示字号 -->
+  <view class="card fontcard">
+    <view class="font-head">
+      <text class="font-title">显示字号</text>
+      <text class="font-note">全局生效，方便长辈阅读</text>
+    </view>
+    <view class="font-chips">
+      <view class="f-chip {{fs === 'std' ? 'f-chip-on' : ''}}" bindtap="onFontSize" data-fs="std">标准</view>
+      <view class="f-chip f-chip-l {{fs === 'l' ? 'f-chip-on' : ''}}" bindtap="onFontSize" data-fs="l">大</view>
+      <view class="f-chip f-chip-xl {{fs === 'xl' ? 'f-chip-on' : ''}}" bindtap="onFontSize" data-fs="xl">特大</view>
+    </view>
+    <view class="font-preview serif">字号预览 · <text class="wx-jin">庚</text><text class="wx-huo">午</text> <text class="wx-shui">壬</text><text class="wx-huo">午</text></view>
   </view>
 
   <!-- 功能列表 -->

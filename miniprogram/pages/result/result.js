@@ -1,6 +1,7 @@
 var bazi = require('../../utils/bazi.js');
 var store = require('../../utils/store.js');
 var baike = require('../../utils/baike.js');
+var prefs = require('../../utils/prefs.js');
 
 Page({
   data: {
@@ -17,10 +18,12 @@ Page({
     lnIndex: -1,
     selLiuNian: null,
     termCard: null,
-    baZiStr: ''
+    baZiStr: '',
+    fs: 'std'
   },
 
   onLoad: function (options) {
+    this.setData({ fs: prefs.getFontSize() });
     var input = null;
     try {
       input = JSON.parse(decodeURIComponent(options.input));
@@ -162,14 +165,10 @@ Page({
 
   noop: function () {},
 
-  // 详批：人格动力分析（开发中）
+  // 详批：调候/旺衰/格局三派合参
   onXiangPi: function () {
-    wx.showModal({
-      title: '详批 · 人格动力分析',
-      content: '基于命盘的人格动力深度分析系统正在打磨中，上线后将为您解读性格底层动力与运势走向，敬请期待。',
-      showCancel: false,
-      confirmText: '期待上线',
-      confirmColor: '#A78BFA'
+    wx.navigateTo({
+      url: '/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(this._input))
     });
   },
 
