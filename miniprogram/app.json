@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/result/result",
+    "pages/analysis/analysis",
     "pages/records/records",
     "pages/healing/healing",
     "pages/mine/mine",

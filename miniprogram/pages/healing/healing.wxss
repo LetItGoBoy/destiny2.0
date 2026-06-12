@@ -46,6 +46,27 @@
 .mod-muyu .mod-ico { background: linear-gradient(135deg, #C9A059, #A1763B); }
 .mod-burn .mod-ico { background: linear-gradient(135deg, #F28A6B, #C9543D); }
 .mod-rain .mod-ico { background: linear-gradient(135deg, #6FB6FF, #3D6F9E); }
+
+/* 矢量小图标（SVG data URI，免外部资源） */
+.mod-ico-img {
+  width: 44rpx;
+  height: 44rpx;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.ico-breath {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FBF9FF' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='3.2'/%3E%3Ccircle cx='12' cy='12' r='7' opacity='0.6'/%3E%3Ccircle cx='12' cy='12' r='10.4' opacity='0.3'/%3E%3C/svg%3E");
+}
+.ico-muyu {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FBF9FF' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 13.5a8.5 6.8 0 1 0 17 0a8.5 6.8 0 1 0 -17 0'/%3E%3Cpath d='M8 16h8'/%3E%3Ccircle cx='12' cy='10.4' r='1.1' fill='%23FBF9FF' stroke='none'/%3E%3Cpath d='M17.5 5.5l3-3' opacity='0.7'/%3E%3C/svg%3E");
+}
+.ico-burn {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FBF9FF' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.8c1.2 3.2 5.2 5.2 5.2 9.4a5.2 5.2 0 1 1-10.4 0c0-2 .9-3.6 2-5.2.5 1.1 1.3 1.8 2.2 2C10.6 7 11.4 4.8 12 2.8z'/%3E%3C/svg%3E");
+}
+.ico-rain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FBF9FF' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M6.2 13.5a3.8 3.8 0 0 1 .4-7.6A5.2 5.2 0 0 1 16.8 7a3.6 3.6 0 0 1-.4 6.5H6.2z'/%3E%3Cpath d='M8.2 16.5l-1 3.2'/%3E%3Cpath d='M12.4 16.5l-1 3.2' opacity='0.75'/%3E%3Cpath d='M16.6 16.5l-1 3.2'/%3E%3C/svg%3E");
+}
 .mod-title {
   font-size: 32rpx;
   font-weight: 700;

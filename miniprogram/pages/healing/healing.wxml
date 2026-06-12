@@ -7,22 +7,22 @@
   <!-- 模块入口 -->
   <view class="grid">
     <view class="mod card mod-breath" hover-class="mod-hover" bindtap="openMode" data-mode="breath">
-      <view class="mod-ico serif">息</view>
+      <view class="mod-ico"><view class="mod-ico-img ico-breath"></view></view>
       <view class="mod-title serif">呼吸放松</view>
       <view class="mod-sub">4-4-6 节奏 · 两分钟平静下来</view>
     </view>
     <view class="mod card mod-muyu" hover-class="mod-hover" bindtap="openMode" data-mode="muyu">
-      <view class="mod-ico serif">鱼</view>
+      <view class="mod-ico"><view class="mod-ico-img ico-muyu"></view></view>
       <view class="mod-title serif">电子木鱼</view>
       <view class="mod-sub">敲一敲 · 功德 {{merit}}</view>
     </view>
     <view class="mod card mod-burn" hover-class="mod-hover" bindtap="openMode" data-mode="burn">
-      <view class="mod-ico serif">焚</view>
+      <view class="mod-ico"><view class="mod-ico-img ico-burn"></view></view>
       <view class="mod-title serif">烦恼焚化</view>
       <view class="mod-sub">写下来 · 烧掉它 · 不留痕迹</view>
     </view>
     <view class="mod card mod-rain {{raining ? 'mod-rain-on' : ''}}" hover-class="mod-hover" bindtap="openMode" data-mode="rain">
-      <view class="mod-ico serif">雨</view>
+      <view class="mod-ico"><view class="mod-ico-img ico-rain"></view></view>
       <view class="mod-title serif">静心雨声</view>
       <view class="mod-sub">{{raining ? '正在播放 · 点击停止' : '白噪音 · 助眠专注'}}</view>
     </view>

@@ -165,14 +165,10 @@ Page({
 
   noop: function () {},
 
-  // 详批：人格动力分析（开发中）
+  // 详批：调候/旺衰/格局三派合参
   onXiangPi: function () {
-    wx.showModal({
-      title: '详批 · 人格动力分析',
-      content: '基于命盘的人格动力深度分析系统正在打磨中，上线后将为您解读性格底层动力与运势走向，敬请期待。',
-      showCancel: false,
-      confirmText: '期待上线',
-      confirmColor: '#A78BFA'
+    wx.navigateTo({
+      url: '/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(this._input))
     });
   },
 
