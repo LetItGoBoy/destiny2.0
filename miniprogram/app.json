@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/result/result",
     "pages/analysis/analysis",
+    "pages/astro/astro",
     "pages/records/records",
     "pages/healing/healing",
     "pages/mine/mine",

@@ -30,6 +30,14 @@
     <view class="info-row" wx:if="{{meta.location}}"><text class="info-label">出生地</text><text>{{meta.location}}</text></view>
     <view class="info-row"><text class="info-label">八　字</text><text class="serif info-bazi">{{baZiStr}}</text></view>
     <view class="info-row"><text class="info-label">起　运</text><text>{{meta.qiYun}}<text class="info-note">（{{meta.qiYunDate}} 交运）</text></text></view>
+    <view class="astro-entry" hover-class="astro-entry-hover" bindtap="goAstro">
+      <view class="astro-ico"></view>
+      <view class="astro-body">
+        <view class="astro-title serif">出生星图</view>
+        <view class="astro-sub">看看你出生那一刻，日月五星都在哪里</view>
+      </view>
+      <view class="astro-arrow">›</view>
+    </view>
   </view>
 
   <!-- 命盘表：基础盘四柱 / 详盘六柱（大运、流年在左） -->
