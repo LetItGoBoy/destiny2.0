@@ -60,6 +60,23 @@ function listRecords() {
 }
 
 /**
+ * 更新一条记录（如修改姓名）
+ */
+function updateRecord(id, patch) {
+  if (cloudEnabled() && String(id).indexOf('local_') !== 0) {
+    return wx.cloud.database().collection(COLLECTION).doc(id).update({ data: patch });
+  }
+  var list = localList().map(function (r) {
+    if (r._id === id) {
+      for (var k in patch) r[k] = patch[k];
+    }
+    return r;
+  });
+  localSave(list);
+  return Promise.resolve();
+}
+
+/**
  * 删除一条记录
  */
 function removeRecord(id) {
@@ -81,6 +98,7 @@ function clearLocal() {
 module.exports = {
   saveRecord: saveRecord,
   listRecords: listRecords,
+  updateRecord: updateRecord,
   removeRecord: removeRecord,
   clearLocal: clearLocal
 };

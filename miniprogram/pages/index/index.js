@@ -22,7 +22,9 @@ Page({
     regionIndex: [0, 0],
     regionText: '',
     useTrueSolar: true,
-    recent: []
+    recent: [],
+    casting: false,
+    zhiRing: ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
   },
 
   onLoad: function () {
@@ -44,8 +46,13 @@ Page({
 
   onShow: function () {
     var that = this;
+    this.setData({ casting: false });
     store.listRecords().then(function (res) {
-      that.setData({ recent: res.list.slice(0, 3) });
+      var recent = res.list.slice(0, 3).map(function (r) {
+        r.bz = bazi.colorizeBaZi(r.baZi);
+        return r;
+      });
+      that.setData({ recent: recent });
     });
   },
 
@@ -128,8 +135,9 @@ Page({
     this.setData({ useTrueSolar: e.detail.value });
   },
 
-  // ---- 排盘 ----
+  // ---- 排盘（带起盘过渡动画）----
   onPaiPan: function () {
+    if (this.data.casting) return;
     var d = this.data;
     var time = d.time.split(':');
     var input = {
@@ -156,9 +164,17 @@ Page({
     input.city = city.name;
     input.lng = city.lng;
 
-    wx.navigateTo({
-      url: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(input))
-    });
+    // 先播起盘动画，再进结果页
+    this.setData({ casting: true });
+    var that = this;
+    setTimeout(function () {
+      wx.navigateTo({
+        url: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(input)),
+        complete: function () {
+          setTimeout(function () { that.setData({ casting: false }); }, 400);
+        }
+      });
+    }, 1300);
   },
 
   // ---- 模块入口 ----

@@ -103,11 +103,26 @@
       <view class="recent-line1">
         <text class="recent-name">{{item.name || '未署名'}}</text>
         <text class="recent-gender {{item.gender === 1 ? 'g-m' : 'g-f'}}">{{item.gender === 1 ? '乾' : '坤'}}</text>
-        <text class="recent-bazi serif">{{item.baZi}}</text>
+        <view class="recent-bazi serif">
+          <text class="bz-pillar" wx:for="{{item.bz}}" wx:for-item="gz" wx:key="index"><text class="wx-{{gz[0].cls}}">{{gz[0].text}}</text><text class="wx-{{gz[1].cls}}">{{gz[1].text}}</text></text>
+        </view>
       </view>
       <view class="recent-line2">{{item.solarStr}}</view>
     </view>
   </view>
 
   <view class="footer">同乐八字 · 仅供传统文化研究参考</view>
+
+  <!-- 起盘过渡动画 -->
+  <view class="cast-mask" wx:if="{{casting}}">
+    <view class="cast-stage">
+      <view class="cast-ring">
+        <text class="cast-zhi serif" wx:for="{{zhiRing}}" wx:key="*this"
+          style="transform: rotate({{index * 30}}deg) translateY(-168rpx);">{{item}}</text>
+      </view>
+      <view class="cast-circle"></view>
+      <view class="cast-orb"></view>
+    </view>
+    <view class="cast-text">正在排盘</view>
+  </view>
 </view>

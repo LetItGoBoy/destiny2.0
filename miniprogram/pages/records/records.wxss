@@ -3,7 +3,7 @@
 }
 
 .head {
-  padding: 8rpx 8rpx 28rpx;
+  padding: 8rpx 8rpx 24rpx;
 }
 .head-title {
   font-size: 44rpx;
@@ -16,6 +16,96 @@
   color: var(--ink-3);
 }
 
+/* 搜索栏 */
+.search {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 28rpx;
+  border-radius: 100rpx;
+  margin-bottom: 14rpx;
+}
+.search-ico {
+  font-size: 38rpx;
+  color: var(--ink-3);
+  margin-right: 16rpx;
+  transform: rotate(-45deg);
+}
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--ink);
+}
+.search-ph {
+  color: var(--ink-3);
+}
+.search-clear {
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fill);
+  color: var(--ink-3);
+  font-size: 24rpx;
+  margin-left: 12rpx;
+}
+.search-hint {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  padding: 0 16rpx 18rpx;
+}
+
+/* 柱位筛选 */
+.pillar-chips {
+  display: flex;
+  gap: 14rpx;
+  padding: 4rpx 4rpx 16rpx;
+}
+.p-chip {
+  padding: 8rpx 28rpx;
+  border-radius: 100rpx;
+  border: 1rpx solid var(--line);
+  background: var(--fill);
+  font-size: 24rpx;
+  color: var(--ink-2);
+}
+.p-chip-on {
+  background: var(--tint);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* 干支聚合分组 */
+.group {
+  margin-bottom: 12rpx;
+}
+.group-head {
+  display: flex;
+  align-items: baseline;
+  padding: 16rpx 12rpx 14rpx;
+}
+.group-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 2rpx;
+}
+.group-kw {
+  margin-left: 14rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2rpx;
+}
+.group-count {
+  margin-left: auto;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+/* 记录卡片 */
 .rec {
   padding: 26rpx 30rpx;
   margin-bottom: 20rpx;
@@ -54,7 +144,9 @@
   font-size: 36rpx;
   font-weight: 700;
   letter-spacing: 4rpx;
-  color: var(--primary);
+}
+.bz-pillar {
+  margin-right: 20rpx;
 }
 .rec-line3 {
   display: flex;
@@ -64,12 +156,20 @@
   color: var(--ink-3);
 }
 
+/* 无结果 */
+.no-result {
+  text-align: center;
+  padding: 80rpx 0;
+  font-size: 26rpx;
+  color: var(--ink-3);
+}
+
 /* 空状态 */
 .empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 160rpx;
+  padding-top: 120rpx;
 }
 .empty-seal {
   width: 120rpx;
@@ -91,5 +191,4 @@
   margin-top: 48rpx;
   width: 320rpx;
   height: 88rpx;
-  line-height: 88rpx;
 }

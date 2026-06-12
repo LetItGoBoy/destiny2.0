@@ -189,7 +189,9 @@ function computeChart(input) {
     shengXiao: lunar.getYearShengXiaoByLiChun(),
     clockStr: formatDate(clockDate),
     chartStr: formatDate(chartDate),
+    chartTime: pad(chartDate.getHours()) + ':' + pad(chartDate.getMinutes()),
     lunarStr: lunar.toString() + ' ' + timeZhiName,
+    lunarShort: lunar.getMonthInChinese() + '月' + lunar.getDayInChinese() + ' ' + timeZhiName,
     useTrueSolar: useTrueSolar,
     offsetMinutes: offsetMinutes,
     location: (input.province || '') + (input.city && input.city !== input.province ? ' ' + input.city : ''),
@@ -242,9 +244,18 @@ function getLunarDays(year, month) {
   return list;
 }
 
+// 把八字字符串（如 '庚午 己卯 己卯 乙亥'）转为带五行色的视图，供记录列表渲染
+function colorizeBaZi(str) {
+  if (!str) return [];
+  return str.split(' ').map(function (gz) {
+    return [ganView(gz.charAt(0)), zhiView(gz.charAt(1))];
+  });
+}
+
 module.exports = {
   computeChart: computeChart,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
-  changSheng: changSheng
+  changSheng: changSheng,
+  colorizeBaZi: colorizeBaZi
 };

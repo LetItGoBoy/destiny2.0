@@ -19,9 +19,9 @@
     "backgroundColor": "#1B1531",
     "borderStyle": "black",
     "list": [
-      { "pagePath": "pages/index/index", "text": "排盘" },
-      { "pagePath": "pages/records/records", "text": "记录" },
-      { "pagePath": "pages/mine/mine", "text": "我的" }
+      { "pagePath": "pages/index/index", "text": "排盘", "iconPath": "images/tab/paipan.png", "selectedIconPath": "images/tab/paipan-on.png" },
+      { "pagePath": "pages/records/records", "text": "记录", "iconPath": "images/tab/records.png", "selectedIconPath": "images/tab/records-on.png" },
+      { "pagePath": "pages/mine/mine", "text": "我的", "iconPath": "images/tab/mine.png", "selectedIconPath": "images/tab/mine-on.png" }
     ]
   },
   "style": "v2",
