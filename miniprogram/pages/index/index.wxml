@@ -19,10 +19,6 @@
         <view class="today-gz serif">
           <text class="wx-{{daily.ganZhi[0].cls}}">{{daily.ganZhi[0].text}}</text><text class="wx-{{daily.ganZhi[1].cls}}">{{daily.ganZhi[1].text}}</text>
         </view>
-        <view class="today-tags">
-          <view class="today-tag">{{daily.shiShen}}</view>
-          <view class="today-tag today-tag-2">{{daily.xingYun}}</view>
-        </view>
         <view class="today-who">{{daily.name}} ›</view>
       </view>
       <view class="today-advice">{{daily.advice}}</view>

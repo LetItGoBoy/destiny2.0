@@ -398,7 +398,6 @@
 .btn-xiangpi {
   flex: 1.4;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 96rpx;
@@ -408,25 +407,17 @@
   background: linear-gradient(135deg, #F6D98B, #E0A653);
   border-radius: 20rpx;
   box-shadow: 0 8rpx 28rpx rgba(224, 166, 83, 0.45);
-}
-.btn-xiangpi::after {
-  border: none;
-}
-.btn-xiangpi.button-hover {
-  opacity: 0.88;
-}
-.xp-main {
   color: #34250C;
   font-size: 34rpx;
   font-weight: 800;
   letter-spacing: 8rpx;
   text-indent: 8rpx;
 }
-.xp-sub {
-  color: rgba(52, 37, 12, 0.7);
-  font-size: 18rpx;
-  margin-top: 4rpx;
-  letter-spacing: 2rpx;
+.btn-xiangpi::after {
+  border: none;
+}
+.btn-xiangpi.button-hover {
+  opacity: 0.88;
 }
 
 /* 词条解读卡 */

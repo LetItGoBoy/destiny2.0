@@ -1,0 +1,282 @@
+.page {
+  padding: 32rpx 28rpx 48rpx;
+}
+
+.head {
+  padding: 8rpx 8rpx 28rpx;
+}
+.head-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+}
+.head-sub {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+/* 模块网格 */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+.mod {
+  width: calc(50% - 12rpx);
+  box-sizing: border-box;
+  padding: 30rpx 28rpx;
+}
+.mod-hover {
+  opacity: 0.85;
+}
+.mod-ico {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #FBF9FF;
+  margin-bottom: 18rpx;
+}
+.mod-breath .mod-ico { background: linear-gradient(135deg, #9D78F8, #6C4BD9); }
+.mod-muyu .mod-ico { background: linear-gradient(135deg, #C9A059, #A1763B); }
+.mod-burn .mod-ico { background: linear-gradient(135deg, #F28A6B, #C9543D); }
+.mod-rain .mod-ico { background: linear-gradient(135deg, #6FB6FF, #3D6F9E); }
+.mod-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.mod-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.mod-rain-on {
+  border-color: #6FB6FF;
+  box-shadow: 0 0 24rpx rgba(111, 182, 255, 0.3);
+}
+
+.footer {
+  margin-top: 48rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 2rpx;
+}
+
+/* 全屏覆盖层 */
+.overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: radial-gradient(circle at 50% 38%, #281E4A 0%, #14101F 75%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: ovFade 0.25s ease;
+}
+@keyframes ovFade {
+  from { opacity: 0; }
+}
+.ov-close {
+  position: absolute;
+  top: 110rpx;
+  right: 44rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  color: var(--ink-2);
+  font-size: 28rpx;
+}
+
+/* 呼吸放松 */
+.breath-stage {
+  width: 460rpx;
+  height: 460rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.breath-orb {
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #CDB8FF, #7C5CE0 62%, #483390);
+  box-shadow: 0 0 80rpx rgba(157, 120, 248, 0.7), 0 0 200rpx rgba(124, 92, 224, 0.35);
+}
+.breath-phase {
+  margin-top: 48rpx;
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: 10rpx;
+  text-indent: 10rpx;
+}
+.breath-round {
+  margin-top: 18rpx;
+  font-size: 26rpx;
+  color: var(--ink-3);
+}
+
+/* 电子木鱼 */
+.merit-count {
+  font-size: 30rpx;
+  color: var(--ink-2);
+  margin-bottom: 36rpx;
+}
+.merit-num {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--gold);
+  margin-left: 8rpx;
+}
+.muyu-stage {
+  position: relative;
+  width: 420rpx;
+  height: 360rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.muyu-body {
+  position: relative;
+  width: 340rpx;
+  height: 280rpx;
+  border-radius: 48% 48% 46% 46% / 56% 56% 40% 40%;
+  background: radial-gradient(circle at 38% 30%, #B98E5A, #8A6239 55%, #5F4126);
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.5), inset 0 -10rpx 30rpx rgba(0, 0, 0, 0.35);
+}
+.muyu-hit-0 { animation: muyuBounce 0.18s ease; }
+.muyu-hit-1 { animation: muyuBounce2 0.18s ease; }
+@keyframes muyuBounce {
+  40% { transform: scale(0.94); }
+}
+@keyframes muyuBounce2 {
+  40% { transform: scale(0.94); }
+}
+.muyu-slit {
+  position: absolute;
+  left: 50%;
+  bottom: 56rpx;
+  width: 200rpx;
+  height: 26rpx;
+  margin-left: -100rpx;
+  border-radius: 100rpx;
+  background: #2A1C10;
+  box-shadow: inset 0 6rpx 10rpx rgba(0, 0, 0, 0.8);
+}
+.muyu-dot {
+  position: absolute;
+  left: 50%;
+  top: 62rpx;
+  width: 56rpx;
+  height: 56rpx;
+  margin-left: -28rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #D9B07A, #8A6239);
+  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.4);
+}
+.merit-float {
+  position: absolute;
+  left: 50%;
+  top: 10rpx;
+  font-size: 32rpx;
+  color: var(--gold);
+  font-weight: 700;
+  animation: floatUp 0.9s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes floatUp {
+  0% { opacity: 0; transform: translate(-50%, 20rpx); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -110rpx); }
+}
+.muyu-tip {
+  margin-top: 28rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+/* 烦恼焚化 */
+.burn-title {
+  font-size: 38rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  margin-bottom: 32rpx;
+}
+.burn-card {
+  width: 620rpx;
+  padding: 28rpx;
+  box-sizing: border-box;
+}
+.burn-input {
+  width: 100%;
+  height: 320rpx;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.burn-ph {
+  color: var(--ink-3);
+}
+.burning {
+  animation: burnUp 2s ease-in forwards;
+}
+@keyframes burnUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); border-color: var(--line); }
+  30% { border-color: #F28A6B; box-shadow: 0 0 40rpx rgba(242, 138, 107, 0.5); }
+  60% { opacity: 0.7; box-shadow: 0 0 80rpx rgba(242, 138, 107, 0.8); }
+  100% { opacity: 0; transform: translateY(-160rpx) scale(0.78); box-shadow: 0 0 120rpx rgba(242, 138, 107, 0); }
+}
+.burn-btn {
+  margin-top: 40rpx;
+  width: 420rpx;
+  height: 92rpx;
+}
+.burn-btn-off {
+  opacity: 0.45;
+}
+.burn-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.burn-done-ico {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  color: var(--ink-2);
+  border: 2rpx dashed var(--line);
+}
+.burn-done-text {
+  margin-top: 36rpx;
+  font-size: 32rpx;
+  color: var(--ink);
+}
+.burn-done-sub {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+.burn-again {
+  margin-top: 48rpx;
+  font-size: 28rpx;
+  color: var(--primary);
+  font-weight: 600;
+}

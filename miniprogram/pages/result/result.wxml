@@ -200,10 +200,7 @@
     <button class="btn-save {{saved ? 'btn-saved' : ''}}" bindtap="onSave">
       {{saved ? '已保存' : '保存'}}
     </button>
-    <button class="btn-xiangpi" bindtap="onXiangPi">
-      <view class="xp-main">详批</view>
-      <view class="xp-sub">人格动力分析</view>
-    </button>
+    <button class="btn-xiangpi" bindtap="onXiangPi">详批</button>
   </view>
 
   <!-- 词条解读卡（十神/长生/神煞/纳音） -->
