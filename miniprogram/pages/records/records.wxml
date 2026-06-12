@@ -1,30 +1,71 @@
+<!-- 记录卡片模板 -->
+<template name="recCard">
+  <view class="rec card" hover-class="rec-hover"
+    bindtap="onItemTap" bindlongpress="onItemLongPress" data-id="{{_id}}">
+    <view class="rec-line1">
+      <text class="rec-name">{{name || '未署名'}}</text>
+      <text class="rec-gender {{gender === 1 ? 'g-m' : 'g-f'}}">{{gender === 1 ? '乾造' : '坤造'}}</text>
+      <text class="rec-true" wx:if="{{useTrueSolar}}">真太阳时</text>
+    </view>
+    <view class="rec-bazi serif">
+      <text class="bz-pillar" wx:for="{{bz}}" wx:for-item="gz" wx:key="index"><text class="wx-{{gz[0].cls}}">{{gz[0].text}}</text><text class="wx-{{gz[1].cls}}">{{gz[1].text}}</text></text>
+    </view>
+    <view class="rec-line3">
+      <text>{{solarStr}}</text>
+      <text class="rec-loc" wx:if="{{city}}">{{city}}</text>
+    </view>
+  </view>
+</template>
+
 <view class="page">
   <view class="head">
     <view class="head-title serif">八字记录</view>
-    <view class="head-sub">{{source === 'cloud' ? '云端同步 · 跟随微信账号' : '存储于本机'}} · 长按可删除</view>
+    <view class="head-sub">{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按可改名/删除</view>
   </view>
 
-  <block wx:if="{{list.length > 0}}">
-    <view class="rec card" wx:for="{{list}}" wx:key="_id"
-      hover-class="rec-hover"
-      bindtap="onItemTap" bindlongpress="onItemLongPress" data-index="{{index}}">
-      <view class="rec-line1">
-        <text class="rec-name">{{item.name || '未署名'}}</text>
-        <text class="rec-gender {{item.gender === 1 ? 'g-m' : 'g-f'}}">{{item.gender === 1 ? '乾造' : '坤造'}}</text>
-        <text class="rec-true" wx:if="{{item.useTrueSolar}}">真太阳时</text>
-      </view>
-      <view class="rec-bazi serif">{{item.baZi}}</view>
-      <view class="rec-line3">
-        <text>{{item.solarStr}}</text>
-        <text class="rec-loc" wx:if="{{item.city}}">{{item.city}}</text>
-      </view>
+  <!-- 搜索栏 -->
+  <view class="search card">
+    <text class="search-ico">⌕</text>
+    <input class="search-input" placeholder="搜索姓名，或输入干支聚合（如：庚午）"
+      placeholder-class="search-ph" confirm-type="search"
+      value="{{keyword}}" bindinput="onSearch" />
+    <text class="search-clear" wx:if="{{keyword}}" bindtap="onClear">✕</text>
+  </view>
+  <view class="search-hint" wx:if="{{mode === 'ganzhi'}}">干支「{{keyword}}」按柱位聚合 · 姓名按字母排序</view>
+  <view class="search-hint" wx:elif="{{!keyword && total > 0}}">按姓名字母排序</view>
+
+  <!-- 姓名模式：排序列表 -->
+  <block wx:if="{{mode === 'name'}}">
+    <block wx:for="{{shown}}" wx:key="_id">
+      <template is="recCard" data="{{...item}}" />
+    </block>
+    <view class="no-result" wx:if="{{keyword && shown.length === 0 && total > 0}}">
+      没有找到姓名含「{{keyword}}」的记录
     </view>
   </block>
 
-  <view class="empty" wx:if="{{!loading && list.length === 0}}">
+  <!-- 干支模式：按柱位聚合 -->
+  <block wx:if="{{mode === 'ganzhi'}}">
+    <view class="group" wx:for="{{groups}}" wx:key="title" wx:for-item="grp">
+      <view class="group-head">
+        <text class="group-title serif">{{grp.title}}</text>
+        <text class="group-kw serif">{{grp.kw}}</text>
+        <text class="group-count">{{grp.count}}人</text>
+      </view>
+      <block wx:for="{{grp.items}}" wx:key="_id">
+        <template is="recCard" data="{{...item}}" />
+      </block>
+    </view>
+    <view class="no-result" wx:if="{{groups.length === 0}}">
+      没有找到八字含「{{keyword}}」的记录
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && total === 0}}">
     <view class="empty-seal seal serif">命</view>
     <view class="empty-text">还没有保存的八字记录</view>
-    <view class="empty-sub">排盘后点击「保存到记录」即可留存</view>
+    <view class="empty-sub">排盘后点击「保存」即可留存</view>
     <button class="btn-primary empty-btn" bindtap="goIndex">去排盘</button>
   </view>
 </view>

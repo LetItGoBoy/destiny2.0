@@ -242,9 +242,18 @@ function getLunarDays(year, month) {
   return list;
 }
 
+// 把八字字符串（如 '庚午 己卯 己卯 乙亥'）转为带五行色的视图，供记录列表渲染
+function colorizeBaZi(str) {
+  if (!str) return [];
+  return str.split(' ').map(function (gz) {
+    return [ganView(gz.charAt(0)), zhiView(gz.charAt(1))];
+  });
+}
+
 module.exports = {
   computeChart: computeChart,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
-  changSheng: changSheng
+  changSheng: changSheng,
+  colorizeBaZi: colorizeBaZi
 };

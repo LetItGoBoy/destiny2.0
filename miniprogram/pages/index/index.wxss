@@ -125,6 +125,99 @@
 .btn-paipan {
   margin-top: 36rpx;
   height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+/* 起盘过渡动画 */
+.cast-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: radial-gradient(circle at 50% 40%, #2C2152 0%, #14101F 72%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: castFade 0.3s ease;
+}
+.cast-stage {
+  position: relative;
+  width: 420rpx;
+  height: 420rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cast-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  animation: castSpin 7s linear infinite;
+}
+.cast-zhi {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44rpx;
+  height: 44rpx;
+  margin-left: -22rpx;
+  margin-top: -22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: var(--primary);
+  opacity: 0.9;
+}
+.cast-circle {
+  position: absolute;
+  width: 268rpx;
+  height: 268rpx;
+  border: 2rpx dashed rgba(167, 139, 250, 0.4);
+  border-radius: 50%;
+  animation: castSpinBack 11s linear infinite;
+}
+.cast-orb {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #CDB8FF, #7C5CE0 62%, #483390);
+  box-shadow: 0 0 60rpx rgba(157, 120, 248, 0.85), 0 0 150rpx rgba(124, 92, 224, 0.4);
+  animation: castPulse 1.1s ease-in-out infinite alternate;
+}
+.cast-text {
+  margin-top: 72rpx;
+  font-size: 28rpx;
+  color: var(--ink-2);
+  letter-spacing: 8rpx;
+  text-indent: 8rpx;
+  animation: castBlink 1.3s ease-in-out infinite;
+}
+@keyframes castSpin {
+  to { transform: rotate(360deg); }
+}
+@keyframes castSpinBack {
+  to { transform: rotate(-360deg); }
+}
+@keyframes castPulse {
+  from { transform: scale(0.9); }
+  to { transform: scale(1.08); }
+}
+@keyframes castFade {
+  from { opacity: 0; }
+}
+@keyframes castBlink {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
 }
 
 /* 配对模块 */
@@ -236,8 +329,11 @@
 .recent-bazi {
   margin-left: auto;
   font-size: 26rpx;
-  color: var(--primary);
   letter-spacing: 2rpx;
+}
+.bz-pillar {
+  margin-left: 10rpx;
+  font-weight: 600;
 }
 .recent-line2 {
   margin-top: 6rpx;

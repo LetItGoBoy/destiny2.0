@@ -46,8 +46,7 @@ page {
   border-radius: 20rpx;
   font-size: 34rpx;
   font-weight: 600;
-  letter-spacing: 8rpx;
-  text-indent: 8rpx;
+  letter-spacing: 6rpx;
   line-height: 1;
   padding: 0;
   box-shadow: 0 10rpx 28rpx rgba(124, 92, 224, 0.45);
