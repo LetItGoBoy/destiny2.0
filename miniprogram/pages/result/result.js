@@ -1,6 +1,6 @@
 var bazi = require('../../utils/bazi.js');
 var store = require('../../utils/store.js');
-var shiShenInfo = require('../../utils/shishen-info.js');
+var baike = require('../../utils/baike.js');
 
 Page({
   data: {
@@ -16,7 +16,8 @@ Page({
     liuNianBar: [],
     lnIndex: -1,
     selLiuNian: null,
-    ssCard: null
+    termCard: null,
+    baZiStr: ''
   },
 
   onLoad: function (options) {
@@ -61,7 +62,8 @@ Page({
       saved: options.from === 'record',
       meta: chart.meta,
       wuXing: chart.wuXing,
-      daYunBar: daYunBar
+      daYunBar: daYunBar,
+      baZiStr: chart.pillars.map(function (p) { return p.ganZhi; }).join('　')
     });
 
     // 默认选中当前所处大运
@@ -147,18 +149,15 @@ Page({
     this.setData({ tablePillars: pillars });
   },
 
-  // 点击十神弹出喜忌性格卡
-  onShiShenTap: function (e) {
-    var ss = e.currentTarget.dataset.ss;
-    var info = shiShenInfo[ss];
-    if (!info) return;
-    this.setData({
-      ssCard: { name: ss, brief: info.brief, xi: info.xi, ji: info.ji }
-    });
+  // 点击十神/十二长生/神煞/纳音弹出解读卡
+  onTermTap: function (e) {
+    var card = baike.lookup(e.currentTarget.dataset.term);
+    if (!card) return;
+    this.setData({ termCard: card });
   },
 
-  closeSsCard: function () {
-    this.setData({ ssCard: null });
+  closeTermCard: function () {
+    this.setData({ termCard: null });
   },
 
   noop: function () {},

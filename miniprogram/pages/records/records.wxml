@@ -31,7 +31,15 @@
       value="{{keyword}}" bindinput="onSearch" />
     <text class="search-clear" wx:if="{{keyword}}" bindtap="onClear">✕</text>
   </view>
-  <view class="search-hint" wx:if="{{mode === 'ganzhi'}}">干支「{{keyword}}」按柱位聚合 · 姓名按字母排序</view>
+  <!-- 干支模式：柱位筛选 -->
+  <view class="pillar-chips" wx:if="{{mode === 'ganzhi'}}">
+    <view class="p-chip {{pillarFilter === -1 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="-1">全部</view>
+    <view class="p-chip {{pillarFilter === 0 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="0">年柱</view>
+    <view class="p-chip {{pillarFilter === 1 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="1">月柱</view>
+    <view class="p-chip {{pillarFilter === 2 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="2">日柱</view>
+    <view class="p-chip {{pillarFilter === 3 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="3">时柱</view>
+  </view>
+  <view class="search-hint" wx:if="{{mode === 'ganzhi'}}">干支「{{keyword}}」{{pillarFilter === -1 ? '按柱位聚合' : '筛选' }} · 姓名按字母排序</view>
   <view class="search-hint" wx:elif="{{!keyword && total > 0}}">按姓名字母排序</view>
 
   <!-- 姓名模式：排序列表 -->

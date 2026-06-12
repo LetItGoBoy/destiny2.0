@@ -4,10 +4,18 @@
   <view class="tabs">
     <view class="tab serif {{tab === 'base' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="base">基础盘</view>
     <view class="tab serif {{tab === 'detail' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="detail">详盘</view>
+    <view class="tab serif {{tab === 'info' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="info">基本信息</view>
   </view>
 
-  <!-- 命主信息 -->
-  <view class="card info">
+  <!-- 盘面页：仅保留精简生日条 -->
+  <view class="card birth-strip" wx:if="{{tab !== 'info'}}">
+    <text class="info-tag {{meta.gender === 1 ? 'tag-m' : 'tag-f'}}">{{meta.gender === 1 ? '乾造' : '坤造'}}</text>
+    <text class="birth-main">{{meta.clockStr}}</text>
+    <text class="birth-lunar">{{meta.lunarShort}}</text>
+  </view>
+
+  <!-- 基本信息页 -->
+  <view class="card info" wx:if="{{tab === 'info'}}">
     <view class="info-head">
       <text class="info-name serif">{{meta.name || '未署名'}}</text>
       <text class="info-tag {{meta.gender === 1 ? 'tag-m' : 'tag-f'}}">{{meta.gender === 1 ? '乾造' : '坤造'}}</text>
@@ -20,11 +28,12 @@
       <text>{{meta.chartStr}}<text class="info-note">（修正{{meta.offsetMinutes >= 0 ? '+' : ''}}{{meta.offsetMinutes}}分）</text></text>
     </view>
     <view class="info-row" wx:if="{{meta.location}}"><text class="info-label">出生地</text><text>{{meta.location}}</text></view>
+    <view class="info-row"><text class="info-label">八　字</text><text class="serif info-bazi">{{baZiStr}}</text></view>
     <view class="info-row"><text class="info-label">起　运</text><text>{{meta.qiYun}}<text class="info-note">（{{meta.qiYunDate}} 交运）</text></text></view>
   </view>
 
-  <!-- 命盘表：基础盘四柱 / 详盘六柱（四柱 + 大运 + 流年） -->
-  <view class="card chart">
+  <!-- 命盘表：基础盘四柱 / 详盘六柱（大运、流年在左） -->
+  <view class="card chart" wx:if="{{tab !== 'info'}}">
     <view class="chart-row head-row">
       <view class="cell label-cell"></view>
       <view class="cell head-cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
@@ -38,7 +47,7 @@
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">—</text>
         <text wx:elif="{{item.shiShenGan === '日主'}}" class="rizhu">日主</text>
-        <text wx:else class="shishen ss-tap" bindtap="onShiShenTap" data-ss="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
+        <text wx:else class="shishen" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
       </view>
     </view>
 
@@ -47,7 +56,7 @@
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
-          <view class="wx-mark wx-{{item.gan.cls}}">{{item.gan.wx}}</view>
+          <view class="wx-mark wx-{{item.gan.cls}}"><view class="el-ico el-{{item.gan.cls}}"></view><text>{{item.gan.wx}}</text></view>
         </block>
         <text wx:else class="dim">—</text>
       </view>
@@ -58,7 +67,7 @@
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
-          <view class="wx-mark wx-{{item.zhi.cls}}">{{item.zhi.wx}}</view>
+          <view class="wx-mark wx-{{item.zhi.cls}}"><view class="el-ico el-{{item.zhi.cls}}"></view><text>{{item.zhi.wx}}</text></view>
         </block>
         <text wx:else class="dim">—</text>
       </view>
@@ -68,9 +77,9 @@
       <view class="cell label-cell">藏干</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text"
-          bindtap="onShiShenTap" data-ss="{{hg.shiShen}}">
+          bindtap="onTermTap" data-term="{{hg.shiShen}}">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
-          <text class="hg-ss ss-tap">{{hg.shiShen}}</text>
+          <text class="hg-ss">{{hg.shiShen}}</text>
         </view>
         <text wx:if="{{item.empty}}" class="dim">—</text>
       </view>
@@ -79,14 +88,14 @@
     <view class="chart-row">
       <view class="cell label-cell">星运</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain">{{item.empty ? '—' : item.xingYun}}</text>
+        <text class="plain" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.empty ? '—' : item.xingYun}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">自坐</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain">{{item.empty ? '—' : item.ziZuo}}</text>
+        <text class="plain" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.empty ? '—' : item.ziZuo}}</text>
       </view>
     </view>
 
@@ -100,14 +109,15 @@
     <view class="chart-row">
       <view class="cell label-cell">纳音</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain dim naying">{{item.empty ? '—' : item.naYin}}</text>
+        <text class="plain dim naying" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.empty ? '—' : item.naYin}}</text>
       </view>
     </view>
 
     <view class="chart-row no-line shensha-row">
       <view class="cell label-cell">神煞</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="ss-item" wx:for="{{item.shenSha}}" wx:for-item="ss" wx:key="*this">{{ss}}</text>
+        <text class="ss-item" wx:for="{{item.shenSha}}" wx:for-item="ss" wx:key="*this"
+          bindtap="onTermTap" data-term="{{ss}}">{{ss}}</text>
         <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">—</text>
       </view>
     </view>
@@ -127,7 +137,7 @@
               <view class="yun-gz serif dim">童限</view>
             </block>
             <block wx:else>
-              <view class="yun-ss ss-tap" catchtap="onShiShenTap" data-ss="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
+              <view class="yun-ss" catchtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
               <view class="yun-gz serif">
                 <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
               </view>
@@ -146,7 +156,7 @@
           <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
             wx:for="{{liuNianBar}}" wx:key="index"
             bindtap="onLiuNianTap" data-index="{{item.index}}">
-            <view class="yun-ss ss-tap" catchtap="onShiShenTap" data-ss="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
+            <view class="yun-ss" catchtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
             <view class="yun-gz serif">
               <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
             </view>
@@ -166,14 +176,14 @@
           <view class="ly-gz serif">
             <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
           </view>
-          <view class="ly-ss ss-tap" bindtap="onShiShenTap" data-ss="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
+          <view class="ly-ss" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
         </view>
       </view>
     </view>
   </block>
 
   <!-- 五行 -->
-  <view class="card wuxing">
+  <view class="card wuxing" wx:if="{{tab !== 'info'}}">
     <view class="section-title serif">五行</view>
     <view class="wx-bar">
       <view class="wx-item" wx:for="{{wuXing}}" wx:key="wx">
@@ -196,22 +206,18 @@
     </button>
   </view>
 
-  <!-- 十神性格卡 -->
-  <view class="ss-mask" wx:if="{{ssCard}}" bindtap="closeSsCard">
+  <!-- 词条解读卡（十神/长生/神煞/纳音） -->
+  <view class="ss-mask" wx:if="{{termCard}}" bindtap="closeTermCard">
     <view class="ss-sheet card" catchtap="noop">
       <view class="ss-sheet-head">
-        <text class="ss-sheet-name serif">{{ssCard.name}}</text>
-        <text class="ss-sheet-brief">{{ssCard.brief}}</text>
+        <text class="ss-sheet-name serif">{{termCard.name}}</text>
+        <text class="ss-sheet-brief">{{termCard.brief}}</text>
       </view>
-      <view class="ss-block ss-block-xi">
-        <view class="ss-block-title">为喜用时</view>
-        <view class="ss-block-text">{{ssCard.xi}}</view>
+      <view class="ss-block ss-block-{{block.type}}" wx:for="{{termCard.blocks}}" wx:for-item="block" wx:key="title">
+        <view class="ss-block-title" wx:if="{{block.title}}">{{block.title}}</view>
+        <view class="ss-block-text">{{block.text}}</view>
       </view>
-      <view class="ss-block ss-block-ji">
-        <view class="ss-block-title">为忌时</view>
-        <view class="ss-block-text">{{ssCard.ji}}</view>
-      </view>
-      <view class="ss-sheet-close" bindtap="closeSsCard">知道了</view>
+      <view class="ss-sheet-close" bindtap="closeTermCard">知道了</view>
     </view>
   </view>
 </view>

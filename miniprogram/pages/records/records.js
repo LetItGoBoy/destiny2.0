@@ -32,6 +32,7 @@ Page({
   data: {
     keyword: '',
     mode: 'name',
+    pillarFilter: -1,
     shown: [],
     groups: [],
     total: 0,
@@ -62,17 +63,25 @@ Page({
   },
 
   onClear: function () {
-    this.setData({ keyword: '' });
+    this.setData({ keyword: '', pillarFilter: -1 });
     this.apply();
   },
 
-  // 应用搜索：干支 → 按柱位聚合；其他 → 姓名模糊匹配 + 字母排序
+  // 切换柱位筛选（全部/年柱/月柱/日柱/时柱）
+  onPillarFilter: function (e) {
+    this.setData({ pillarFilter: Number(e.currentTarget.dataset.pillar) });
+    this.apply();
+  },
+
+  // 应用搜索：干支 → 按柱位聚合（可筛选具体柱位）；其他 → 姓名模糊匹配 + 字母排序
   apply: function () {
     var kw = (this.data.keyword || '').trim();
     var all = this._all || [];
     if (kw && isGanZhiQuery(kw)) {
+      var filter = this.data.pillarFilter;
       var groups = [];
       for (var i = 0; i < 4; i++) {
+        if (filter >= 0 && i !== filter) continue;
         var items = [];
         for (var j = 0; j < all.length; j++) {
           var p = all[j].pillarArr[i] || '';
@@ -95,7 +104,7 @@ Page({
           return (r.name || '').indexOf(kw) > -1;
         });
       }
-      this.setData({ mode: 'name', shown: sortByName(items2), groups: [] });
+      this.setData({ mode: 'name', shown: sortByName(items2), groups: [], pillarFilter: -1 });
     }
   },
 

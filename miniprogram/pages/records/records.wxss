@@ -56,6 +56,27 @@
   padding: 0 16rpx 18rpx;
 }
 
+/* 柱位筛选 */
+.pillar-chips {
+  display: flex;
+  gap: 14rpx;
+  padding: 4rpx 4rpx 16rpx;
+}
+.p-chip {
+  padding: 8rpx 28rpx;
+  border-radius: 100rpx;
+  border: 1rpx solid var(--line);
+  background: var(--fill);
+  font-size: 24rpx;
+  color: var(--ink-2);
+}
+.p-chip-on {
+  background: var(--tint);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
 /* 干支聚合分组 */
 .group {
   margin-bottom: 12rpx;
