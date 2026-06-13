@@ -301,3 +301,15 @@
   color: var(--primary);
   font-weight: 600;
 }
+
+/* 深色全屏覆盖层：局部回到亮色文字（页面整体为浅色主题） */
+.overlay {
+  color: #F4F2FF;
+  --ink: #F4F2FF;
+  --ink-2: #C9CCE6;
+  --ink-3: #9CA0C4;
+  --card: rgba(255, 255, 255, 0.06);
+  --line: rgba(255, 255, 255, 0.14);
+  --fill: rgba(255, 255, 255, 0.08);
+  --gold: #E3C27E;
+}

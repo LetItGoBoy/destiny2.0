@@ -21,10 +21,10 @@
   border-radius: 14rpx;
 }
 .tab-on {
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
-  color: #FBF9FF;
+  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  color: #FFFFFF;
   font-weight: 700;
-  box-shadow: 0 4rpx 16rpx rgba(124, 92, 224, 0.4);
+  box-shadow: 0 4rpx 16rpx rgba(109, 93, 246, 0.32);
 }
 
 /* 精简生日条（盘面页顶部） */
@@ -365,8 +365,9 @@
   display: flex;
   gap: 20rpx;
   padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
-  background: rgba(20, 16, 31, 0.92);
+  background: rgba(255, 255, 255, 0.92);
   border-top: 1rpx solid var(--line);
+  box-shadow: 0 -6rpx 24rpx rgba(20, 21, 60, 0.06);
   backdrop-filter: blur(20rpx);
 }
 .btn-save {
@@ -394,7 +395,7 @@
   border-color: var(--line);
   color: var(--ink-3);
 }
-/* 详批：鎏金渐变，全局最醒目 */
+/* 详批：靛紫→电光青渐变，全局最醒目 */
 .btn-xiangpi {
   flex: 1.4;
   display: flex;
@@ -404,10 +405,10 @@
   margin: 0;
   padding: 0;
   line-height: 1;
-  background: linear-gradient(135deg, #F6D98B, #E0A653);
+  background: linear-gradient(135deg, #6D5DF6, #22D3EE);
   border-radius: 20rpx;
-  box-shadow: 0 8rpx 28rpx rgba(224, 166, 83, 0.45);
-  color: #34250C;
+  box-shadow: 0 8rpx 28rpx rgba(64, 120, 230, 0.4);
+  color: #FFFFFF;
   font-size: 34rpx;
   font-weight: 800;
   letter-spacing: 8rpx;
@@ -427,7 +428,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 7, 18, 0.72);
+  background: rgba(20, 21, 43, 0.45);
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -478,7 +479,7 @@
   margin-bottom: 8rpx;
 }
 .ss-block-xi .ss-block-title {
-  color: #5ECC8F;
+  color: #16A971;
 }
 .ss-block-ji .ss-block-title {
   color: var(--pink);
@@ -535,3 +536,60 @@
 .fs-xl .ly-name, .fs-xl .ly-ss { font-size: 26rpx; }
 .fs-xl .ss-block-text { font-size: 32rpx; }
 .fs-xl .section-note { font-size: 26rpx; }
+
+/* 出生星图入口（深色星河面板，程序亮点） */
+.astro-entry {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding: 26rpx 28rpx;
+  border-radius: 22rpx;
+  overflow: hidden;
+  background: radial-gradient(circle at 82% 50%, #232C57 0%, #11163A 70%);
+  border: 1rpx solid rgba(123, 107, 255, 0.4);
+  box-shadow: 0 12rpx 32rpx rgba(30, 35, 90, 0.22);
+}
+.astro-entry-hover {
+  opacity: 0.92;
+}
+.astro-preview {
+  width: 200rpx;
+  height: 200rpx;
+  flex-shrink: 0;
+  order: 2;
+  margin-left: 12rpx;
+}
+.astro-body {
+  flex: 1;
+  min-width: 0;
+  order: 1;
+}
+.astro-tag {
+  display: inline-block;
+  font-size: 19rpx;
+  color: #C7D2FF;
+  background: rgba(123, 107, 255, 0.22);
+  border: 1rpx solid rgba(123, 107, 255, 0.45);
+  border-radius: 100rpx;
+  padding: 3rpx 16rpx;
+}
+.astro-title {
+  margin-top: 12rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 2rpx;
+}
+.astro-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: rgba(220, 226, 255, 0.82);
+  line-height: 1.5;
+}
+.astro-cta {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #8FE9F5;
+}

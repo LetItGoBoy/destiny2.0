@@ -65,6 +65,11 @@ Page({
     });
   },
 
+  // 此刻星象 → 打开当前时刻星图
+  goAstroNow: function () {
+    wx.navigateTo({ url: '/pages/astro/astro?now=1' });
+  },
+
   // 今日运势卡：已绑定 → 打开本人命盘；未绑定 → 引导去记录绑定
   onTodayTap: function () {
     if (this._self) {
@@ -156,9 +161,8 @@ Page({
     this.setData({ useTrueSolar: e.detail.value });
   },
 
-  // ---- 排盘（带起盘过渡动画）----
-  onPaiPan: function () {
-    if (this.data.casting) return;
+  // 收集表单为排盘入参
+  collectInput: function () {
     var d = this.data;
     var time = d.time.split(':');
     var input = {
@@ -184,18 +188,34 @@ Page({
     input.province = prov.name;
     input.city = city.name;
     input.lng = city.lng;
+    return input;
+  },
 
-    // 先播起盘动画，再进结果页
+  // 先播起盘动画，再跳转
+  castThenGo: function (url) {
+    if (this.data.casting) return;
     this.setData({ casting: true });
     var that = this;
     setTimeout(function () {
       wx.navigateTo({
-        url: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(input)),
+        url: url,
         complete: function () {
           setTimeout(function () { that.setData({ casting: false }); }, 400);
         }
       });
     }, 1300);
+  },
+
+  // ---- 排盘（进结果页）----
+  onPaiPan: function () {
+    var input = this.collectInput();
+    this.castThenGo('/pages/result/result?input=' + encodeURIComponent(JSON.stringify(input)));
+  },
+
+  // ---- 一键详批（跳过排盘，直达解读）----
+  onQuickXiangPi: function () {
+    var input = this.collectInput();
+    this.castThenGo('/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(input)));
   },
 
   // ---- 模块入口 ----

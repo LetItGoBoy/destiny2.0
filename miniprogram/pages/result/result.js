@@ -172,6 +172,13 @@ Page({
     });
   },
 
+  // 出生星图
+  goAstro: function () {
+    wx.navigateTo({
+      url: '/pages/astro/astro?input=' + encodeURIComponent(JSON.stringify(this._input))
+    });
+  },
+
   extraColumn: function (p, label, sub) {
     return {
       label: label,

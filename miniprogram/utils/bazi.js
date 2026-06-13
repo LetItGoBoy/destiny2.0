@@ -189,6 +189,7 @@ function computeChart(input) {
     shengXiao: lunar.getYearShengXiaoByLiChun(),
     clockStr: formatDate(clockDate),
     chartStr: formatDate(chartDate),
+    timestamp: chartDate.getTime(),
     chartTime: pad(chartDate.getHours()) + ':' + pad(chartDate.getMinutes()),
     lunarStr: lunar.toString() + ' ' + timeZhiName,
     lunarShort: lunar.getMonthInChinese() + '月' + lunar.getDayInChinese() + ' ' + timeZhiName,

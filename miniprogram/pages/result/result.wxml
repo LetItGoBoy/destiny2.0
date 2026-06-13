@@ -14,6 +14,17 @@
     <text class="birth-lunar">{{meta.lunarShort}}</text>
   </view>
 
+  <!-- 出生星图入口（基础盘内，默认静止，进入后可时光流动）-->
+  <view class="astro-entry" wx:if="{{tab === 'base'}}" hover-class="astro-entry-hover" bindtap="goAstro">
+    <starfield class="astro-preview" ts="{{meta.timestamp}}" flow="{{false}}" spin="{{false}}" />
+    <view class="astro-body">
+      <view class="astro-tag">星河 · 亮点</view>
+      <view class="astro-title serif">出生星图</view>
+      <view class="astro-sub">你出生那一刻，日月五星的真实位置</view>
+      <view class="astro-cta">进入 3D 星图 ›</view>
+    </view>
+  </view>
+
   <!-- 基本信息页 -->
   <view class="card info" wx:if="{{tab === 'info'}}">
     <view class="info-head">
