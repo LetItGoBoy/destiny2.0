@@ -103,6 +103,10 @@
     </view>
 
     <button class="btn-primary btn-paipan" bindtap="onPaiPan">开始排盘</button>
+    <button class="btn-quick" bindtap="onQuickXiangPi">
+      <text class="btn-quick-main">一键详批</text>
+      <text class="btn-quick-sub">看不懂排盘？直接看性格 · 健康解读</text>
+    </button>
   </view>
 
   <!-- 配对模块入口 -->

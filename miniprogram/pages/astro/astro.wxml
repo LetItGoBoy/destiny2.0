@@ -7,7 +7,7 @@
   </view>
 
   <!-- 3D 星图 -->
-  <view class="sky-wrap card">
+  <view class="sky-wrap">
     <canvas type="2d" id="sky" class="sky"
       bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
     <view class="sky-tip">{{flowing ? '行星正按真实速度运行 · 水星疾驰而土星缓行' : (isNow ? '此刻星河 · 画面缓转仅为视角 · 点击星体看详情' : '星体定格于出生时刻 · 画面缓转仅为视角 · 点击星体看详情')}}</view>

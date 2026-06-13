@@ -76,6 +76,8 @@ Component({
       var that = this;
       if (this._stopped || !this._canvas) return;
       this.render();
+      // 既不旋转也不流动时，渲染一帧即静止，省电
+      if (!this.data.spin && !this.data.flow) return;
       this._canvas.requestAnimationFrame(function () {
         that.loop();
       });
@@ -101,9 +103,12 @@ Component({
       var ctx = this._ctx;
       var w = this._w, h = this._h;
       var now = Date.now();
-      if (this.data.spin) this._theta += 0.0016;
+      var dt = this._lastFrame ? Math.min(now - this._lastFrame, 100) : 16;
+      this._lastFrame = now;
+      var animate = this.data.spin || this.data.flow;
+      if (this.data.spin) this._theta += dt / 1000 * 0.06; // 约 3.4°/秒，缓转
       if (this.data.flow) {
-        this._simTs += 0.5 * 86400000;
+        this._simTs += dt * 86400; // 现实 1 秒 = 命盘 1 天
         this._sky = astro.compute(this._simTs);
       }
 
@@ -112,7 +117,7 @@ Component({
       // 星点
       for (var i = 0; i < this._stars.length; i++) {
         var stp = this._stars[i];
-        ctx.globalAlpha = 0.4 + 0.4 * Math.sin(now / 900 + stp.p);
+        ctx.globalAlpha = animate ? (0.4 + 0.4 * Math.sin(now / 900 + stp.p)) : 0.7;
         ctx.fillStyle = '#CFE0FF';
         ctx.beginPath();
         ctx.arc(stp.x, stp.y, stp.r, 0, Math.PI * 2);

@@ -2,9 +2,9 @@
 var FS_KEY = 'tl_fontsize';
 var SELF_KEY = 'tl_self';
 
-// 字号档位：std 标准 / l 大 / xl 特大
+// 字号档位：std 标准 / l 大 / xl 特大（默认大字号，方便阅读）
 function getFontSize() {
-  return wx.getStorageSync(FS_KEY) || 'std';
+  return wx.getStorageSync(FS_KEY) || 'l';
 }
 
 function setFontSize(v) {

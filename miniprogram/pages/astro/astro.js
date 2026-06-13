@@ -169,8 +169,7 @@ Page({
     var ctx = this._ctx;
     var w = this._w, h = this._h;
     var now = Date.now();
-    // 闲置 4 秒后缓慢自转（仅相机视角，星体位置不变）
-    if (now - this._lastTouchAt > 4000) this._theta += 0.0022;
+    // 默认静止：视角与星体均不动，仅手动拖动或时光流动时改变
 
     // 时光流动：行星按真实角速度运行（每帧约 1/3 天）
     if (this.data.flowing) {
