@@ -10,7 +10,9 @@
   <view class="sky-wrap card">
     <canvas type="2d" id="sky" class="sky"
       bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
-    <view class="sky-tip">拖动旋转视角 · 点击星体查看详情</view>
+    <view class="sky-tip">{{flowing ? '行星正按真实速度运行 · 水星疾驰而土星缓行' : '星体定格于出生时刻 · 画面缓转仅为视角 · 点击星体看详情'}}</view>
+    <view class="flow-label" wx:if="{{flowing && flowLabel}}">{{flowLabel}}</view>
+    <view class="flow-btn {{flowing ? 'flow-btn-on' : ''}}" bindtap="toggleFlow">{{flowing ? '回到出生时刻' : '▶ 时光流动'}}</view>
     <!-- 选中星体信息 -->
     <view class="sel-card" wx:if="{{selected}}" bindtap="closeSelected">
       <view class="sel-name serif {{selected.cls ? 'wx-' + selected.cls : ''}}">{{selected.name}}<text class="sel-ancient">{{selected.ancient}}</text></view>

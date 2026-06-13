@@ -16,7 +16,9 @@ Page({
     meta: {},
     baZiStr: '',
     list: [],
-    selected: null
+    selected: null,
+    flowing: false,
+    flowLabel: ''
   },
 
   onLoad: function (options) {
@@ -39,7 +41,9 @@ Page({
       setTimeout(function () { wx.navigateBack(); }, 1200);
       return;
     }
-    this._sky = astro.compute(chart.meta.timestamp);
+    this._birthTs = chart.meta.timestamp;
+    this._simTs = this._birthTs;
+    this._sky = astro.compute(this._birthTs);
 
     this.setData({
       loaded: true,
@@ -137,8 +141,23 @@ Page({
     var ctx = this._ctx;
     var w = this._w, h = this._h;
     var now = Date.now();
-    // 闲置 4 秒后缓慢自转
+    // 闲置 4 秒后缓慢自转（仅相机视角，星体位置不变）
     if (now - this._lastTouchAt > 4000) this._theta += 0.0022;
+
+    // 时光流动：行星按真实角速度运行（每帧约 1/3 天）
+    if (this.data.flowing) {
+      this._simTs += 0.34 * 86400000;
+      this._sky = astro.compute(this._simTs);
+      this._flowFrame = (this._flowFrame || 0) + 1;
+      if (this._flowFrame % 12 === 1) {
+        var d = new Date(this._simTs);
+        var days = Math.round((this._simTs - this._birthTs) / 86400000);
+        var span = days >= 365 ? (days / 365.25).toFixed(1) + ' 年' : days + ' 天';
+        this.setData({
+          flowLabel: d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 · 出生后 ' + span
+        });
+      }
+    }
 
     ctx.clearRect(0, 0, w, h);
 
@@ -281,6 +300,8 @@ Page({
   onTouchEnd: function (e) {
     this._lastTouchAt = Date.now();
     if (this._moved || !e.changedTouches.length) return;
+    // 时光流动中星体位置随时间变化，与出生数据不对应，不响应点选
+    if (this.data.flowing) return;
     // 点选星体
     var x = e.changedTouches[0].x;
     var y = e.changedTouches[0].y;
@@ -318,5 +339,17 @@ Page({
 
   closeSelected: function () {
     this.setData({ selected: null });
+  },
+
+  // 时光流动开关：开启后行星按真实角速度运行；关闭即回到出生时刻
+  toggleFlow: function () {
+    if (this.data.flowing) {
+      this._simTs = this._birthTs;
+      this._sky = astro.compute(this._birthTs);
+      this.setData({ flowing: false, flowLabel: '' });
+    } else {
+      this._flowFrame = 0;
+      this.setData({ flowing: true, selected: null });
+    }
   }
 });
