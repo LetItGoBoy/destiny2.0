@@ -65,6 +65,11 @@ Page({
     });
   },
 
+  // 此刻星象 → 打开当前时刻星图
+  goAstroNow: function () {
+    wx.navigateTo({ url: '/pages/astro/astro?now=1' });
+  },
+
   // 今日运势卡：已绑定 → 打开本人命盘；未绑定 → 引导去记录绑定
   onTodayTap: function () {
     if (this._self) {

@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "出生星图"
+  "navigationBarTitleText": "星图",
+  "navigationBarBackgroundColor": "#0C1026",
+  "navigationBarTextStyle": "white"
 }

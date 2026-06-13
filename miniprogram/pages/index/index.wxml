@@ -8,6 +8,16 @@
     </view>
   </view>
 
+  <!-- 此刻星象（程序亮点 · 默认展示） -->
+  <view class="starhero" hover-class="starhero-hover" bindtap="goAstroNow">
+    <starfield class="starhero-canvas" ts="{{0}}" flow="{{true}}" spin="{{true}}" />
+    <view class="starhero-overlay">
+      <view class="starhero-tag">星河实时演进</view>
+      <view class="starhero-title serif">此刻星象</view>
+      <view class="starhero-sub">日月五星正在运行 · 点击进入星图</view>
+    </view>
+  </view>
+
   <!-- 今日运势卡 -->
   <view class="card today" hover-class="mod-hover" bindtap="onTodayTap" wx:if="{{daily}}">
     <view class="today-head">
@@ -89,7 +99,7 @@
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>
       </view>
-      <switch checked="{{useTrueSolar}}" color="#A78BFA" bindchange="onTrueSolarChange" />
+      <switch checked="{{useTrueSolar}}" color="#6D5DF6" bindchange="onTrueSolarChange" />
     </view>
 
     <button class="btn-primary btn-paipan" bindtap="onPaiPan">开始排盘</button>

@@ -23,6 +23,34 @@ Page({
 
   onLoad: function (options) {
     this.setData({ fs: prefs.getFontSize() });
+
+    // 此刻星象模式（首页进入，无出生数据）
+    if (options.now) {
+      this._birthTs = Date.now();
+      this._simTs = this._birthTs;
+      this._sky = astro.compute(this._birthTs);
+      var d = new Date(this._birthTs);
+      this.setData({
+        loaded: true,
+        isNow: true,
+        meta: {
+          name: '此刻星象',
+          genderText: '',
+          lunarShort: '',
+          chartStr: d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' +
+            (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes()
+        },
+        baZiStr: '',
+        list: this._sky.list
+      });
+      this._theta = -0.6;
+      this._elev = 0.42;
+      this._lastTouchAt = 0;
+      this._screenPos = [];
+      this.initCanvas();
+      return;
+    }
+
     var input = null;
     try {
       input = JSON.parse(decodeURIComponent(options.input));
@@ -270,7 +298,7 @@ Page({
         ctx.fillStyle = 'rgba(241, 237, 251, 0.82)';
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'center';
-        var label = it.wx ? it.name + '·' + it.wx : it.name;
+        var label = it.name;
         ctx.fillText(label, it.x, it.y + it.size + 13);
       }
     }

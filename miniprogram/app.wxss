@@ -1,90 +1,92 @@
-/* 同乐八字 - 全局样式（深色星空紫 · 现代神秘风） */
-/* 主色：薰衣草紫 #A78BFA  深紫底 #14101F  柔粉 #F2A7C3  鎏金 #E3C27E */
+/* 同乐八字 - 全局样式（浅色 · 未来星河风） */
+/* 主色：靛紫 #6D5DF6  电光青 #22D3EE  墨蓝近黑 #14152B  白底 #F5F6FB */
 
 page {
-  background: #14101F;
-  background-image: linear-gradient(180deg, #221A3D 0%, #181228 360rpx, #14101F 720rpx);
+  background: #F5F6FB;
+  background-image: linear-gradient(180deg, #EEF0FB 0%, #F5F6FB 420rpx);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  color: #F1EDFB;
+  color: #14152B;
   font-size: 28rpx;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
-  --primary: #A78BFA;
-  --primary-deep: #7C5CE0;
-  --pink: #F2A7C3;
-  --gold: #E3C27E;
-  --ink: #F1EDFB;
-  --ink-2: #A79FC2;
-  --ink-3: #6F6791;
-  --card: #201A38;
-  --line: rgba(255, 255, 255, 0.08);
-  --fill: rgba(255, 255, 255, 0.05);
-  --tint: rgba(167, 139, 250, 0.16);
+  --primary: #6D5DF6;
+  --primary-deep: #4B3DD4;
+  --cyan: #22D3EE;
+  --pink: #EC5C8D;
+  --gold: #C08A2B;
+  --ink: #14152B;
+  --ink-2: #5B5E78;
+  --ink-3: #9A9CB5;
+  --card: #FFFFFF;
+  --line: rgba(20, 21, 60, 0.08);
+  --fill: #F1F2FA;
+  --tint: rgba(109, 93, 246, 0.10);
 }
 
-/* 衬线标题字 */
+/* 现代标题字（去衬线、去宋体，偏未来感） */
 .serif {
-  font-family: "Songti SC", "STSong", "SimSun", serif;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  letter-spacing: 1rpx;
 }
 
-/* 卡片：深紫玻璃质感 */
+/* 卡片：白底柔投影 */
 .card {
   background: var(--card);
   border-radius: 24rpx;
   border: 1rpx solid var(--line);
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8rpx 30rpx rgba(20, 21, 60, 0.06);
 }
 
-/* 主按钮：紫色渐变柔光（flex 保证文字垂直水平居中） */
+/* 主按钮：靛紫→电光青渐变 */
 .btn-primary {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
-  color: #FBF9FF;
+  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  color: #FFFFFF;
   border-radius: 20rpx;
   font-size: 34rpx;
   font-weight: 600;
   letter-spacing: 6rpx;
   line-height: 1;
   padding: 0;
-  box-shadow: 0 10rpx 28rpx rgba(124, 92, 224, 0.45);
+  box-shadow: 0 12rpx 30rpx rgba(109, 93, 246, 0.32);
 }
 .btn-primary::after {
   border: none;
 }
 .btn-primary.button-hover {
-  opacity: 0.85;
+  opacity: 0.88;
 }
 
-/* 五行配色（适配深底的高亮版）：木火土金水 */
-.wx-mu { color: #5ECC8F; }
-.wx-huo { color: #FF8A70; }
-.wx-tu { color: #D9A05B; }
-.wx-jin { color: #F0D078; }
-.wx-shui { color: #6FB6FF; }
+/* 五行配色（适配白底的深色版）：木火土金水 */
+.wx-mu { color: #16A971; }
+.wx-huo { color: #E85540; }
+.wx-tu { color: #C0872C; }
+.wx-jin { color: #B0851C; }
+.wx-shui { color: #2E86E6; }
 
-.bg-mu { background: #5ECC8F; }
-.bg-huo { background: #FF8A70; }
-.bg-tu { background: #D9A05B; }
-.bg-jin { background: #F0D078; }
-.bg-shui { background: #6FB6FF; }
+/* 五行实底（彩色圆点，配深字） */
+.bg-mu { background: #34C88A; }
+.bg-huo { background: #FF7A63; }
+.bg-tu { background: #E0A85A; }
+.bg-jin { background: #ECC64E; }
+.bg-shui { background: #5AA6F2; }
 
 /* 文字辅助 */
 .text-2 { color: var(--ink-2); }
 .text-3 { color: var(--ink-3); }
 
-/* 印章式 LOGO（紫晕月相风） */
+/* LOGO 徽标（现代玻璃渐变） */
 .seal {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #9D78F8, #5B3FA8);
-  color: #FBF9FF;
-  border-radius: 18rpx;
-  box-shadow: 0 8rpx 24rpx rgba(124, 92, 224, 0.45), inset 0 0 0 3rpx rgba(251, 249, 255, 0.35);
-  font-family: "Songti SC", "STSong", "SimSun", serif;
+  background: linear-gradient(135deg, #7B6BFF, #4B3DD4);
+  color: #FFFFFF;
+  border-radius: 22rpx;
+  box-shadow: 0 10rpx 26rpx rgba(75, 61, 212, 0.35);
   font-weight: 700;
 }

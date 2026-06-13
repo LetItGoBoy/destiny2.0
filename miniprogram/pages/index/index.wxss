@@ -34,12 +34,63 @@
   letter-spacing: 2rpx;
 }
 
+/* 此刻星象 Hero（深色星河面板，浮于浅色页面） */
+.starhero {
+  position: relative;
+  height: 400rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  background: radial-gradient(circle at 50% 42%, #20284D 0%, #0E1230 78%);
+  box-shadow: 0 16rpx 40rpx rgba(30, 35, 90, 0.28);
+  border: 1rpx solid rgba(123, 107, 255, 0.3);
+}
+.starhero-hover {
+  opacity: 0.94;
+}
+.starhero-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.starhero-overlay {
+  position: absolute;
+  left: 30rpx;
+  bottom: 28rpx;
+  pointer-events: none;
+}
+.starhero-tag {
+  display: inline-block;
+  font-size: 20rpx;
+  color: #C7D2FF;
+  background: rgba(123, 107, 255, 0.22);
+  border: 1rpx solid rgba(123, 107, 255, 0.45);
+  border-radius: 100rpx;
+  padding: 4rpx 18rpx;
+  letter-spacing: 1rpx;
+}
+.starhero-title {
+  margin-top: 14rpx;
+  font-size: 46rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 4rpx;
+  text-shadow: 0 2rpx 18rpx rgba(0, 0, 0, 0.4);
+}
+.starhero-sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: rgba(220, 226, 255, 0.85);
+}
+
 /* 今日运势卡 */
 .today {
   padding: 24rpx 30rpx 26rpx;
   margin-bottom: 24rpx;
-  background: linear-gradient(135deg, rgba(157, 120, 248, 0.16), rgba(32, 26, 56, 0.6)), var(--card);
-  border-color: rgba(167, 139, 250, 0.25);
+  background: linear-gradient(135deg, rgba(109, 93, 246, 0.10), rgba(34, 211, 238, 0.06)), var(--card);
+  border-color: rgba(109, 93, 246, 0.22);
 }
 .today-head {
   display: flex;
@@ -190,8 +241,8 @@
   color: var(--ink-2);
 }
 .seg-on {
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
-  color: #FBF9FF;
+  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  color: #FFFFFF;
   font-weight: 600;
 }
 
@@ -351,8 +402,8 @@
   top: 0;
   right: 0;
   font-size: 18rpx;
-  color: #1A142E;
-  background: var(--gold);
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
   padding: 4rpx 14rpx;
   border-radius: 0 22rpx 0 14rpx;
   font-weight: 600;
@@ -441,3 +492,10 @@
 .fs-xl .recent-bazi { font-size: 32rpx; }
 .fs-xl .recent-line2 { font-size: 28rpx; }
 .fs-xl .mod-title { font-size: 34rpx; }
+
+/* 起盘过渡为深色覆盖层：局部回到亮色文字 */
+.cast-mask {
+  color: #E8E6FF;
+  --ink-2: #C9CCE6;
+  --primary: #A78BFA;
+}

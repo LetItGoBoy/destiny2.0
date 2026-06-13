@@ -1,6 +1,28 @@
+/* 星图为沉浸式深色「天文馆」，在浅色 App 中局部覆盖为深色主题 */
 .page {
   padding: 28rpx 28rpx 56rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 50% 10%, #1B2347 0%, #0C1026 58%, #070A1A 100%);
+  --card: rgba(255, 255, 255, 0.05);
+  --line: rgba(255, 255, 255, 0.12);
+  --fill: rgba(255, 255, 255, 0.06);
+  --ink: #F1EDFB;
+  --ink-2: #C3C7E0;
+  --ink-3: #8A8FB5;
+  --primary: #A78BFA;
+  --gold: #E3C27E;
+  --tint: rgba(167, 139, 250, 0.18);
 }
+.page .card {
+  box-shadow: none;
+}
+/* 深色面板下五行文字回到高亮版 */
+.page .wx-mu { color: #5ED39A; }
+.page .wx-huo { color: #FF8A70; }
+.page .wx-tu { color: #E0B070; }
+.page .wx-jin { color: #F0D078; }
+.page .wx-shui { color: #7FB6FF; }
 
 .head {
   padding: 8rpx 8rpx 24rpx;

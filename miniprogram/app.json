@@ -10,16 +10,16 @@
     "pages/match/match"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#221A3D",
+    "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTitleText": "同乐八字",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#14101F",
-    "backgroundTextStyle": "light"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F5F6FB",
+    "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#6F6791",
-    "selectedColor": "#A78BFA",
-    "backgroundColor": "#1B1531",
+    "color": "#9A9CB5",
+    "selectedColor": "#6D5DF6",
+    "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
       { "pagePath": "pages/index/index", "text": "排盘", "iconPath": "images/tab/paipan.png", "selectedIconPath": "images/tab/paipan-on.png" },
