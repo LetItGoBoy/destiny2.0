@@ -16,16 +16,17 @@
   color: var(--ink-3);
 }
 
-/* 模块网格 */
+/* 模块网格：固定两列，窄屏也不塌成单列 */
 .grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 24rpx;
+  justify-content: space-between;
 }
 .mod {
-  width: calc(50% - 12rpx);
+  width: 48.5%;
   box-sizing: border-box;
   padding: 30rpx 28rpx;
+  margin-bottom: 24rpx;
 }
 .mod-hover {
   opacity: 0.85;

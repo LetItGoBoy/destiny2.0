@@ -16,6 +16,26 @@
     <view class="summary serif">{{summary}}</view>
   </view>
 
+  <!-- 调候（首位） -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-th">调候</text>
+      <text class="sec-title serif">气候{{tiaoHou.climate}} · {{tiaoHou.deLi}}</text>
+    </view>
+    <view class="chip-row" wx:if="{{tiaoHou.yong.length}}">
+      <text class="chip-label">用神</text>
+      <view class="yong-chip" wx:for="{{tiaoHou.yong}}" wx:key="gan">
+        <text class="yong-gan serif wx-{{item.cls}}">{{item.gan}}</text>
+        <text class="yong-status {{item.status === '透干' ? 'st-tou' : (item.status === '藏支' ? 'st-cang' : 'st-none')}}">{{item.status}}</text>
+      </view>
+    </view>
+    <view class="chip-row" wx:if="{{tiaoHou.xiYong.length}}">
+      <text class="chip-label">喜用</text>
+      <text class="wx-chip wx-{{item.cls}}" wx:for="{{tiaoHou.xiYong}}" wx:key="gan">{{item.gan}}</text>
+    </view>
+    <view class="sec-line" wx:for="{{tiaoHou.lines}}" wx:key="*this">{{item}}</view>
+  </view>
+
   <!-- 旺衰 -->
   <view class="card sec">
     <view class="sec-head">
@@ -40,22 +60,6 @@
       </block>
     </view>
     <view class="sec-note">{{wangShuai.xiNote}}</view>
-  </view>
-
-  <!-- 调候 -->
-  <view class="card sec">
-    <view class="sec-head">
-      <text class="sec-tag tag-th">调候</text>
-      <text class="sec-title serif">气候{{tiaoHou.climate}} · {{tiaoHou.deLi}}</text>
-    </view>
-    <view class="chip-row" wx:if="{{tiaoHou.yong.length}}">
-      <text class="chip-label">用神</text>
-      <view class="yong-chip" wx:for="{{tiaoHou.yong}}" wx:key="gan">
-        <text class="yong-gan serif wx-{{item.cls}}">{{item.gan}}</text>
-        <text class="yong-status {{item.status === '透干' ? 'st-tou' : (item.status === '藏支' ? 'st-cang' : 'st-none')}}">{{item.status}}</text>
-      </view>
-    </view>
-    <view class="sec-line" wx:for="{{tiaoHou.lines}}" wx:key="*this">{{item}}</view>
   </view>
 
   <!-- 格局 -->
