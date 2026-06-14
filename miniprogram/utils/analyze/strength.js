@@ -43,17 +43,24 @@ function analyze(ctx, t) {
   for (var k = 0; k < gi.length; k++) seenGrp(ctx.gans[gi[k]]);
   for (var z = 0; z < 4; z++) seenGrp(LunarUtil.ZHI_HIDE_GAN[ctx.zhis[z]][0]);
 
+  // 传统三才修正：得令为首（+6%）、每处通根加分（+2.5%/处）
+  // 纯力量比值未能区分「根深少扶」与「真浮虚弱」，加成后再定级
+  var bonus = 0;
+  if (deLing) bonus += 0.06;
+  bonus += roots.length * 0.025;
+  var score = Math.min(p + bonus, 0.95);
+
   // 定级（从格需满足极端条件；专旺允许食伤吐秀）
   var level;
   var special = '';
-  if (p >= 0.88 || (p >= 0.7 && deLing && !guanShaSeen && !caiSeen)) {
+  if (score >= 0.88 || (score >= 0.7 && deLing && !guanShaSeen && !caiSeen)) {
     level = '极强';
     special = '从强';
-  } else if (p >= 0.62) {
+  } else if (score >= 0.62) {
     level = '身强';
-  } else if (p >= 0.48) {
+  } else if (score >= 0.48) {
     level = '中和';
-  } else if (p >= 0.3) {
+  } else if (score >= 0.3) {
     level = '身弱';
   } else if (!roots.length && !yinTou && !biTou) {
     level = '极弱';
@@ -109,6 +116,12 @@ function analyze(ctx, t) {
   lines.push('日主' + dayGan + '属' + dm + '，生于' + ctx.zhis[1] + '月，月令本气为' + monthGod + '，' + (deLing ? '得令而旺' : '失令无气') + '。');
   lines.push(roots.length ? '地支于' + roots.join('、') + '通根，根气' + (roots.length >= 2 ? '深厚' : '尚浅') + '。' : '四支无根，日主虚浮。');
   lines.push('全盘生扶力量约占 ' + pct(p) + '%，克泄耗约占 ' + pct(1 - p) + '%。');
+  if (bonus > 0) {
+    var bonusParts = [];
+    if (deLing) bonusParts.push('得令+6%');
+    if (roots.length) bonusParts.push('通根' + roots.length + '处+' + pct(roots.length * 0.025) + '%');
+    lines.push('综合三才（得令·得地）修正后有效强度约 ' + pct(score) + '%（' + bonusParts.join('、') + '）。');
+  }
 
   var verdict;
   if (special === '从强') verdict = '综合判定：从强格局，旺之极者宜顺不宜逆。';
