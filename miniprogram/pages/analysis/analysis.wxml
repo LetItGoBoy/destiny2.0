@@ -60,6 +60,49 @@
       </block>
     </view>
     <view class="sec-note">{{wangShuai.xiNote}}</view>
+
+    <!-- 计算过程折叠面板 -->
+    <view class="calc-toggle" bindtap="onToggleBreakdown">
+      <text class="calc-toggle-text">{{showBreakdown ? '收起' : '展开'}}计算过程</text>
+      <text class="calc-arrow {{showBreakdown ? 'calc-arrow-up' : ''}}">▾</text>
+    </view>
+    <view wx:if="{{showBreakdown}}" class="calc-breakdown">
+      <!-- 逐字明细 -->
+      <view class="bd-row {{item.pillarIdx > 0 && item.isGanRow ? 'bd-sep' : ''}}"
+            wx:for="{{wangShuai.breakdown}}" wx:key="label">
+        <text class="bd-pos">{{item.label}}</text>
+        <text class="bd-char wx-{{item.cls}}">{{item.char}}</text>
+        <text class="bd-godwx">{{item.godWx}}</text>
+        <text class="bd-math {{item.party === 'same' ? 'bd-same' : (item.party === 'diff' ? 'bd-diff' : 'bd-day')}}">{{item.math}}</text>
+        <text class="bd-ptag {{item.party === 'same' ? 'bd-same' : (item.party === 'diff' ? 'bd-diff' : '')}}">
+          {{item.party === 'same' ? '生扶' : (item.party === 'diff' ? '克泄耗' : '')}}
+        </text>
+      </view>
+      <!-- 汇总行 -->
+      <view class="bd-footer">
+        <view class="bd-foot-row">
+          <text class="bd-foot-lbl">生扶合计</text>
+          <text class="bd-same bd-foot-val">{{wangShuai.rawSame}}</text>
+          <text class="bd-foot-sep">·</text>
+          <text class="bd-foot-lbl">克泄耗合计</text>
+          <text class="bd-diff bd-foot-val">{{wangShuai.rawDiff}}</text>
+        </view>
+        <view class="bd-foot-row">
+          <text class="bd-foot-lbl">原始比例</text>
+          <text class="bd-foot-val">{{wangShuai.rawSame}} ÷ {{wangShuai.rawTotal}} = {{wangShuai.samePct}}%</text>
+        </view>
+        <view class="bd-foot-row" wx:for="{{wangShuai.bonusLines}}" wx:key="label" wx:for-item="bl">
+          <text class="bd-foot-lbl">三才·{{bl.label}}</text>
+          <text class="bd-same bd-foot-val">{{bl.val}}</text>
+          <text class="bd-foot-note">{{bl.note}}</text>
+        </view>
+        <view class="bd-foot-row bd-foot-total">
+          <text class="bd-foot-lbl">有效强度</text>
+          <text class="bd-same bd-foot-val">{{wangShuai.scorePct}}%</text>
+          <text class="bd-foot-result">→ 日主{{wangShuai.special || wangShuai.level}}</text>
+        </view>
+      </view>
+    </view>
   </view>
 
   <!-- 格局 -->

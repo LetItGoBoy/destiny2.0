@@ -50,6 +50,11 @@ function analyze(ctx, t) {
   bonus += roots.length * 0.025;
   var score = Math.min(p + bonus, 0.95);
 
+  // 三才修正明细（供页面展示计算过程）
+  var bonusLines = [];
+  if (deLing) bonusLines.push({ label: '得令', val: '+6%', note: '月令本气属印比' });
+  if (roots.length) bonusLines.push({ label: '通根' + roots.length + '处', val: '+' + pct(roots.length * 0.025) + '%', note: roots.join('、') });
+
   // 定级（从格需满足极端条件；专旺允许食伤吐秀）
   var level;
   var special = '';
@@ -139,7 +144,14 @@ function analyze(ctx, t) {
     jiShen: toChips(ji),
     xiNote: xiNote,
     lines: lines,
-    verdict: verdict
+    verdict: verdict,
+    // 计算过程明细
+    breakdown: t.detail,
+    rawSame: t.same.toFixed(2),
+    rawDiff: t.diff.toFixed(2),
+    rawTotal: t.total.toFixed(2),
+    scorePct: pct(score),
+    bonusLines: bonusLines
   };
 }
 

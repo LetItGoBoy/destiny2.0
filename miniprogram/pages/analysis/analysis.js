@@ -14,7 +14,12 @@ Page({
     tiaoHou: null,
     geJu: null,
     xingGe: null,
-    jianKang: null
+    jianKang: null,
+    showBreakdown: false
+  },
+
+  onToggleBreakdown: function () {
+    this.setData({ showBreakdown: !this.data.showBreakdown });
   },
 
   onLoad: function (options) {

@@ -56,6 +56,7 @@ function keWoOf(dm) {
  * 全盘加权统计
  * 天干各计 1 分；地支按柱权重 × 藏干比例摊分。
  * elem 含日主本身；same/diff（同党/异党）与十神不计日主。
+ * 同时返回 detail 数组，记录每个字的来源、权重公式与得分，供页面展示计算过程。
  */
 function tally(gans, zhis, dayGan) {
   var dm = ganWx(dayGan);
@@ -63,6 +64,9 @@ function tally(gans, zhis, dayGan) {
   var god = { 比肩: 0, 劫财: 0, 食神: 0, 伤官: 0, 偏财: 0, 正财: 0, 七杀: 0, 正官: 0, 偏印: 0, 正印: 0 };
   var same = 0;
   var diff = 0;
+  var detail = [];
+  var PLBLS = ['年', '月', '日', '时'];
+  var RANKS = ['本', '中', '余'];
 
   var add = function (g, w, isDayMaster) {
     var wx = ganWx(g);
@@ -75,14 +79,46 @@ function tally(gans, zhis, dayGan) {
   };
 
   for (var i = 0; i < 4; i++) {
-    add(gans[i], 1.0, i === 2);
+    var isDay = i === 2;
+    var g0 = gans[i];
+    var wx0 = ganWx(g0);
+    var rel0 = relation(dm, wx0);
+    add(g0, 1.0, isDay);
+    detail.push({
+      pillarIdx: i,
+      isGanRow: true,
+      label: PLBLS[i] + '干',
+      char: g0,
+      cls: WX_CLS[wx0],
+      godWx: isDay ? '日主' : (LunarUtil.SHI_SHEN[dayGan + g0] + '·' + wx0),
+      math: isDay ? '—' : '= 1.00',
+      w: isDay ? null : 1.0,
+      party: isDay ? 'day' : ((rel0 === '同我' || rel0 === '生我') ? 'same' : 'diff')
+    });
+
     var hides = LunarUtil.ZHI_HIDE_GAN[zhis[i]];
     var ws = HIDE_W[hides.length];
     for (var j = 0; j < hides.length; j++) {
-      add(hides[j], ZHI_W[i] * ws[j], false);
+      var hw = ZHI_W[i] * ws[j];
+      var g1 = hides[j];
+      var wx1 = ganWx(g1);
+      var rel1 = relation(dm, wx1);
+      add(g1, hw, false);
+      detail.push({
+        pillarIdx: i,
+        isGanRow: false,
+        label: PLBLS[i] + '支' + zhis[i] + '(' + RANKS[j] + ')',
+        char: g1,
+        cls: WX_CLS[wx1],
+        godWx: LunarUtil.SHI_SHEN[dayGan + g1] + '·' + wx1,
+        math: ZHI_W[i].toFixed(1) + '×' + ws[j].toFixed(1) + ' = ' + hw.toFixed(2),
+        w: parseFloat(hw.toFixed(2)),
+        party: (rel1 === '同我' || rel1 === '生我') ? 'same' : 'diff'
+      });
     }
   }
-  return { dm: dm, elem: elem, god: god, same: same, diff: diff, total: same + diff };
+
+  return { dm: dm, elem: elem, god: god, same: same, diff: diff, total: same + diff, detail: detail };
 }
 
 // 日主在哪些地支有根（藏干同五行）
