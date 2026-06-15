@@ -7,55 +7,61 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{ background:radial-gradient(120% 90% at 50% 0%,#15102C 0%,#0B0817 60%,#060410 100%);
-        color:#EDE9FB; max-width:440px; margin:0 auto; padding:24px 20px 40px;
+        color:#EDE9FB; max-width:440px; margin:0 auto; padding:24px 20px 70px;
         font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
   .hd{ text-align:center; margin-bottom:6px; }
   .hd .bz{ font-size:18px; letter-spacing:6px; font-weight:600; }
   .hd .s{ font-size:11px; color:#8c84ad; margin-top:6px; letter-spacing:2px; }
 
-  .panel{ position:relative; margin-top:30px; }
-  .ptitle{ font-size:12px; color:#9a92be; letter-spacing:2px; margin-bottom:14px; }
+  .panel{ position:relative; margin-top:34px; }
+  .ptitle{ font-size:12px; color:#9a92be; letter-spacing:2px; margin-bottom:16px; }
   .row{ position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; z-index:2; }
-  .row.two{ grid-template-columns:repeat(2,1fr); max-width:230px; }
+  .row.two{ grid-template-columns:repeat(2,1fr); max-width:220px; }
   .cell{ aspect-ratio:1/1.15; border-radius:16px; display:flex; flex-direction:column;
          align-items:center; justify-content:center; gap:5px;
          background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
   .cell .lab{ font-size:10px; color:#7a719e; }
   .cell .zhi{ font-size:34px; font-weight:800; font-family:"STKaiti","KaiTi",serif; color:#E9C06A;
-              line-height:1; }
+              line-height:1; transition:opacity .3s; }
   svg.links{ position:absolute; inset:0; width:100%; height:100%; z-index:5; overflow:visible; pointer-events:none; }
 
-  /* 各关系动画 */
+  /* === 冲：红色闪电对撞 === */
   .bolt{ fill:none; stroke:#FF4D4D; stroke-width:2.4; stroke-linecap:round;
          filter:drop-shadow(0 0 5px #ff4d4d); stroke-dasharray:5 5;
          animation:flow .55s linear infinite, flick .9s ease-in-out infinite; }
   @keyframes flow{ to{stroke-dashoffset:-20;} }
-  @keyframes flick{ 0%,100%{opacity:.55} 45%{opacity:1} }
-
-  .xing{ fill:rgba(157,90,230,.05); stroke:#A86BE8; stroke-width:1.8; stroke-dasharray:7 6;
-         filter:drop-shadow(0 0 4px #9a5ae6);
-         animation:rot 5s linear infinite, pulseS 1.6s ease-in-out infinite; transform-origin:center; }
-  @keyframes rot{ to{stroke-dashoffset:-52;} }
-  @keyframes pulseS{ 0%,100%{opacity:.55} 50%{opacity:1} }
-
-  .he{ fill:none; stroke:#5BD08A; stroke-width:2.6; stroke-linecap:round;
-       filter:drop-shadow(0 0 6px #5bd08a); stroke-dasharray:4 8;
-       animation:pull .8s linear infinite; }
-  @keyframes pull{ to{stroke-dashoffset:-24;} }
-
-  .hai{ fill:none; stroke:#FF9B3D; stroke-width:2.2; stroke-linecap:round;
-        filter:drop-shadow(0 0 4px #ff9b3d); animation:stab 1.4s ease-in-out infinite; }
-  @keyframes stab{ 0%,100%{opacity:.5; stroke-width:1.8} 50%{opacity:1; stroke-width:3} }
-
-  /* 地支反应 */
-  .vibX{ animation:vibX .5s ease-in-out infinite; }     /* 冲：水平对撞 */
+  @keyframes flick{ 0%,100%{opacity:.5} 45%{opacity:1} }
+  .vibX{ animation:vibX .5s ease-in-out infinite; }
   @keyframes vibX{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(3px)} 75%{transform:translateX(-3px)} }
-  .vibR{ animation:vibR 1.6s ease-in-out infinite; }    /* 刑：抖动 */
-  @keyframes vibR{ 0%,100%{transform:rotate(0)} 25%{transform:rotate(1.5deg)} 75%{transform:rotate(-1.5deg)} }
-  .lean{ animation:lean 1.8s ease-in-out infinite; }    /* 合：倾靠 */
+
+  /* === 刑：内耗（能量被抽向中心打旋消耗） === */
+  .drainline{ fill:none; stroke:#9a5ae6; stroke-width:1.4; stroke-dasharray:3 7; opacity:.5;
+              animation:suck 1s linear infinite; }
+  @keyframes suck{ to{stroke-dashoffset:-20;} }   /* 向中心流动 */
+  .vortex{ fill:none; stroke:#B47BF0; stroke-width:2; transform-box:fill-box; transform-origin:center;
+           filter:drop-shadow(0 0 6px #9a5ae6); animation:swirl 2.2s linear infinite; }
+  @keyframes swirl{ 0%{transform:rotate(0) scale(.7);opacity:.4} 50%{transform:rotate(180deg) scale(1.1);opacity:1} 100%{transform:rotate(360deg) scale(.7);opacity:.4} }
+  .pdrain{ fill:#C79BFF; }
+  .drain .zhi{ animation:dim 1.6s ease-in-out infinite; }
+  @keyframes dim{ 0%,100%{opacity:1} 55%{opacity:.35} }   /* 字发虚 */
+
+  /* === 合：捆绑（叠靠 + 绳索收紧） === */
+  .bind{ fill:rgba(91,208,138,.06); stroke:#5BD08A; stroke-width:2.4; stroke-dasharray:9 5;
+         transform-box:fill-box; transform-origin:center; filter:drop-shadow(0 0 6px #5bd08a);
+         animation:cinch 1.8s ease-in-out infinite; }
+  @keyframes cinch{ 0%,100%{transform:scale(1.05);opacity:.6} 50%{transform:scale(.98);opacity:1} }
+  .knot{ fill:#5BD08A; filter:drop-shadow(0 0 5px #5bd08a); animation:knotp 1.8s ease-in-out infinite; }
+  @keyframes knotp{ 0%,100%{r:4} 50%{r:6} }
+  .lean{ animation:lean 1.8s ease-in-out infinite; }
   @keyframes lean{ 0%,100%{transform:translateX(0)} 50%{transform:translateX(var(--lx,0))} }
 
-  .legend{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:34px;
+  /* === 害：暗算（暗器偷袭） === */
+  .sneak{ fill:none; stroke:#FF7A33; stroke-width:1.3; stroke-dasharray:2 6; opacity:.32; }
+  .dagger{ fill:#FF7A33; filter:drop-shadow(0 0 5px #ff7a33); }
+  .flinch{ animation:flinch 2.2s ease-in-out infinite; }
+  @keyframes flinch{ 0%,68%,100%{transform:translate(0,0)} 74%{transform:translate(-4px,2px)} 80%{transform:translate(3px,-1px)} }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:16px; justify-content:center; margin-top:38px;
            font-size:12px; color:#9a92be; }
   .legend i{ display:inline-block; width:22px; height:3px; border-radius:3px; margin-right:6px;
              vertical-align:middle; }
@@ -70,7 +76,6 @@
     <div class="s">命主 · 己土　|　地支 辰戌未丑 · 刑冲合害</div>
   </div>
 
-  <!-- 真实盘：冲 + 三刑 -->
   <div class="panel">
     <div class="ptitle">本盘地支关系（点连线看解释）</div>
     <div class="row" id="row1">
@@ -82,31 +87,29 @@
     <svg class="links" id="svg1"></svg>
   </div>
 
-  <!-- 合 示意 -->
   <div class="panel">
-    <div class="ptitle">合（示意 · 卯戌六合）</div>
+    <div class="ptitle">合（示意 · 卯戌六合）— 捆绑相系</div>
     <div class="row two" id="row2">
-      <div class="cell" data-i="0"><span class="lab"></span><span class="zhi">卯</span></div>
-      <div class="cell" data-i="1"><span class="lab"></span><span class="zhi">戌</span></div>
+      <div class="cell" data-i="0"><span class="zhi">卯</span></div>
+      <div class="cell" data-i="1"><span class="zhi">戌</span></div>
     </div>
     <svg class="links" id="svg2"></svg>
   </div>
 
-  <!-- 害 示意 -->
   <div class="panel">
-    <div class="ptitle">害（示意 · 酉戌相害）</div>
+    <div class="ptitle">害（示意 · 酉戌相害）— 暗算偷袭</div>
     <div class="row two" id="row3">
-      <div class="cell" data-i="0"><span class="lab"></span><span class="zhi">酉</span></div>
-      <div class="cell" data-i="1"><span class="lab"></span><span class="zhi">戌</span></div>
+      <div class="cell" data-i="0"><span class="zhi">酉</span></div>
+      <div class="cell" data-i="1"><span class="zhi">戌</span></div>
     </div>
     <svg class="links" id="svg3"></svg>
   </div>
 
   <div class="legend">
-    <span><i style="background:#FF4D4D"></i>冲</span>
-    <span><i style="background:#A86BE8"></i>刑</span>
-    <span><i style="background:#5BD08A"></i>合</span>
-    <span><i style="background:#FF9B3D"></i>害</span>
+    <span><i style="background:#FF4D4D"></i>冲 · 对撞</span>
+    <span><i style="background:#B47BF0"></i>刑 · 内耗</span>
+    <span><i style="background:#5BD08A"></i>合 · 捆绑</span>
+    <span><i style="background:#FF7A33"></i>害 · 暗算</span>
   </div>
 
   <div class="tip" id="tip">轻触任意一条连线，查看关系含义</div>
@@ -116,78 +119,88 @@ var NS="http://www.w3.org/2000/svg";
 var EXPL={
   '辰戌冲':'辰戌相冲：水库火库相激，根基动荡、聚散无常，主变动。',
   '丑未冲':'丑未相冲：金库木库相撞，内心拉扯、易反复，主迁变。',
-  '丑戌未刑':'丑戌未三刑（恃势之刑）：三土相刑，恃强生隙，易招是非、固执自伤。',
-  '卯戌合':'卯戌六合（化火）：木火相牵，情志相投、彼此牵引而结盟。',
-  '酉戌害':'酉戌相害：金土相穿，暗中受损、好意成怨，主暗耗。'
+  '丑戌未刑':'丑戌未三刑（恃势之刑）：三土相磨，能量内耗、暗自损伤，易招是非。',
+  '卯戌合':'卯戌六合（化火）：木火相牵，情志相投，彼此捆系结盟。',
+  '酉戌害':'酉戌相害：金土相穿，暗中受损、好意成怨，主暗算。'
 };
-
+function el(name,attrs){ var e=document.createElementNS(NS,name);
+  for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 function center(cell, host){
   var r=cell.getBoundingClientRect(), h=host.getBoundingClientRect();
   return { x:r.left-h.left+r.width/2, y:r.top-h.top+r.height/2,
            top:r.top-h.top, bottom:r.top-h.top+r.height,
-           left:r.left-h.left, right:r.left-h.left+r.width };
+           left:r.left-h.left, right:r.left-h.left+r.width, w:r.width, h:r.height };
 }
-function tipFor(key){
-  var t=document.getElementById('tip');
-  return function(){ t.textContent=EXPL[key]||key; };
-}
-
-/* 锯齿闪电 */
+function tipFor(key){ var t=document.getElementById('tip');
+  return function(){ t.textContent=EXPL[key]||key; }; }
 function lightning(a,b){
   var n=7, pts=[], dx=(b.x-a.x)/n, dy=(b.y-a.y)/n, nx=-(b.y-a.y), ny=(b.x-a.x);
   var len=Math.hypot(nx,ny)||1; nx/=len; ny/=len;
-  for(var i=0;i<=n;i++){
-    var off=(i===0||i===n)?0:(i%2?1:-1)*7;
-    pts.push((a.x+dx*i+nx*off).toFixed(1)+','+(a.y+dy*i+ny*off).toFixed(1));
-  }
+  for(var i=0;i<=n;i++){ var off=(i===0||i===n)?0:(i%2?1:-1)*7;
+    pts.push((a.x+dx*i+nx*off).toFixed(1)+','+(a.y+dy*i+ny*off).toFixed(1)); }
   return pts.join(' ');
+}
+// 沿直线运动的粒子（用于刑·内耗，向中心吸）
+function particle(svg,x1,y1,x2,y2,dur,delay){
+  var c=el('circle',{r:2.6,cx:0,cy:0,class:'pdrain'});
+  var m=el('animateMotion',{dur:dur+'s',begin:delay+'s',repeatCount:'indefinite',
+        path:'M'+x1+' '+y1+' L'+x2+' '+y2});
+  var o=el('animate',{attributeName:'opacity',dur:dur+'s',begin:delay+'s',
+        repeatCount:'indefinite',values:'0;1;0.2',keyTimes:'0;0.6;1'});
+  c.appendChild(m); c.appendChild(o); svg.appendChild(c);
 }
 
 function build(svgId, rowId, rels){
   var svg=document.getElementById(svgId), row=document.getElementById(rowId);
-  var cells=row.querySelectorAll('.cell');
-  var host=svg.parentNode;
+  var cells=row.querySelectorAll('.cell'), host=svg.parentNode;
   var C=[]; cells.forEach(function(c){ C.push(center(c,host)); });
 
   rels.forEach(function(rel){
     if(rel.t==='冲'){
-      var a=C[rel.a], b=C[rel.b];
-      var pl=document.createElementNS(NS,'polyline');
-      pl.setAttribute('points', lightning(a,b));
-      pl.setAttribute('class','bolt'); pl.style.pointerEvents='stroke';
-      pl.addEventListener('click', tipFor(rel.k)); svg.appendChild(pl);
+      var pl=el('polyline',{points:lightning(C[rel.a],C[rel.b]),class:'bolt'});
+      pl.style.pointerEvents='stroke'; pl.addEventListener('click',tipFor(rel.k)); svg.appendChild(pl);
       cells[rel.a].classList.add('vibX'); cells[rel.b].classList.add('vibX');
     }
     else if(rel.t==='刑'){
-      var poly=document.createElementNS(NS,'polygon');
-      var p=rel.n.map(function(i){ var c=C[i]; return c.x+','+(c.top-14); }).join(' ');
-      poly.setAttribute('points',p); poly.setAttribute('class','xing');
-      poly.style.pointerEvents='all';
-      poly.addEventListener('click', tipFor(rel.k)); svg.appendChild(poly);
-      rel.n.forEach(function(i){ cells[i].classList.add('vibR'); });
+      // 质心
+      var cx=0,cy=0; rel.n.forEach(function(i){ cx+=C[i].x; cy+=C[i].y; });
+      cx/=rel.n.length; cy/=rel.n.length;
+      rel.n.forEach(function(i,k){
+        var ln=el('path',{d:'M'+C[i].x+' '+C[i].y+' L'+cx+' '+cy,class:'drainline'});
+        ln.style.pointerEvents='stroke'; ln.addEventListener('click',tipFor(rel.k)); svg.appendChild(ln);
+        particle(svg,C[i].x,C[i].y,cx,cy,1.4,k*0.45);
+        particle(svg,C[i].x,C[i].y,cx,cy,1.4,k*0.45+0.7);
+        cells[i].classList.add('drain');
+      });
+      // 中心漩涡（消耗点）
+      var vg=el('g',{}); vg.style.transform='translate('+cx+'px,'+cy+'px)';
+      var v=el('circle',{r:11,cx:0,cy:0,class:'vortex','stroke-dasharray':'10 6'});
+      vg.appendChild(v); svg.appendChild(vg);
     }
     else if(rel.t==='合'){
-      var a2=C[rel.a], b2=C[rel.b];
-      var mx=(a2.x+b2.x)/2, path=document.createElementNS(NS,'path');
-      path.setAttribute('d','M'+a2.x+' '+(a2.top-6)+' Q '+mx+' '+(a2.top-46)+' '+b2.x+' '+(b2.top-6));
-      path.setAttribute('class','he'); path.style.pointerEvents='stroke';
-      path.addEventListener('click', tipFor(rel.k)); svg.appendChild(path);
-      cells[rel.a].style.setProperty('--lx','8px'); cells[rel.a].classList.add('lean');
-      cells[rel.b].style.setProperty('--lx','-8px'); cells[rel.b].classList.add('lean');
+      cells[rel.a].style.setProperty('--lx','16px'); cells[rel.a].classList.add('lean');
+      cells[rel.b].style.setProperty('--lx','-16px'); cells[rel.b].classList.add('lean');
+      var L=Math.min(C[rel.a].left,C[rel.b].left)-8, R=Math.max(C[rel.a].right,C[rel.b].right)+8;
+      var T=Math.min(C[rel.a].top,C[rel.b].top)-8, B=Math.max(C[rel.a].bottom,C[rel.b].bottom)+8;
+      var rect=el('rect',{x:L,y:T,width:R-L,height:B-T,rx:20,class:'bind'});
+      rect.style.pointerEvents='all'; rect.addEventListener('click',tipFor(rel.k)); svg.appendChild(rect);
+      var mx=(L+R)/2; svg.appendChild(el('circle',{cx:mx,cy:T,r:4,class:'knot'}));
+      svg.appendChild(el('circle',{cx:mx,cy:B,r:4,class:'knot'}));
     }
     else if(rel.t==='害'){
-      var a3=C[rel.a], b3=C[rel.b], ln=document.createElementNS(NS,'line');
-      ln.setAttribute('x1',a3.x); ln.setAttribute('y1',a3.y);
-      ln.setAttribute('x2',b3.x); ln.setAttribute('y2',b3.y);
-      ln.setAttribute('class','hai'); ln.style.pointerEvents='stroke';
-      ln.addEventListener('click', tipFor(rel.k)); svg.appendChild(ln);
-      // 中间穿叉
-      var mx2=(a3.x+b3.x)/2, my2=(a3.y+b3.y)/2;
-      ['M'+(mx2-7)+' '+(my2-7)+' L'+(mx2+7)+' '+(my2+7),
-       'M'+(mx2+7)+' '+(my2-7)+' L'+(mx2-7)+' '+(my2+7)].forEach(function(d){
-        var x=document.createElementNS(NS,'path'); x.setAttribute('d',d);
-        x.setAttribute('class','hai'); svg.appendChild(x);
-      });
+      var a=C[rel.a], b=C[rel.b];
+      // 偷袭路线：从 a 下方绕过去
+      var d='M'+a.x+' '+a.bottom+' Q '+((a.x+b.x)/2)+' '+(b.bottom+46)+' '+b.x+' '+(b.bottom-4);
+      var sneak=el('path',{d:d,class:'sneak'});
+      sneak.style.pointerEvents='stroke'; sneak.addEventListener('click',tipFor(rel.k)); svg.appendChild(sneak);
+      // 暗器：先慢爬再猛刺
+      var dag=el('path',{d:'M0 -5 L9 0 L0 5 L2 0 Z',class:'dagger'});
+      var m=el('animateMotion',{dur:'2.2s',repeatCount:'indefinite',rotate:'auto',
+            path:d,keyPoints:'0;0.55;1',keyTimes:'0;0.72;0.82',calcMode:'linear'});
+      var o=el('animate',{attributeName:'opacity',dur:'2.2s',repeatCount:'indefinite',
+            values:'0;0.25;0.25;1;0',keyTimes:'0;0.1;0.7;0.82;1'});
+      dag.appendChild(m); dag.appendChild(o); svg.appendChild(dag);
+      cells[rel.b].classList.add('flinch');
     }
   });
 }
