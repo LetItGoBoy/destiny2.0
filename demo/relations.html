@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>地支 · 刑冲合害动画</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{ background:radial-gradient(120% 90% at 50% 0%,#15102C 0%,#0B0817 60%,#060410 100%);
+        color:#EDE9FB; max-width:440px; margin:0 auto; padding:24px 20px 40px;
+        font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
+  .hd{ text-align:center; margin-bottom:6px; }
+  .hd .bz{ font-size:18px; letter-spacing:6px; font-weight:600; }
+  .hd .s{ font-size:11px; color:#8c84ad; margin-top:6px; letter-spacing:2px; }
+
+  .panel{ position:relative; margin-top:30px; }
+  .ptitle{ font-size:12px; color:#9a92be; letter-spacing:2px; margin-bottom:14px; }
+  .row{ position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:14px; z-index:2; }
+  .row.two{ grid-template-columns:repeat(2,1fr); max-width:230px; }
+  .cell{ aspect-ratio:1/1.15; border-radius:16px; display:flex; flex-direction:column;
+         align-items:center; justify-content:center; gap:5px;
+         background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
+  .cell .lab{ font-size:10px; color:#7a719e; }
+  .cell .zhi{ font-size:34px; font-weight:800; font-family:"STKaiti","KaiTi",serif; color:#E9C06A;
+              line-height:1; }
+  svg.links{ position:absolute; inset:0; width:100%; height:100%; z-index:5; overflow:visible; pointer-events:none; }
+
+  /* 各关系动画 */
+  .bolt{ fill:none; stroke:#FF4D4D; stroke-width:2.4; stroke-linecap:round;
+         filter:drop-shadow(0 0 5px #ff4d4d); stroke-dasharray:5 5;
+         animation:flow .55s linear infinite, flick .9s ease-in-out infinite; }
+  @keyframes flow{ to{stroke-dashoffset:-20;} }
+  @keyframes flick{ 0%,100%{opacity:.55} 45%{opacity:1} }
+
+  .xing{ fill:rgba(157,90,230,.05); stroke:#A86BE8; stroke-width:1.8; stroke-dasharray:7 6;
+         filter:drop-shadow(0 0 4px #9a5ae6);
+         animation:rot 5s linear infinite, pulseS 1.6s ease-in-out infinite; transform-origin:center; }
+  @keyframes rot{ to{stroke-dashoffset:-52;} }
+  @keyframes pulseS{ 0%,100%{opacity:.55} 50%{opacity:1} }
+
+  .he{ fill:none; stroke:#5BD08A; stroke-width:2.6; stroke-linecap:round;
+       filter:drop-shadow(0 0 6px #5bd08a); stroke-dasharray:4 8;
+       animation:pull .8s linear infinite; }
+  @keyframes pull{ to{stroke-dashoffset:-24;} }
+
+  .hai{ fill:none; stroke:#FF9B3D; stroke-width:2.2; stroke-linecap:round;
+        filter:drop-shadow(0 0 4px #ff9b3d); animation:stab 1.4s ease-in-out infinite; }
+  @keyframes stab{ 0%,100%{opacity:.5; stroke-width:1.8} 50%{opacity:1; stroke-width:3} }
+
+  /* 地支反应 */
+  .vibX{ animation:vibX .5s ease-in-out infinite; }     /* 冲：水平对撞 */
+  @keyframes vibX{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(3px)} 75%{transform:translateX(-3px)} }
+  .vibR{ animation:vibR 1.6s ease-in-out infinite; }    /* 刑：抖动 */
+  @keyframes vibR{ 0%,100%{transform:rotate(0)} 25%{transform:rotate(1.5deg)} 75%{transform:rotate(-1.5deg)} }
+  .lean{ animation:lean 1.8s ease-in-out infinite; }    /* 合：倾靠 */
+  @keyframes lean{ 0%,100%{transform:translateX(0)} 50%{transform:translateX(var(--lx,0))} }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:34px;
+           font-size:12px; color:#9a92be; }
+  .legend i{ display:inline-block; width:22px; height:3px; border-radius:3px; margin-right:6px;
+             vertical-align:middle; }
+  .tip{ position:fixed; left:0; right:0; bottom:0; background:rgba(12,8,24,.95);
+        border-top:1px solid rgba(255,255,255,.08); padding:14px 20px; text-align:center;
+        font-size:13px; color:#EDE9FB; max-width:440px; margin:0 auto; min-height:46px; }
+</style>
+</head>
+<body>
+  <div class="hd">
+    <div class="bz">戊辰 壬戌 己未 乙丑</div>
+    <div class="s">命主 · 己土　|　地支 辰戌未丑 · 刑冲合害</div>
+  </div>
+
+  <!-- 真实盘：冲 + 三刑 -->
+  <div class="panel">
+    <div class="ptitle">本盘地支关系（点连线看解释）</div>
+    <div class="row" id="row1">
+      <div class="cell" data-i="0"><span class="lab">年</span><span class="zhi">辰</span></div>
+      <div class="cell" data-i="1"><span class="lab">月</span><span class="zhi">戌</span></div>
+      <div class="cell" data-i="2"><span class="lab">日</span><span class="zhi">未</span></div>
+      <div class="cell" data-i="3"><span class="lab">时</span><span class="zhi">丑</span></div>
+    </div>
+    <svg class="links" id="svg1"></svg>
+  </div>
+
+  <!-- 合 示意 -->
+  <div class="panel">
+    <div class="ptitle">合（示意 · 卯戌六合）</div>
+    <div class="row two" id="row2">
+      <div class="cell" data-i="0"><span class="lab"></span><span class="zhi">卯</span></div>
+      <div class="cell" data-i="1"><span class="lab"></span><span class="zhi">戌</span></div>
+    </div>
+    <svg class="links" id="svg2"></svg>
+  </div>
+
+  <!-- 害 示意 -->
+  <div class="panel">
+    <div class="ptitle">害（示意 · 酉戌相害）</div>
+    <div class="row two" id="row3">
+      <div class="cell" data-i="0"><span class="lab"></span><span class="zhi">酉</span></div>
+      <div class="cell" data-i="1"><span class="lab"></span><span class="zhi">戌</span></div>
+    </div>
+    <svg class="links" id="svg3"></svg>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:#FF4D4D"></i>冲</span>
+    <span><i style="background:#A86BE8"></i>刑</span>
+    <span><i style="background:#5BD08A"></i>合</span>
+    <span><i style="background:#FF9B3D"></i>害</span>
+  </div>
+
+  <div class="tip" id="tip">轻触任意一条连线，查看关系含义</div>
+
+<script>
+var NS="http://www.w3.org/2000/svg";
+var EXPL={
+  '辰戌冲':'辰戌相冲：水库火库相激，根基动荡、聚散无常，主变动。',
+  '丑未冲':'丑未相冲：金库木库相撞，内心拉扯、易反复，主迁变。',
+  '丑戌未刑':'丑戌未三刑（恃势之刑）：三土相刑，恃强生隙，易招是非、固执自伤。',
+  '卯戌合':'卯戌六合（化火）：木火相牵，情志相投、彼此牵引而结盟。',
+  '酉戌害':'酉戌相害：金土相穿，暗中受损、好意成怨，主暗耗。'
+};
+
+function center(cell, host){
+  var r=cell.getBoundingClientRect(), h=host.getBoundingClientRect();
+  return { x:r.left-h.left+r.width/2, y:r.top-h.top+r.height/2,
+           top:r.top-h.top, bottom:r.top-h.top+r.height,
+           left:r.left-h.left, right:r.left-h.left+r.width };
+}
+function tipFor(key){
+  var t=document.getElementById('tip');
+  return function(){ t.textContent=EXPL[key]||key; };
+}
+
+/* 锯齿闪电 */
+function lightning(a,b){
+  var n=7, pts=[], dx=(b.x-a.x)/n, dy=(b.y-a.y)/n, nx=-(b.y-a.y), ny=(b.x-a.x);
+  var len=Math.hypot(nx,ny)||1; nx/=len; ny/=len;
+  for(var i=0;i<=n;i++){
+    var off=(i===0||i===n)?0:(i%2?1:-1)*7;
+    pts.push((a.x+dx*i+nx*off).toFixed(1)+','+(a.y+dy*i+ny*off).toFixed(1));
+  }
+  return pts.join(' ');
+}
+
+function build(svgId, rowId, rels){
+  var svg=document.getElementById(svgId), row=document.getElementById(rowId);
+  var cells=row.querySelectorAll('.cell');
+  var host=svg.parentNode;
+  var C=[]; cells.forEach(function(c){ C.push(center(c,host)); });
+
+  rels.forEach(function(rel){
+    if(rel.t==='冲'){
+      var a=C[rel.a], b=C[rel.b];
+      var pl=document.createElementNS(NS,'polyline');
+      pl.setAttribute('points', lightning(a,b));
+      pl.setAttribute('class','bolt'); pl.style.pointerEvents='stroke';
+      pl.addEventListener('click', tipFor(rel.k)); svg.appendChild(pl);
+      cells[rel.a].classList.add('vibX'); cells[rel.b].classList.add('vibX');
+    }
+    else if(rel.t==='刑'){
+      var poly=document.createElementNS(NS,'polygon');
+      var p=rel.n.map(function(i){ var c=C[i]; return c.x+','+(c.top-14); }).join(' ');
+      poly.setAttribute('points',p); poly.setAttribute('class','xing');
+      poly.style.pointerEvents='all';
+      poly.addEventListener('click', tipFor(rel.k)); svg.appendChild(poly);
+      rel.n.forEach(function(i){ cells[i].classList.add('vibR'); });
+    }
+    else if(rel.t==='合'){
+      var a2=C[rel.a], b2=C[rel.b];
+      var mx=(a2.x+b2.x)/2, path=document.createElementNS(NS,'path');
+      path.setAttribute('d','M'+a2.x+' '+(a2.top-6)+' Q '+mx+' '+(a2.top-46)+' '+b2.x+' '+(b2.top-6));
+      path.setAttribute('class','he'); path.style.pointerEvents='stroke';
+      path.addEventListener('click', tipFor(rel.k)); svg.appendChild(path);
+      cells[rel.a].style.setProperty('--lx','8px'); cells[rel.a].classList.add('lean');
+      cells[rel.b].style.setProperty('--lx','-8px'); cells[rel.b].classList.add('lean');
+    }
+    else if(rel.t==='害'){
+      var a3=C[rel.a], b3=C[rel.b], ln=document.createElementNS(NS,'line');
+      ln.setAttribute('x1',a3.x); ln.setAttribute('y1',a3.y);
+      ln.setAttribute('x2',b3.x); ln.setAttribute('y2',b3.y);
+      ln.setAttribute('class','hai'); ln.style.pointerEvents='stroke';
+      ln.addEventListener('click', tipFor(rel.k)); svg.appendChild(ln);
+      // 中间穿叉
+      var mx2=(a3.x+b3.x)/2, my2=(a3.y+b3.y)/2;
+      ['M'+(mx2-7)+' '+(my2-7)+' L'+(mx2+7)+' '+(my2+7),
+       'M'+(mx2+7)+' '+(my2-7)+' L'+(mx2-7)+' '+(my2+7)].forEach(function(d){
+        var x=document.createElementNS(NS,'path'); x.setAttribute('d',d);
+        x.setAttribute('class','hai'); svg.appendChild(x);
+      });
+    }
+  });
+}
+
+window.addEventListener('load',function(){
+  build('svg1','row1',[
+    {t:'冲',a:0,b:1,k:'辰戌冲'},
+    {t:'冲',a:2,b:3,k:'丑未冲'},
+    {t:'刑',n:[1,2,3],k:'丑戌未刑'}
+  ]);
+  build('svg2','row2',[{t:'合',a:0,b:1,k:'卯戌合'}]);
+  build('svg3','row3',[{t:'害',a:0,b:1,k:'酉戌害'}]);
+});
+</script>
+</body>
+</html>
