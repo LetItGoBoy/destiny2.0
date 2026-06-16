@@ -31,6 +31,13 @@ function sortByName(list) {
   });
 }
 
+// 按排盘时间（创建时间）倒序
+function sortByTime(list) {
+  return list.slice(0).sort(function (a, b) {
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+}
+
 Page({
   data: {
     keyword: '',
@@ -39,6 +46,7 @@ Page({
     source: 'local',
     loading: true,
     fs: 'std',
+    sortMode: 'name',                       // name 字母（默认）/ time 排盘时间
     // 筛选
     showFilter: false,
     genderFilter: -1,                       // -1 不限 / 1 男 / 0 女
@@ -85,6 +93,11 @@ Page({
 
   onToggleFilter: function () {
     this.setData({ showFilter: !this.data.showFilter });
+  },
+
+  onSortMode: function (e) {
+    this.setData({ sortMode: e.currentTarget.dataset.m });
+    this.apply();
   },
 
   // 性别（再点取消）
@@ -154,7 +167,8 @@ Page({
       return true;
     });
 
-    this.setData({ shown: sortByName(res), filterCount: cnt });
+    var sorted = this.data.sortMode === 'time' ? sortByTime(res) : sortByName(res);
+    this.setData({ shown: sorted, filterCount: cnt });
   },
 
   findById: function (id) {

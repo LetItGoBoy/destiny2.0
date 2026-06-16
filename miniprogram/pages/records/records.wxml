@@ -78,8 +78,14 @@
     </view>
   </view>
 
-  <view class="search-hint" wx:if="{{filterCount}}">筛选命中 {{shown.length}} 条 · 姓名按字母排序</view>
-  <view class="search-hint" wx:elif="{{!keyword && total > 0}}">按姓名字母排序</view>
+  <!-- 排序 -->
+  <view class="sort-row" wx:if="{{total > 0}}">
+    <text class="sort-hint">{{filterCount ? '筛选命中 ' + shown.length + ' 条' : (sortMode === 'time' ? '按排盘时间排序' : '按姓名字母排序')}}</text>
+    <view class="sort-seg">
+      <text class="sort-opt {{sortMode === 'name' ? 'sort-on' : ''}}" bindtap="onSortMode" data-m="name">字母</text>
+      <text class="sort-opt {{sortMode === 'time' ? 'sort-on' : ''}}" bindtap="onSortMode" data-m="time">排盘时间</text>
+    </view>
+  </view>
 
   <!-- 列表 -->
   <block wx:for="{{shown}}" wx:key="_id">
@@ -96,4 +102,6 @@
     <view class="empty-sub">排盘后点击「保存」即可留存</view>
     <button class="btn-primary empty-btn" bindtap="goIndex">去排盘</button>
   </view>
+
+  <view class="footer" wx:if="{{total > 0}}">命盘仅供传统文化娱乐参考，不构成人生决策依据</view>
 </view>

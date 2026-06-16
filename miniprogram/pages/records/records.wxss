@@ -353,3 +353,43 @@
 .fs-xl .search-input { font-size: 34rpx; }
 .fs-xl .head-sub { font-size: 28rpx; }
 .fs-xl .rec-gender, .fs-xl .rec-self, .fs-xl .rec-true { font-size: 24rpx; }
+
+/* 排序切换 */
+.sort-row {
+  display: flex;
+  align-items: center;
+  padding: 0 12rpx 16rpx;
+}
+.sort-hint {
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.sort-seg {
+  margin-left: auto;
+  display: flex;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  border-radius: 100rpx;
+  padding: 4rpx;
+}
+.sort-opt {
+  font-size: 22rpx;
+  color: var(--ink-2);
+  padding: 6rpx 22rpx;
+  border-radius: 100rpx;
+}
+.sort-on {
+  background: var(--card);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 2rpx 10rpx rgba(20, 21, 60, 0.08);
+}
+
+/* 页脚免责声明 */
+.footer {
+  text-align: center;
+  font-size: 21rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+  padding: 40rpx 20rpx 10rpx;
+}

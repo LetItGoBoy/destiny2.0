@@ -314,3 +314,13 @@
   --fill: rgba(255, 255, 255, 0.08);
   --gold: #E3C27E;
 }
+
+/* 页脚免责声明 */
+.page-footer {
+  text-align: center;
+  font-size: 21rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+  line-height: 1.6;
+  padding: 30rpx 30rpx 16rpx;
+}
