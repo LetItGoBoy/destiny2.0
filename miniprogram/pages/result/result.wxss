@@ -395,6 +395,28 @@
   border-color: var(--line);
   color: var(--ink-3);
 }
+/* 量化：青色描边 */
+.btn-quant {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  background: var(--fill);
+  border: 1rpx solid var(--cyan);
+  border-radius: 20rpx;
+  color: #128FA6;
+  font-size: 32rpx;
+  font-weight: 600;
+  letter-spacing: 6rpx;
+  text-indent: 6rpx;
+}
+.btn-quant::after { border: none; }
+.btn-quant.button-hover { opacity: 0.88; }
+
 /* 详批：靛紫→电光青渐变，全局最醒目 */
 .btn-xiangpi {
   flex: 1.4;

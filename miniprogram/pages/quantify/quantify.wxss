@@ -1,0 +1,104 @@
+.page { padding: 24rpx 28rpx 60rpx; }
+
+/* 头部 */
+.head { padding: 28rpx 32rpx; margin-bottom: 22rpx; }
+.head-row { display: flex; align-items: baseline; }
+.head-name { font-size: 34rpx; font-weight: 700; }
+.head-meta { margin-left: auto; font-size: 22rpx; color: var(--ink-3); }
+.cur {
+  margin-top: 14rpx; font-size: 24rpx; color: var(--primary);
+  background: var(--tint); display: inline-block; padding: 6rpx 18rpx; border-radius: 999rpx;
+}
+
+/* 模式切换 */
+.modes {
+  display: flex; gap: 12rpx; margin-bottom: 22rpx;
+  background: var(--fill); padding: 6rpx; border-radius: 18rpx;
+}
+.mode {
+  flex: 1; text-align: center; padding: 16rpx 0; font-size: 26rpx;
+  color: var(--ink-2); border-radius: 14rpx; transition: all .2s;
+}
+.mode.on {
+  background: #fff; color: var(--primary); font-weight: 700;
+  box-shadow: 0 4rpx 14rpx rgba(20,21,60,.08);
+}
+
+/* 能量盘 */
+.disk { padding: 26rpx 22rpx 30rpx; margin-bottom: 22rpx; }
+.cols, .cells { display: flex; }
+.ch-col { flex: 1; text-align: center; }
+.pos { font-size: 22rpx; color: var(--ink-3); }
+.cells { margin-top: 10rpx; }
+.cell { flex: 1; display: flex; flex-direction: column; align-items: center; }
+
+/* 充能水位 */
+.fillbox {
+  position: relative; width: 118rpx; height: 150rpx; border-radius: 20rpx;
+  background: var(--fill); border: 1rpx solid var(--line); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.fillbox.is-day { border: 2rpx solid var(--gold); }
+.fill {
+  position: absolute; left: 0; right: 0; bottom: 0; width: 100%;
+  opacity: .82; transition: height .8s cubic-bezier(.2,.7,.2,1);
+}
+.fill-ch {
+  position: relative; z-index: 2; font-size: 52rpx; font-weight: 800;
+  color: var(--ink); line-height: 1;
+}
+
+/* 字号大小 */
+.sizebox {
+  width: 118rpx; height: 150rpx; border-radius: 20rpx; background: var(--fill);
+  border: 1rpx solid var(--line); display: flex; align-items: center; justify-content: center;
+}
+.sizebox.is-day { border: 2rpx solid var(--gold); }
+.size-ch { font-weight: 800; line-height: 1; transition: font-size .8s cubic-bezier(.2,.7,.2,1); }
+
+.god { margin-top: 10rpx; font-size: 21rpx; color: var(--ink-2); }
+.dl { margin-top: 4rpx; font-size: 20rpx; font-weight: 700; min-height: 26rpx; }
+.dl.up { color: #16A971; }
+.dl.down { color: #EC5C8D; }
+.dl.flat { color: transparent; }
+
+/* 旺衰条 */
+.ws { margin-top: 28rpx; padding-top: 22rpx; border-top: 1rpx solid var(--line); }
+.ws-bar {
+  height: 18rpx; border-radius: 10rpx; overflow: hidden;
+  background: linear-gradient(90deg,#C9508A,#F285AE);
+}
+.ws-same {
+  height: 100%; border-radius: 10rpx 0 0 10rpx;
+  background: linear-gradient(90deg,#6C4BD9,#9D78F8);
+  transition: width .8s cubic-bezier(.2,.7,.2,1);
+}
+.ws-legend { display: flex; align-items: center; margin-top: 12rpx; font-size: 22rpx; }
+.lg-same { color: var(--primary); }
+.lg-diff { margin-left: auto; color: var(--pink); }
+.lg-delta { margin: 0 auto; font-size: 20rpx; color: var(--ink-3); }
+
+/* 选择器 */
+.sel { padding: 22rpx 24rpx; margin-bottom: 22rpx; }
+.sel-t { font-size: 23rpx; color: var(--ink-2); margin-bottom: 16rpx; }
+.chips { white-space: nowrap; }
+.chip {
+  display: inline-flex; flex-direction: column; align-items: center;
+  padding: 14rpx 22rpx; margin-right: 14rpx; border-radius: 16rpx;
+  background: var(--fill); border: 1rpx solid var(--line);
+}
+.chip-on {
+  background: var(--tint); border-color: var(--primary);
+}
+.chip-gz { font-size: 30rpx; font-weight: 800; line-height: 1.1; }
+.chip-sub { font-size: 19rpx; color: var(--ink-2); margin-top: 4rpx; }
+.chip-age { font-size: 18rpx; color: var(--ink-3); margin-top: 2rpx; }
+
+.foot {
+  text-align: center; font-size: 21rpx; color: var(--ink-3);
+  letter-spacing: 1rpx; margin-top: 8rpx; line-height: 1.6;
+}
+
+/* 字号档位 */
+.fs-l .god { font-size: 23rpx; }
+.fs-xl .god { font-size: 25rpx; }

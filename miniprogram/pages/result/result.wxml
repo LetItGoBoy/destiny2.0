@@ -211,6 +211,7 @@
     <button class="btn-save {{saved ? 'btn-saved' : ''}}" bindtap="onSave">
       {{saved ? '已保存' : '保存'}}
     </button>
+    <button class="btn-quant" bindtap="onQuantify">量化</button>
     <button class="btn-xiangpi" bindtap="onXiangPi">详批</button>
   </view>
 

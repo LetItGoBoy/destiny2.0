@@ -165,6 +165,13 @@ Page({
 
   noop: function () {},
 
+  // 量化：逐字能量 + 大运流年改写
+  onQuantify: function () {
+    wx.navigateTo({
+      url: '/pages/quantify/quantify?input=' + encodeURIComponent(JSON.stringify(this._input))
+    });
+  },
+
   // 详批：调候/旺衰/格局三派合参
   onXiangPi: function () {
     wx.navigateTo({

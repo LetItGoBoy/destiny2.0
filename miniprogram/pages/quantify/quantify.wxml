@@ -1,0 +1,98 @@
+<view class="page fs-{{fs}}" wx:if="{{loaded}}">
+
+  <!-- 头部 -->
+  <view class="card head">
+    <view class="head-row">
+      <text class="head-name serif">{{meta.name || '未署名'}}</text>
+      <text class="head-meta">{{meta.genderText}} · 日主{{meta.dayGan}}</text>
+    </view>
+    <view class="cur">{{curLabel}}</view>
+  </view>
+
+  <!-- 模式切换 -->
+  <view class="modes">
+    <view class="mode {{mode === 'fill' ? 'on' : ''}}" bindtap="onMode" data-mode="fill">充能水位</view>
+    <view class="mode {{mode === 'size' ? 'on' : ''}}" bindtap="onMode" data-mode="size">字号大小</view>
+  </view>
+
+  <!-- 能量盘 -->
+  <view class="card disk">
+    <view class="cols">
+      <view class="ch-col" wx:for="{{ganCells}}" wx:key="pos">
+        <text class="pos">{{item.pos}}</text>
+      </view>
+    </view>
+
+    <!-- 天干行 -->
+    <view class="cells">
+      <view class="cell" wx:for="{{ganCells}}" wx:key="pos">
+        <view wx:if="{{mode === 'fill'}}" class="fillbox {{item.isDay ? 'is-day' : ''}}">
+          <view class="fill bg-{{item.cls}}" style="height:{{item.fill}}%"></view>
+          <text class="fill-ch">{{item.char}}</text>
+        </view>
+        <view wx:else class="sizebox {{item.isDay ? 'is-day' : ''}}">
+          <text class="size-ch wx-{{item.cls}}" style="font-size:{{item.fs}}rpx">{{item.char}}</text>
+        </view>
+        <text class="god">{{item.god}}</text>
+        <text class="dl {{item.dir}}">{{item.deltaTxt}}</text>
+      </view>
+    </view>
+
+    <!-- 地支行 -->
+    <view class="cells">
+      <view class="cell" wx:for="{{zhiCells}}" wx:key="pos">
+        <view wx:if="{{mode === 'fill'}}" class="fillbox">
+          <view class="fill bg-{{item.cls}}" style="height:{{item.fill}}%"></view>
+          <text class="fill-ch">{{item.char}}</text>
+        </view>
+        <view wx:else class="sizebox">
+          <text class="size-ch wx-{{item.cls}}" style="font-size:{{item.fs}}rpx">{{item.char}}</text>
+        </view>
+        <text class="god">{{item.god}}</text>
+        <text class="dl {{item.dir}}">{{item.deltaTxt}}</text>
+      </view>
+    </view>
+
+    <!-- 旺衰条 -->
+    <view class="ws">
+      <view class="ws-bar"><view class="ws-same" style="width:{{pNow}}%"></view></view>
+      <view class="ws-legend">
+        <text class="lg-same">生扶 {{pNow}}%</text>
+        <block wx:if="{{hasLuck && pNow !== pBase}}">
+          <text class="lg-delta">原局 {{pBase}}% → {{pNow}}%</text>
+        </block>
+        <text class="lg-diff">克泄耗 {{100 - pNow}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 大运选择 -->
+  <view class="card sel">
+    <view class="sel-t">大运（点选叠加，重复点取消）</view>
+    <scroll-view scroll-x class="chips" enhanced show-scrollbar="{{false}}">
+      <view class="chip {{dyIndex === item.index ? 'chip-on' : ''}}"
+            wx:for="{{daYunList}}" wx:key="index"
+            bindtap="onDaYun" data-index="{{item.index}}">
+        <text class="chip-gz wx-{{item.cls}}">{{item.gz}}</text>
+        <text class="chip-sub">{{item.god}}</text>
+        <text class="chip-age">{{item.age}}岁</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 流年选择 -->
+  <view class="card sel" wx:if="{{liuNianList.length}}">
+    <view class="sel-t">流年（{{daYunList[dyIndex].gz}} 运内）</view>
+    <scroll-view scroll-x class="chips" enhanced show-scrollbar="{{false}}">
+      <view class="chip {{lnIndex === item.index ? 'chip-on' : ''}}"
+            wx:for="{{liuNianList}}" wx:key="index"
+            bindtap="onLiuNian" data-index="{{item.index}}">
+        <text class="chip-gz wx-{{item.cls}}">{{item.gz}}</text>
+        <text class="chip-sub">{{item.god}}</text>
+        <text class="chip-age">{{item.year}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="foot">字越大 / 水位越高，该字（十神）能量越强 · 岁运令原局逐字升降</view>
+</view>
