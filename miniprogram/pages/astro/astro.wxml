@@ -41,5 +41,4 @@
   </view>
 
   <view class="footer">{{isNow ? '行星位置由轨道力学实时计算，精度约 1°' : '星图基于真太阳时校正的出生时刻计算'}}</view>
-  <view class="footer">命盘仅供传统文化娱乐参考，不构成人生决策依据</view>
 </view>

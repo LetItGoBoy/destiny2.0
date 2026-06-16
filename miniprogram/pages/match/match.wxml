@@ -13,6 +13,4 @@
 
   <button class="btn-primary btn-notify" bindtap="onNotify">上线提醒我</button>
   <view class="back" bindtap="goBack">返回排盘</view>
-
-  <view class="page-footer">命盘仅供传统文化娱乐参考，不构成人生决策依据</view>
 </view>

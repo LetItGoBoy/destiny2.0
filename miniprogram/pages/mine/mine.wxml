@@ -62,6 +62,5 @@
     </view>
   </view>
 
-  <view class="footer">命盘仅供传统文化娱乐参考，不构成人生决策依据</view>
-  <view class="footer footer-ver">同乐八字 v{{version}}</view>
+  <view class="footer">同乐八字 v{{version}} · 仅供传统文化研究参考</view>
 </view>
