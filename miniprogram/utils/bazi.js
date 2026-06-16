@@ -245,6 +245,26 @@ function getLiuRi(ctx, liuYueGanZhi, year) {
   return list;
 }
 
+// 仅计算四柱（名人库列表用，避免整盘大运流年的开销）
+function quickBaZi(input) {
+  var clockDate;
+  if (input.calendar === 'lunar') {
+    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, input.hour || 12, input.minute || 0, 0);
+    var sd = ld.getSolar();
+    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), input.hour || 12, input.minute || 0, 0);
+  } else {
+    clockDate = new Date(input.year, input.month - 1, input.day, input.hour || 12, input.minute || 0, 0);
+  }
+  var solar = Solar.fromDate(clockDate);
+  var lunar = solar.getLunar();
+  var ec = lunar.getEightChar();
+  ec.setSect(1);
+  var gans = [ec.getYearGan(), ec.getMonthGan(), ec.getDayGan(), ec.getTimeGan()];
+  var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
+  var baZi = gans[0] + zhis[0] + ' ' + gans[1] + zhis[1] + ' ' + gans[2] + zhis[2] + ' ' + gans[3] + zhis[3];
+  return { baZi: baZi, dayGan: gans[2] };
+}
+
 function formatDate(date) {
   return date.getFullYear() + '年' + pad(date.getMonth() + 1) + '月' + pad(date.getDate()) + '日 ' +
     pad(date.getHours()) + ':' + pad(date.getMinutes());
@@ -289,6 +309,7 @@ function colorizeBaZi(str) {
 
 module.exports = {
   computeChart: computeChart,
+  quickBaZi: quickBaZi,
   buildLuckPillar: buildLuckPillar,
   getLiuRi: getLiuRi,
   getLunarMonths: getLunarMonths,

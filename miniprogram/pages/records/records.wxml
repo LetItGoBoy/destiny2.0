@@ -26,7 +26,14 @@
 <view class="page fs-{{fs}}">
   <view class="head">
     <view class="head-title serif">八字记录</view>
-    <view class="head-sub">{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按设本人/改名/删除</view>
+    <view class="head-sub" wx:if="{{listTab === 'celeb'}}">国外名人命盘 · 共{{total}}位 · 点击查看（生时多不可考，按正午起盘）</view>
+    <view class="head-sub" wx:else>{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按设本人/改名/删除</view>
+  </view>
+
+  <!-- 列表切换：用户列表 / 名人库 -->
+  <view class="list-tabs">
+    <view class="lt {{listTab === 'user' ? 'lt-on' : ''}}" bindtap="onListTab" data-t="user">用户列表</view>
+    <view class="lt {{listTab === 'celeb' ? 'lt-on' : ''}}" bindtap="onListTab" data-t="celeb">名人库</view>
   </view>
 
   <!-- 搜索 + 筛选 -->
@@ -96,7 +103,7 @@
   </view>
 
   <!-- 空状态 -->
-  <view class="empty" wx:if="{{!loading && total === 0}}">
+  <view class="empty" wx:if="{{!loading && total === 0 && listTab === 'user'}}">
     <view class="empty-seal seal serif">命</view>
     <view class="empty-text">还没有保存的八字记录</view>
     <view class="empty-sub">排盘后点击「保存」即可留存</view>

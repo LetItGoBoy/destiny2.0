@@ -1,6 +1,7 @@
 var store = require('../../utils/store.js');
 var bazi = require('../../utils/bazi.js');
 var prefs = require('../../utils/prefs.js');
+var celebs = require('../../utils/celebs.js');
 
 var PILLAR_LABELS = ['年柱', '月柱', '日柱', '时柱'];
 // 干支五行配色
@@ -46,6 +47,7 @@ Page({
     source: 'local',
     loading: true,
     fs: 'std',
+    listTab: 'user',                        // user 用户列表 / celeb 名人库
     sortMode: 'name',                       // name 字母（默认）/ time 排盘时间
     // 筛选
     showFilter: false,
@@ -88,6 +90,43 @@ Page({
 
   onClear: function () {
     this.setData({ keyword: '' });
+    this.apply();
+  },
+
+  // 名人库（懒构建，仅算四柱）
+  buildCelebs: function () {
+    if (this._celebAll) return;
+    var list = [];
+    for (var i = 0; i < celebs.length; i++) {
+      var c = celebs[i];
+      var input = {
+        name: c.name, gender: c.gender, calendar: 'solar',
+        year: c.year, month: c.month, day: c.day, hour: 12, minute: 0,
+        useTrueSolar: false
+      };
+      try {
+        var q = bazi.quickBaZi(input);
+        var bz = bazi.colorizeBaZi(q.baZi);
+        var pillarArr = q.baZi.split(' ');
+        list.push({
+          _id: 'celeb_' + i, _celeb: true,
+          name: c.name, gender: c.gender, baZi: q.baZi,
+          bz: bz, pillarArr: pillarArr,
+          dayGan: q.dayGan,
+          dayCls: (bz[2] && bz[2][0]) ? bz[2][0].cls : '',
+          solarStr: c.field + ' · ' + c.year + '年' + c.month + '月' + c.day + '日',
+          createdAt: 0, input: input
+        });
+      } catch (e) { /* 跳过无法起盘的日期 */ }
+    }
+    this._celebAll = list;
+  },
+
+  onListTab: function (e) {
+    var t = e.currentTarget.dataset.t;
+    if (t === this.data.listTab) return;
+    if (t === 'celeb') this.buildCelebs();
+    this.setData({ listTab: t });
     this.apply();
   },
 
@@ -146,12 +185,17 @@ Page({
     this.apply();
   },
 
+  // 当前数据源（用户列表 / 名人库）
+  activeList: function () {
+    return this.data.listTab === 'celeb' ? (this._celebAll || []) : (this._all || []);
+  },
+
   // 应用：姓名模糊 + 性别 + 逐柱干支聚合
   apply: function () {
     var kw = (this.data.keyword || '').trim();
     var g = this.data.genderFilter;
     var slots = this.data.slots;
-    var all = this._all || [];
+    var all = this.activeList();
 
     var cnt = (g !== -1 ? 1 : 0);
     for (var s = 0; s < 8; s++) if (slots[s]) cnt++;
@@ -168,11 +212,11 @@ Page({
     });
 
     var sorted = this.data.sortMode === 'time' ? sortByTime(res) : sortByName(res);
-    this.setData({ shown: sorted, filterCount: cnt });
+    this.setData({ shown: sorted, filterCount: cnt, total: all.length });
   },
 
   findById: function (id) {
-    var all = this._all || [];
+    var all = this.activeList();
     for (var i = 0; i < all.length; i++) {
       if (all[i]._id === id) return all[i];
     }
@@ -182,22 +226,23 @@ Page({
   onItemTap: function (e) {
     var rec = this.findById(e.currentTarget.dataset.id);
     if (!rec) return;
-    var input = {
+    var input = rec.input || {
       name: rec.name, gender: rec.gender, calendar: rec.calendar,
       year: rec.year, month: rec.month, day: rec.day,
       hour: rec.hour, minute: rec.minute,
       province: rec.province, city: rec.city, lng: rec.lng,
       useTrueSolar: rec.useTrueSolar
     };
+    var prefix = rec._celeb ? '' : 'from=record&';
     wx.navigateTo({
-      url: '/pages/result/result?from=record&input=' + encodeURIComponent(JSON.stringify(input))
+      url: '/pages/result/result?' + prefix + 'input=' + encodeURIComponent(JSON.stringify(input))
     });
   },
 
   onItemLongPress: function (e) {
     var that = this;
     var rec = this.findById(e.currentTarget.dataset.id);
-    if (!rec) return;
+    if (!rec || rec._celeb) return;
     var selfItem = rec.isSelf ? '取消本人命盘' : '设为本人命盘';
     wx.showActionSheet({
       itemList: [selfItem, '修改姓名', '删除该记录'],

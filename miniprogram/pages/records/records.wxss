@@ -393,3 +393,28 @@
   letter-spacing: 1rpx;
   padding: 40rpx 20rpx 10rpx;
 }
+
+/* 用户列表 / 名人库 切换 */
+.list-tabs {
+  display: flex;
+  gap: 12rpx;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 18rpx;
+}
+.lt {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  font-size: 27rpx;
+  color: var(--ink-2);
+  border-radius: 12rpx;
+}
+.lt-on {
+  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4rpx 14rpx rgba(109, 93, 246, 0.3);
+}
