@@ -357,6 +357,31 @@
 .bottom-space {
   height: 20rpx;
 }
+/* 详盘二级信息折叠开关 */
+.sub-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin: 6rpx 0 2rpx;
+  padding: 14rpx 0;
+  border-top: 1rpx dashed var(--line);
+}
+.sub-toggle-t {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+}
+.sub-arrow {
+  font-size: 20rpx;
+  color: var(--ink-3);
+  display: inline-block;
+  transition: transform 0.2s;
+}
+.sub-arrow-up {
+  transform: rotate(180deg);
+}
+
 .savebar {
   position: fixed;
   left: 0;

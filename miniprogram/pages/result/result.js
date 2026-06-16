@@ -19,7 +19,12 @@ Page({
     selLiuNian: null,
     termCard: null,
     baZiStr: '',
-    fs: 'std'
+    fs: 'std',
+    showSubRows: false
+  },
+
+  onToggleSubRows: function () {
+    this.setData({ showSubRows: !this.data.showSubRows });
   },
 
   onLoad: function (options) {

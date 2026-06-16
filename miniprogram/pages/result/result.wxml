@@ -96,6 +96,11 @@
       </view>
     </view>
 
+    <view class="sub-toggle" bindtap="onToggleSubRows">
+      <text class="sub-toggle-t">{{showSubRows ? '收起' : '展开'}}星运 · 自坐 · 空亡 · 纳音 · 神煞</text>
+      <text class="sub-arrow {{showSubRows ? 'sub-arrow-up' : ''}}">▾</text>
+    </view>
+    <block wx:if="{{showSubRows}}">
     <view class="chart-row">
       <view class="cell label-cell">星运</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
@@ -132,6 +137,7 @@
         <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">—</text>
       </view>
     </view>
+    </block>
   </view>
 
   <!-- 详盘：大运/流年选择条 + 流月 -->
