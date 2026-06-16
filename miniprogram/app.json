@@ -2,7 +2,6 @@
   "pages": [
     "pages/index/index",
     "pages/result/result",
-    "pages/quantify/quantify",
     "pages/analysis/analysis",
     "pages/astro/astro",
     "pages/records/records",

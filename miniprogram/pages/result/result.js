@@ -2,6 +2,7 @@ var bazi = require('../../utils/bazi.js');
 var store = require('../../utils/store.js');
 var baike = require('../../utils/baike.js');
 var prefs = require('../../utils/prefs.js');
+var energy = require('../../utils/analyze/energy.js');
 
 Page({
   data: {
@@ -23,7 +24,19 @@ Page({
     termCard: null,
     baZiStr: '',
     fs: 'std',
-    showSubRows: false
+    showSubRows: false,
+    // 能量盘
+    qMode: 'fill',
+    qDaYunList: [],
+    qLiuNianList: [],
+    qDyIndex: -1,
+    qLnIndex: -1,
+    qGanCells: [],
+    qZhiCells: [],
+    qpBase: 50,
+    qpNow: 50,
+    qHasLuck: false,
+    qCurLabel: '原局 · 无岁运'
   },
 
   onToggleSubRows: function () {
@@ -53,6 +66,18 @@ Page({
     }
     this._chart = chart;
     this._ctx = chart.ctx;
+
+    // 能量盘大运列表（去童限）
+    this._qDy = (chart.daYun || []).filter(function (d) {
+      return d.ganZhi && !d.isQian;
+    }).map(function (d, i) {
+      return {
+        index: i, gz: d.ganZhi, gan: d.gan, zhi: d.zhi,
+        god: d.shiShenGan, age: d.startAge + '–' + d.endAge,
+        _liuNian: d.liuNian || []
+      };
+    });
+    this.setData({ qDaYunList: this._qDy });
 
     // 大运横条（不含流年，控制 setData 体积）
     var daYunBar = chart.daYun.map(function (d) {
@@ -91,8 +116,66 @@ Page({
   },
 
   onTab: function (e) {
-    this.setData({ tab: e.currentTarget.dataset.tab });
+    var tab = e.currentTarget.dataset.tab;
+    this.setData({ tab: tab });
     this.updateTable();
+    if (tab === 'energy' && !this._qInit) {
+      this._qInit = true;
+      this.qRecompute();
+    }
+  },
+
+  // ── 能量盘 ──
+  onQMode: function (e) {
+    this.setData({ qMode: e.currentTarget.dataset.mode });
+    this.qRecompute();
+  },
+
+  onQDaYun: function (e) {
+    var idx = Number(e.currentTarget.dataset.index);
+    if (idx === this.data.qDyIndex) {
+      this.setData({ qDyIndex: -1, qLnIndex: -1, qLiuNianList: [] });
+      this.qRecompute();
+      return;
+    }
+    var d = this._qDy[idx];
+    var ln = (d._liuNian || []).map(function (x, i) {
+      return { index: i, gz: x.ganZhi, gan: x.gan, zhi: x.zhi, god: x.shiShenGan, year: x.year };
+    });
+    this.setData({ qDyIndex: idx, qLnIndex: -1, qLiuNianList: ln });
+    this.qRecompute();
+  },
+
+  onQLiuNian: function (e) {
+    var idx = Number(e.currentTarget.dataset.index);
+    this.setData({ qLnIndex: idx === this.data.qLnIndex ? -1 : idx });
+    this.qRecompute();
+  },
+
+  qRecompute: function () {
+    var dyGZ = null, lnGZ = null, label = '原局 · 无岁运';
+    if (this.data.qDyIndex >= 0) {
+      var d = this._qDy[this.data.qDyIndex];
+      dyGZ = d.gz; label = '大运 ' + d.gz;
+      if (this.data.qLnIndex >= 0) {
+        var ln = this.data.qLiuNianList[this.data.qLnIndex];
+        lnGZ = ln.gz; label += ' · 流年 ' + ln.gz + '（' + ln.year + '）';
+      }
+    }
+    var m = energy.build(this._chart, { daYunGZ: dyGZ, liuNianGZ: lnGZ });
+    var maxRef = m.maxRef;
+    var deco = function (c) {
+      var r = Math.min(1, c.val / maxRef);
+      c.fill = Math.round(8 + r * 92);
+      c.fs = Math.round(40 + r * 54);
+      return c;
+    };
+    this.setData({
+      qGanCells: m.ganCells.map(deco),
+      qZhiCells: m.zhiCells.map(deco),
+      qpBase: m.pBase, qpNow: m.pNow,
+      qHasLuck: m.hasLuck, qCurLabel: label
+    });
   },
 
   onDaYunTap: function (e) {
@@ -216,13 +299,6 @@ Page({
   },
 
   noop: function () {},
-
-  // 量化：逐字能量 + 大运流年改写
-  onQuantify: function () {
-    wx.navigateTo({
-      url: '/pages/quantify/quantify?input=' + encodeURIComponent(JSON.stringify(this._input))
-    });
-  },
 
   // 详批：调候/旺衰/格局三派合参
   onXiangPi: function () {
