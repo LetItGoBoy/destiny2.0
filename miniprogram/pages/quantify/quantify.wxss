@@ -57,10 +57,6 @@
 .size-ch { font-weight: 800; line-height: 1; transition: font-size .8s cubic-bezier(.2,.7,.2,1); }
 
 .god { margin-top: 10rpx; font-size: 21rpx; color: var(--ink-2); }
-.dl { margin-top: 4rpx; font-size: 20rpx; font-weight: 700; min-height: 26rpx; }
-.dl.up { color: #16A971; }
-.dl.down { color: #EC5C8D; }
-.dl.flat { color: transparent; }
 
 /* 旺衰条 */
 .ws { margin-top: 28rpx; padding-top: 22rpx; border-top: 1rpx solid var(--line); }

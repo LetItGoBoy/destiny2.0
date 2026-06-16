@@ -34,7 +34,6 @@
           <text class="size-ch wx-{{item.cls}}" style="font-size:{{item.fs}}rpx">{{item.char}}</text>
         </view>
         <text class="god">{{item.god}}</text>
-        <text class="dl {{item.dir}}">{{item.deltaTxt}}</text>
       </view>
     </view>
 
@@ -49,7 +48,6 @@
           <text class="size-ch wx-{{item.cls}}" style="font-size:{{item.fs}}rpx">{{item.char}}</text>
         </view>
         <text class="god">{{item.god}}</text>
-        <text class="dl {{item.dir}}">{{item.deltaTxt}}</text>
       </view>
     </view>
 

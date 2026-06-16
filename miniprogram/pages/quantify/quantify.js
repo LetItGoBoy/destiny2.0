@@ -68,10 +68,6 @@ Page({
       var r = Math.min(1, c.val / maxRef);
       c.fill = Math.round(8 + r * 92);     // 充能水位 %
       c.fs = Math.round(40 + r * 54);      // 字号 rpx
-      c.dir = c.delta > 0.015 ? 'up' : (c.delta < -0.015 ? 'down' : 'flat');
-      c.deltaTxt = c.delta > 0.015 ? ('↑+' + c.delta.toFixed(2))
-                 : (c.delta < -0.015 ? ('↓' + c.delta.toFixed(2)) : '');
-      c.valTxt = c.val.toFixed(2);
       return c;
     };
     this.setData({
