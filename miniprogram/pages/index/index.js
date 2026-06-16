@@ -2,7 +2,6 @@ var bazi = require('../../utils/bazi.js');
 var cities = require('../../utils/cities.js');
 var store = require('../../utils/store.js');
 var prefs = require('../../utils/prefs.js');
-var daily = require('../../utils/daily.js');
 
 var THIS_YEAR = new Date().getFullYear();
 var START_YEAR = 1901;
@@ -25,7 +24,6 @@ Page({
     regionText: '',
     useTrueSolar: true,
     recent: [],
-    daily: null,
     fs: 'std',
     casting: false,
     zhiRing: ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
@@ -50,11 +48,9 @@ Page({
 
   onShow: function () {
     var that = this;
-    this._self = prefs.getSelf();
     this.setData({
       casting: false,
-      fs: prefs.getFontSize(),
-      daily: daily.getDaily(this._self)
+      fs: prefs.getFontSize()
     });
     store.listRecords().then(function (res) {
       var recent = res.list.slice(0, 3).map(function (r) {
@@ -68,18 +64,6 @@ Page({
   // 此刻星象 → 打开当前时刻星图
   goAstroNow: function () {
     wx.navigateTo({ url: '/pages/astro/astro?now=1' });
-  },
-
-  // 今日运势卡：已绑定 → 打开本人命盘；未绑定 → 引导去记录绑定
-  onTodayTap: function () {
-    if (this._self) {
-      wx.navigateTo({
-        url: '/pages/result/result?from=record&input=' + encodeURIComponent(JSON.stringify(this._self.input))
-      });
-    } else {
-      wx.switchTab({ url: '/pages/records/records' });
-      wx.showToast({ title: '长按一条记录设为本人命盘', icon: 'none', duration: 2500 });
-    }
   },
 
   onNameInput: function (e) {
@@ -216,13 +200,6 @@ Page({
   onQuickXiangPi: function () {
     var input = this.collectInput();
     this.castThenGo('/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(input)));
-  },
-
-  // ---- 模块入口 ----
-  goMatch: function (e) {
-    wx.navigateTo({
-      url: '/pages/match/match?type=' + e.currentTarget.dataset.type
-    });
   },
 
   goRecord: function (e) {

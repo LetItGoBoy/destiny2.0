@@ -6,8 +6,7 @@
     "pages/astro/astro",
     "pages/records/records",
     "pages/healing/healing",
-    "pages/mine/mine",
-    "pages/match/match"
+    "pages/mine/mine"
   ],
   "window": {
     "navigationBarBackgroundColor": "#FFFFFF",
