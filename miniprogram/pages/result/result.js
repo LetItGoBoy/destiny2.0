@@ -16,7 +16,10 @@ Page({
     dyIndex: -1,
     liuNianBar: [],
     lnIndex: -1,
-    selLiuNian: null,
+    liuYueBar: [],
+    lyIndex: -1,
+    liuRiBar: [],
+    lrIndex: -1,
     termCard: null,
     baZiStr: '',
     fs: 'std',
@@ -49,6 +52,7 @@ Page({
       return;
     }
     this._chart = chart;
+    this._ctx = chart.ctx;
 
     // 大运横条（不含流年，控制 setData 体积）
     var daYunBar = chart.daYun.map(function (d) {
@@ -128,28 +132,71 @@ Page({
   selectLiuNian: function (dyIndex, lnIndex) {
     var ln = this._chart.daYun[dyIndex].liuNian[lnIndex];
     if (!ln) return;
+    // 流月横条（与流年同样式）
+    var liuYueBar = (ln.liuYue || []).map(function (m, i) {
+      return { index: i, name: m.name, ganZhi: m.ganZhi, gan: m.gan, zhi: m.zhi, shiShenGan: m.shiShenGan };
+    });
+    this._lnYear = ln.year;
     this.setData({
       lnIndex: lnIndex,
-      selLiuNian: { year: ln.year, age: ln.age, liuYue: ln.liuYue }
+      liuYueBar: liuYueBar,
+      lyIndex: -1,        // 默认不挂流月柱
+      liuRiBar: [],
+      lrIndex: -1
     });
     this.updateTable();
   },
 
-  // 基础盘 = 四柱；详盘 = 选中大运、流年作为最左两柱 + 四柱（六柱同表）
+  // 流月：点选生成流月柱，并展开该月流日
+  onLiuYueTap: function (e) {
+    var idx = Number(e.currentTarget.dataset.index);
+    if (idx === this.data.lyIndex) {
+      this.setData({ lyIndex: -1, liuRiBar: [], lrIndex: -1 });
+      this.updateTable();
+      return;
+    }
+    var ly = this.data.liuYueBar[idx];
+    var liuRiBar = bazi.getLiuRi(this._ctx, ly.ganZhi, this._lnYear);
+    this.setData({ lyIndex: idx, liuRiBar: liuRiBar, lrIndex: -1 });
+    this.updateTable();
+  },
+
+  // 流日：点选生成流日柱
+  onLiuRiTap: function (e) {
+    var idx = Number(e.currentTarget.dataset.index);
+    this.setData({ lrIndex: idx === this.data.lrIndex ? -1 : idx });
+    this.updateTable();
+  },
+
+  // 基础盘 = 四柱；详盘 = 岁运柱 + 四柱
+  // 列序（左→右）：流日 · 流月 · 流年 · 大运 · 年 · 月 · 日 · 时（默认只挂大运+流年）
   updateTable: function () {
     var pillars = this._chart.pillars.slice(0);
     if (this.data.tab === 'detail') {
       var extras = [];
       var dy = this._chart.daYun[this.data.dyIndex];
+
+      // 流日（最左）
+      if (this.data.lrIndex >= 0 && this.data.liuRiBar[this.data.lrIndex]) {
+        var lr = this.data.liuRiBar[this.data.lrIndex];
+        var lrCol = bazi.buildLuckPillar(this._ctx, lr.ganZhi);
+        if (lrCol) { lrCol.label = '流日'; lrCol.sub = lr.label; lrCol.extra = true; extras.push(lrCol); }
+      }
+      // 流月
+      if (this.data.lyIndex >= 0 && this.data.liuYueBar[this.data.lyIndex]) {
+        var ly = this.data.liuYueBar[this.data.lyIndex];
+        var lyCol = bazi.buildLuckPillar(this._ctx, ly.ganZhi);
+        if (lyCol) { lyCol.label = '流月'; lyCol.sub = ly.name; lyCol.extra = true; extras.push(lyCol); }
+      }
+      // 流年
       if (dy) {
+        var ln = dy.liuNian[this.data.lnIndex];
+        if (ln) extras.push(this.extraColumn(ln, '流年', ln.year + '年'));
+        // 大运（贴近八字）
         if (dy.isQian) {
           extras.push({ label: '大运', sub: '童限', empty: true });
         } else {
           extras.push(this.extraColumn(dy, '大运', dy.startAge + '-' + dy.endAge + '岁'));
-        }
-        var ln = dy.liuNian[this.data.lnIndex];
-        if (ln) {
-          extras.push(this.extraColumn(ln, '流年', ln.year + '年'));
         }
       }
       pillars = extras.concat(pillars);

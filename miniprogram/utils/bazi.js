@@ -207,8 +207,42 @@ function computeChart(input) {
     meta: meta,
     pillars: pillars,
     wuXing: wuXingList,
-    daYun: daYunList
+    daYun: daYunList,
+    ctx: ctx
   };
+}
+
+// 按需构建一柱完整视图（流月/流日列复用），ctx 来自 computeChart 返回
+function buildLuckPillar(ctx, ganZhi) {
+  if (!ganZhi || ganZhi.length < 2) return null;
+  return buildPillarView(ctx, ganZhi.charAt(0), ganZhi.charAt(1), false);
+}
+
+// 计算某流年中某节气月（以流月干支匹配）的所有流日（轻量列表，供平铺）
+function getLiuRi(ctx, liuYueGanZhi, year) {
+  if (!liuYueGanZhi || !year) return [];
+  var s = Solar.fromYmd(year, 1, 1);
+  var list = [];
+  var started = false;
+  for (var k = 0; k < 430; k++) {
+    var cur = s.next(k);
+    var lun = cur.getLunar();
+    if (lun.getMonthInGanZhi() === liuYueGanZhi) {
+      started = true;
+      var dgz = lun.getDayInGanZhi();
+      list.push({
+        index: list.length,
+        ganZhi: dgz,
+        gan: ganView(dgz.charAt(0)),
+        zhi: zhiView(dgz.charAt(1)),
+        shiShenGan: LunarUtil.SHI_SHEN[ctx.dayGan + dgz.charAt(0)],
+        label: cur.getMonth() + '/' + cur.getDay()
+      });
+    } else if (started) {
+      break;
+    }
+  }
+  return list;
 }
 
 function formatDate(date) {
@@ -255,6 +289,8 @@ function colorizeBaZi(str) {
 
 module.exports = {
   computeChart: computeChart,
+  buildLuckPillar: buildLuckPillar,
+  getLiuRi: getLiuRi,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
   changSheng: changSheng,

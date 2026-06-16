@@ -184,16 +184,36 @@
       </scroll-view>
     </view>
 
-    <!-- 流月 -->
-    <view class="card yun-card" wx:if="{{selLiuNian}}">
-      <view class="section-title serif">流月 <text class="section-note">{{selLiuNian.year}}年（农历）</text></view>
-      <view class="liuyue-grid">
-        <view class="liuyue-cell" wx:for="{{selLiuNian.liuYue}}" wx:key="name">
-          <view class="ly-name">{{item.name}}</view>
-          <view class="ly-gz serif">
+    <!-- 流月（与流年同样式，点选生成流月柱） -->
+    <view class="card yun-card" wx:if="{{liuYueBar.length}}">
+      <view class="section-title serif">流月 <text class="section-note">点击生成流月柱（默认不挂）</text></view>
+      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="yun-strip">
+          <view class="yun-cell {{lyIndex === item.index ? 'yun-on' : ''}}"
+            wx:for="{{liuYueBar}}" wx:key="index"
+            bindtap="onLiuYueTap" data-index="{{item.index}}">
+            <view class="yun-ss" catchtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
+            <view class="yun-gz serif">
+              <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
+            </view>
+            <view class="yun-year">{{item.name}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 流日（平铺，点选生成流日柱） -->
+    <view class="card yun-card" wx:if="{{liuRiBar.length}}">
+      <view class="section-title serif">流日 <text class="section-note">{{liuYueBar[lyIndex].name}} · 点击生成流日柱</text></view>
+      <view class="liuri-grid">
+        <view class="liuri-cell {{lrIndex === item.index ? 'lr-on' : ''}}"
+          wx:for="{{liuRiBar}}" wx:key="index"
+          bindtap="onLiuRiTap" data-index="{{item.index}}">
+          <view class="lr-date">{{item.label}}</view>
+          <view class="lr-gz serif">
             <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
           </view>
-          <view class="ly-ss" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
+          <view class="lr-ss">{{item.shiShenGan}}</view>
         </view>
       </view>
     </view>

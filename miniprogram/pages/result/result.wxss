@@ -353,6 +353,37 @@
   color: var(--ink-2);
 }
 
+/* 流日平铺 */
+.liuri-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.liuri-cell {
+  width: 16.66%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12rpx 0;
+  box-sizing: border-box;
+  border-radius: 12rpx;
+}
+.lr-on {
+  background: var(--tint);
+}
+.lr-date {
+  font-size: 19rpx;
+  color: var(--ink-3);
+}
+.lr-gz {
+  font-size: 28rpx;
+  font-weight: 700;
+  margin: 2rpx 0;
+}
+.lr-ss {
+  font-size: 18rpx;
+  color: var(--ink-2);
+}
+
 /* 底部操作栏：保存 + 详批 */
 .bottom-space {
   height: 20rpx;
