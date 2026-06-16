@@ -2,17 +2,19 @@ var store = require('../../utils/store.js');
 var bazi = require('../../utils/bazi.js');
 var prefs = require('../../utils/prefs.js');
 
-var GZ_CHARS = '甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥';
 var PILLAR_LABELS = ['年柱', '月柱', '日柱', '时柱'];
-
-// 输入是否为干支查询（1-2 个干支字符，如「庚」「午」「庚午」）
-function isGanZhiQuery(kw) {
-  if (!kw || kw.length > 2) return false;
-  for (var i = 0; i < kw.length; i++) {
-    if (GZ_CHARS.indexOf(kw.charAt(i)) === -1) return false;
-  }
-  return true;
-}
+// 干支五行配色
+var GAN_LIST = [
+  { ch: '甲', cls: 'mu' }, { ch: '乙', cls: 'mu' }, { ch: '丙', cls: 'huo' }, { ch: '丁', cls: 'huo' },
+  { ch: '戊', cls: 'tu' }, { ch: '己', cls: 'tu' }, { ch: '庚', cls: 'jin' }, { ch: '辛', cls: 'jin' },
+  { ch: '壬', cls: 'shui' }, { ch: '癸', cls: 'shui' }
+];
+var ZHI_LIST = [
+  { ch: '子', cls: 'shui' }, { ch: '丑', cls: 'tu' }, { ch: '寅', cls: 'mu' }, { ch: '卯', cls: 'mu' },
+  { ch: '辰', cls: 'tu' }, { ch: '巳', cls: 'huo' }, { ch: '午', cls: 'huo' }, { ch: '未', cls: 'tu' },
+  { ch: '申', cls: 'jin' }, { ch: '酉', cls: 'jin' }, { ch: '戌', cls: 'tu' }, { ch: '亥', cls: 'shui' }
+];
+var GAN_SET = '甲乙丙丁戊己庚辛壬癸';
 
 // 姓名拼音字母排序，未署名排最后（按时间倒序）
 function sortByName(list) {
@@ -32,14 +34,20 @@ function sortByName(list) {
 Page({
   data: {
     keyword: '',
-    mode: 'name',
-    pillarFilter: -1,
     shown: [],
-    groups: [],
     total: 0,
     source: 'local',
     loading: true,
-    fs: 'std'
+    fs: 'std',
+    // 筛选
+    showFilter: false,
+    genderFilter: -1,                       // -1 不限 / 1 男 / 0 女
+    slots: ['', '', '', '', '', '', '', ''], // 年干,年支,月干,月支,日干,日支,时干,时支
+    activeSlot: -1,
+    filterCount: 0,
+    pillarLabels: PILLAR_LABELS,
+    ganList: GAN_LIST,
+    zhiList: ZHI_LIST
   },
 
   onShow: function () {
@@ -56,6 +64,8 @@ Page({
         r.bz = bazi.colorizeBaZi(r.baZi);
         r.pillarArr = (r.baZi || '').split(' ');
         r.isSelf = r._id === selfId;
+        r.dayGan = (r.pillarArr[2] || '').charAt(0);
+        r.dayCls = (r.bz[2] && r.bz[2][0]) ? r.bz[2][0].cls : '';
         return r;
       });
       that.setData({ source: res.source, loading: false, total: that._all.length });
@@ -69,49 +79,82 @@ Page({
   },
 
   onClear: function () {
-    this.setData({ keyword: '', pillarFilter: -1 });
+    this.setData({ keyword: '' });
     this.apply();
   },
 
-  // 切换柱位筛选（全部/年柱/月柱/日柱/时柱）
-  onPillarFilter: function (e) {
-    this.setData({ pillarFilter: Number(e.currentTarget.dataset.pillar) });
+  onToggleFilter: function () {
+    this.setData({ showFilter: !this.data.showFilter });
+  },
+
+  // 性别（再点取消）
+  onGender: function (e) {
+    var g = Number(e.currentTarget.dataset.g);
+    this.setData({ genderFilter: this.data.genderFilter === g ? -1 : g });
     this.apply();
   },
 
-  // 应用搜索：干支 → 按柱位聚合（可筛选具体柱位）；其他 → 姓名模糊匹配 + 字母排序
+  // 点选柱位插槽：空槽→激活待填；已填→清空并激活以便重填
+  onSlotTap: function (e) {
+    var i = Number(e.currentTarget.dataset.slot);
+    var slots = this.data.slots.slice();
+    if (slots[i]) {
+      slots[i] = '';
+      this.setData({ slots: slots, activeSlot: i });
+      this.apply();
+    } else {
+      this.setData({ activeSlot: this.data.activeSlot === i ? -1 : i });
+    }
+  },
+
+  // 点选干支填入激活槽（类型须匹配：干槽填天干、支槽填地支）
+  onGzTap: function (e) {
+    var ch = e.currentTarget.dataset.ch;
+    var slot = this.data.activeSlot;
+    if (slot < 0) { wx.showToast({ title: '请先点上方柱位', icon: 'none' }); return; }
+    var slotIsGan = slot % 2 === 0;
+    var chIsGan = GAN_SET.indexOf(ch) > -1;
+    if (slotIsGan !== chIsGan) {
+      wx.showToast({ title: slotIsGan ? '该位请选天干' : '该位请选地支', icon: 'none' });
+      return;
+    }
+    var slots = this.data.slots.slice();
+    slots[slot] = ch;
+    this.setData({ slots: slots, activeSlot: -1 });
+    this.apply();
+  },
+
+  onReset: function () {
+    this.setData({
+      genderFilter: -1,
+      slots: ['', '', '', '', '', '', '', ''],
+      activeSlot: -1
+    });
+    this.apply();
+  },
+
+  // 应用：姓名模糊 + 性别 + 逐柱干支聚合
   apply: function () {
     var kw = (this.data.keyword || '').trim();
+    var g = this.data.genderFilter;
+    var slots = this.data.slots;
     var all = this._all || [];
-    if (kw && isGanZhiQuery(kw)) {
-      var filter = this.data.pillarFilter;
-      var groups = [];
-      for (var i = 0; i < 4; i++) {
-        if (filter >= 0 && i !== filter) continue;
-        var items = [];
-        for (var j = 0; j < all.length; j++) {
-          var p = all[j].pillarArr[i] || '';
-          if (p.indexOf(kw) > -1) items.push(all[j]);
-        }
-        if (items.length) {
-          groups.push({
-            title: PILLAR_LABELS[i],
-            kw: kw,
-            count: items.length,
-            items: sortByName(items)
-          });
-        }
+
+    var cnt = (g !== -1 ? 1 : 0);
+    for (var s = 0; s < 8; s++) if (slots[s]) cnt++;
+
+    var res = all.filter(function (r) {
+      if (g !== -1 && r.gender !== g) return false;
+      if (kw && (r.name || '').indexOf(kw) === -1) return false;
+      for (var i = 0; i < 8; i++) {
+        if (!slots[i]) continue;
+        var pillar = r.pillarArr[Math.floor(i / 2)] || '';
+        if (pillar.charAt(i % 2) !== slots[i]) return false;
       }
-      this.setData({ mode: 'ganzhi', groups: groups, shown: [] });
-    } else {
-      var items2 = all;
-      if (kw) {
-        items2 = all.filter(function (r) {
-          return (r.name || '').indexOf(kw) > -1;
-        });
-      }
-      this.setData({ mode: 'name', shown: sortByName(items2), groups: [], pillarFilter: -1 });
-    }
+      return true;
+    });
+
+    this.setData({ shown: sortByName(res), filterCount: cnt });
   },
 
   findById: function (id) {
@@ -153,7 +196,6 @@ Page({
     });
   },
 
-  // 绑定/取消本人命盘（用于首页今日运势）
   toggleSelf: function (rec) {
     if (rec.isSelf) {
       prefs.clearSelf();
