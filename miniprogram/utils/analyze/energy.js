@@ -128,31 +128,56 @@ function aggregate(model) {
 }
 
 // ── 岁运 ──
+// 先让大运、流年各自「同柱作用」：地支藏干 → 本柱天干（天干不对地支），
+// 得到天干的有效强度；再以天干(isStem)与地支藏干(非isStem)两类身份进入原局。
 function buildActors(dyGZ, lnGZ) {
   var actors = [];
   function push(gz, ganF, zhiF) {
     if (!gz || gz.length < 2) return;
-    actors.push({ char: gz.charAt(0), el: ganWx(gz.charAt(0)), f: ganF });
+    var gc = gz.charAt(0), ge = ganWx(gc);
     var hg = LunarUtil.ZHI_HIDE_GAN[gz.charAt(1)], ws = HIDE_W[hg.length];
-    for (var j = 0; j < hg.length; j++) actors.push({ char: hg[j], el: ganWx(hg[j]), f: zhiF * ws[j] });
+    var hiddens = [];
+    for (var j = 0; j < hg.length; j++) {
+      hiddens.push({ char: hg[j], el: ganWx(hg[j]), f: zhiF * ws[j] });
+    }
+    // 同柱：地支藏干 → 天干（通根只认同字；天干不反作用于地支）
+    var ganEff = ganF;
+    for (var k = 0; k < hiddens.length; k++) {
+      var hd = hiddens[k];
+      if (hd.char === gc) { ganEff += C_ROOT * hd.f; }                                   // 同字通根
+      else if (hd.el === ge) { /* 同五行异字：跳过 */ }
+      else if (SHENG[hd.el] === ge) { ganEff += C_SHENG * hd.f; hd.f *= (1 - C_XIE); }   // 藏干生天干
+      else if (KE[hd.el] === ge) { ganEff += -C_KE * hd.f; hd.f *= (1 - C_COST); }       // 藏干克天干
+    }
+    ganEff = Math.max(0.02, ganEff);
+    actors.push({ char: gc, el: ge, f: ganEff, isStem: true });
+    for (var m = 0; m < hiddens.length; m++) {
+      actors.push({ char: hiddens[m].char, el: hiddens[m].el, f: hiddens[m].f, isStem: false });
+    }
   }
   push(dyGZ, DY_GAN_F, DY_ZHI_F);
   push(lnGZ, LN_GAN_F, LN_ZHI_F);
   return actors;
 }
 
-// 岁运对单字作用，返回新能量
-// 帮扶（同类生扶）只认「同字」：同五行异字（如岁运辛金 vs 命局庚金）不帮扶，亦不生克
+// 岁运对原局某天干作用，返回新能量
+// 天干(isStem)：与原局天干双向生克帮扶（同字帮扶 / 同五行异字跳过 / 生克泄耗）
+// 地支藏干(非isStem)：只能同字通根原局天干，不斜向生克（天干地支互不斜作用）
 function affect(ch, el, v, actors) {
   var d = 0;
   for (var i = 0; i < actors.length; i++) {
     var a = actors[i];
-    if (a.char === ch) d += LUCK_SAME * a.f * LUCK_DF;            // 同字帮扶
-    else if (a.el === el) { /* 同五行异字：不帮扶、不生克 */ }
-    else if (SHENG[a.el] === el) d += C_SHENG * a.f * LUCK_DF;     // 岁运生它
-    else if (KE[a.el] === el) d += -C_KE * a.f * LUCK_DF;          // 岁运克它
-    else if (SHENG[el] === a.el) d += -C_XIE * v * LUCK_DF;        // 它生岁运·泄
-    else if (KE[el] === a.el) d += -C_COST * v * LUCK_DF;          // 它克岁运·耗
+    if (a.isStem) {
+      if (a.char === ch) d += LUCK_SAME * a.f * LUCK_DF;            // 同字帮扶
+      else if (a.el === el) { /* 同五行异字：不帮扶、不生克 */ }
+      else if (SHENG[a.el] === el) d += C_SHENG * a.f * LUCK_DF;     // 岁运天干生它
+      else if (KE[a.el] === el) d += -C_KE * a.f * LUCK_DF;          // 岁运天干克它
+      else if (SHENG[el] === a.el) d += -C_XIE * v * LUCK_DF;        // 它生岁运天干·泄
+      else if (KE[el] === a.el) d += -C_COST * v * LUCK_DF;          // 它克岁运天干·耗
+    } else {
+      if (a.char === ch) d += LUCK_SAME * a.f * LUCK_DF;            // 地支藏干同字通根
+      // 非同字：地支不斜向生克，跳过
+    }
   }
   var cap = LUCK_CAP * v;
   if (d > cap) d = cap; if (d < -cap) d = -cap;
@@ -179,6 +204,7 @@ function build(chart, opts) {
   var actors = buildActors(opts.daYunGZ, opts.liuNianGZ);
   var hasLuck = actors.length > 0;
 
+  // 岁运只作用于原局天干；原局地支（藏干）为固定根基，不受岁运改写
   function valAfter(node) { return hasLuck ? affect(node.char, node.el, node.val, actors) : node.val; }
 
   var ganCells = [];
@@ -197,12 +223,12 @@ function build(chart, opts) {
     var pos = plist[z].pos;
     var hs = natal.hidden.filter(function (h) { return h.pillar === pos; });
     if (!hs.length) continue;
-    var baseSum = 0, valSum = 0, mainEl = hs[0].el;
-    for (var k = 0; k < hs.length; k++) { baseSum += hs[k].val; valSum += valAfter(hs[k]); }
+    var baseSum = 0, mainEl = hs[0].el;
+    for (var k = 0; k < hs.length; k++) { baseSum += hs[k].val; }   // 地支不受岁运改写
     zhiCells.push({
       pos: PLBL[pos], char: plist[z].zhi, cls: WX_CLS[mainEl], el: mainEl,
       god: LunarUtil.SHI_SHEN[dayGan + hs[0].char],
-      base: round2(baseSum), val: round2(valSum), delta: round2(valSum - baseSum),
+      base: round2(baseSum), val: round2(baseSum), delta: 0,
       party: partyOf(natal.dm, mainEl)
     });
   }
@@ -214,7 +240,7 @@ function build(chart, opts) {
     hiddenUnits.push({
       god: LunarUtil.SHI_SHEN[dayGan + hn.char],
       base: round2(hn.val),
-      val: round2(valAfter(hn)),
+      val: round2(hn.val),                 // 地支不受岁运改写
       party: partyOf(natal.dm, hn.el)
     });
   }
@@ -226,7 +252,7 @@ function build(chart, opts) {
     var affected = {
       dm: natal.dm, dayGan: dayGan,
       stems: natal.stems.map(function (s) { return { char: s.char, el: s.el, val: valAfter(s), pillar: s.pillar, isDay: s.isDay }; }),
-      hidden: natal.hidden.map(function (h) { return { char: h.char, el: h.el, val: valAfter(h), pillar: h.pillar, rank: h.rank }; })
+      hidden: natal.hidden.map(function (h) { return { char: h.char, el: h.el, val: h.val, pillar: h.pillar, rank: h.rank }; })  // 地支不变
     };
     aggNow = aggregate(affected);
   }
