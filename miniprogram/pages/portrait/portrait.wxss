@@ -163,6 +163,17 @@
   font-size: 22rpx;
   color: var(--ink-3);
 }
+.comp-tip {
+  margin: 12rpx 0 6rpx;
+  padding: 16rpx 20rpx;
+  background: var(--fill);
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.comp-tip .tip-l { color: var(--primary); font-weight: 600; }
+.comp-tip .tip-r { color: var(--ink-3); font-weight: 600; }
 
 .trait {
   padding: 22rpx 0;
@@ -242,11 +253,6 @@
 }
 .pc-on {
   color: var(--ink-2);
-}
-.pc-k {
-  font-weight: 600;
-  color: var(--primary);
-  margin-right: 8rpx;
 }
 .comp-empty {
   padding: 30rpx 0;

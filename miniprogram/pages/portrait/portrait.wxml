@@ -58,6 +58,10 @@
       <text class="comp-sub" wx:elif="{{topTwo.length === 1}}">最突出：{{topTwo[0].name}}</text>
     </view>
 
+    <view class="comp-tip">
+      每条心性都有两面：滑标越靠<text class="tip-l">左</text>，这股特质越发挥得顺、显出好的一面；越靠<text class="tip-r">右</text>，则越容易走偏、需要留意。指针位置由这股心性的能量与你当下的旺衰共同决定，会随大运、流年左右移动。
+    </view>
+
     <view class="trait" wx:for="{{list}}" wx:key="god">
       <view class="trait-line">
         <text class="trait-name serif">{{item.name}}</text>
@@ -74,7 +78,7 @@
       </view>
       <view class="trait-shift" wx:if="{{hasLuck && item.mag !== item.magBase}}">本命 {{item.magBase}}% → 此运 {{item.mag}}%</view>
       <view class="trait-pc">
-        <view class="pc pc-on"><text class="pc-k">{{item.dir === 'pro' ? '优点' : (item.dir === 'con' ? '缺点' : '特质')}}</text>{{item.dir === 'pro' ? item.pro : (item.dir === 'con' ? item.con : item.pro)}}</view>
+        <view class="pc pc-on">{{item.desc}}</view>
       </view>
     </view>
 

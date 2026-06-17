@@ -7,29 +7,30 @@
 var energy = require('./energy.js');
 var base = require('./base.js');
 
-// 十神 → 外显心性（name 心性名，pol 正/偏，lbl 左端顺，rbl 右端偏，pro 优点描述，con 缺点描述）
-// 七杀右端词依旺衰动态切换，用 rblStrong/rblWeak 分别存储
+// 十神 → 外显心性（name 心性名，pol 正/偏，lbl 左端顺，rbl 右端偏，desc 综合特质描述）
+// 七杀右端词与描述依旺衰动态切换，用 rblWeak/descWeak 存储身弱版本
 var TEMP = {
   比肩: { name: '自立', pol: '正', lbl: '有主见、靠得住', rbl: '固执、不肯回头',
-          pro: '独立有主见，靠自己也扛得住，待人讲对等。', con: '主意定了不太肯改，偶尔显得倔。' },
+          desc: '独立、有主见，靠自己也扛得住，待人讲对等、不爱占便宜；这股自立劲一旦走偏，主意定了就不太肯回头，认死理时旁人很难劝得动，偶尔显得倔。' },
   劫财: { name: '果敢', pol: '偏', lbl: '当断则断', rbl: '冲动、意气用事',
-          pro: '行动力强、敢拼，重义气、说做就做。', con: '上头时容易冲，花钱也容易没个准。' },
+          desc: '行动力强、敢拼敢闯，重义气、说做就做，关键时刻当断则断；只是上头时容易凭一时意气行事，决定下得太快，花钱、出手也常没个准头。' },
   食神: { name: '从容', pol: '正', lbl: '张弛有度', rbl: '贪图安逸',
-          pro: '温和乐天，懂享受、有才情，自带松弛感。', con: '太舒服时容易松，少了点紧迫劲。' },
+          desc: '温和乐天、懂得享受生活，自带一份松弛与才情，做事张弛有度、不慌不忙；但日子太舒服时容易松下来，贪图安逸、缺一点紧迫感，该使劲时使不上劲。' },
   伤官: { name: '锋芒', pol: '偏', lbl: '表达有度', rbl: '张扬、好辩',
-          pro: '才华外露、脑子快，敢表达敢挑战。', con: '话偶尔太直，得理时记得留三分。' },
+          desc: '才华外露、脑子转得快，敢表达敢挑战，言谈里有锋芒、有想法；锋芒收不住时容易显得张扬、爱争辩，话偶尔太直，得理时记得给人留三分。' },
   偏财: { name: '灵活', pol: '偏', lbl: '圆融应变', rbl: '见异思迁',
-          pro: '交际广、嗅觉灵，慷慨会变通。', con: '精力和钱容易铺得太散，难聚焦。' },
+          desc: '交际广、嗅觉灵，慷慨大方又懂变通，遇事能圆融应变、左右逢源；但兴趣来得快去得也快，精力和钱容易铺得太散，见异思迁、难长久聚焦在一件事上。' },
   正财: { name: '务实', pol: '正', lbl: '精打细算', rbl: '锱铢必较',
-          pro: '踏实勤恳，重承诺、会规划，稳。', con: '偏求稳，有时和机会擦肩。' },
+          desc: '踏实勤恳、重承诺、会规划，过日子精打细算、稳当可靠；可一旦太计较得失，容易锱铢必较、放不开手脚，偏求稳时也常和好机会擦肩。' },
   七杀: { name: '开拓', pol: '偏', lbl: '果决担当', rbl: '强势压人', rblWeak: '胆小怕事',
-          pro: '果决有魄力、抗压，硬仗顶得上。', con: '急起来偏强势，无意中容易碰人。' },
+          desc: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；只是劲头太足、急起来时偏强势，无意中容易压到旁人、碰着人。',
+          descWeak: '骨子里有开拓、担当的一面，但身弱而杀重，这股劲压不太住反被压制，遇事先怵三分，容易畏缩、不敢出头，错过本可争取的机会。' },
   正官: { name: '自律', pol: '正', lbl: '有章有法', rbl: '刻板拘谨',
-          pro: '端正守规、有章法，让人信任。', con: '偏循规，放开手脚需要点勇气。' },
+          desc: '端正守规、做事有章有法，让人信得过、托付得下；但太守规矩时容易刻板拘谨，凡事讲究分寸反倒放不开，要迈出常规需要点勇气。' },
   偏印: { name: '钻研', pol: '偏', lbl: '深思专注', rbl: '钻牛角尖',
-          pro: '思维独特、悟性高，安静时最出灵感。', con: '想得多动得慢，偶尔会犯嘀咕。' },
+          desc: '思维独特、悟性高，能沉下心钻研，安静独处时最出灵感；想得多了却容易动得慢，一头扎进细节里钻牛角尖，偶尔还会反复犯嘀咕、自己跟自己较劲。' },
   正印: { name: '宽厚', pol: '正', lbl: '仁厚重情', rbl: '心软耳软',
-          pro: '仁厚好学、念旧重情，让人愿意靠近。', con: '心一软容易被牵着走，起步偏慢。' }
+          desc: '仁厚好学、念旧重情，待人温和让人愿意靠近；只是心一软、耳根子一软就容易被人牵着走，凡事想得周全反倒起步偏慢、下不了狠心。' }
 };
 
 // 日主天干 → 外在底色（第一印象）
@@ -95,21 +96,24 @@ function build(chart, opts) {
 
   var list = [];
   for (g in agg) {
-    var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', pro: '', con: '' };
+    var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', desc: '' };
     var dir = direction(agg[g].party, P);
     var dirB = direction(agg[g].party, Pb);
     var w = maxE > 0 ? agg[g].energy / maxE : 1;
     var wb = maxEb > 0 ? agg[g].baseEnergy / maxEb : 1;
-    // 七杀右端词随旺衰切换
-    var rbl = t.rbl;
-    if (g === '七杀' && P < 50 && t.rblWeak) rbl = t.rblWeak;
+    // 七杀右端词与描述随旺衰切换（身弱用 rblWeak/descWeak）
+    var rbl = t.rbl, desc = t.desc;
+    if (g === '七杀' && P < 50) {
+      if (t.rblWeak) rbl = t.rblWeak;
+      if (t.descWeak) desc = t.descWeak;
+    }
     // 滑标位置：0=纯左，100=纯右，50=中间
     // dir=pro → 偏左，dir=con → 偏右，mid → 50
     var mag = Math.round(inten * w);
     var slider = dir === 'pro' ? Math.round(50 - mag / 2) : (dir === 'con' ? Math.round(50 + mag / 2) : 50);
     slider = Math.max(0, Math.min(100, slider));
     list.push({
-      god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: rbl, pro: t.pro, con: t.con, cls: agg[g].cls,
+      god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: rbl, desc: desc, cls: agg[g].cls,
       dir: dir,
       mag: mag,
       slider: slider,
