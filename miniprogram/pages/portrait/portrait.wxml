@@ -58,42 +58,23 @@
       <text class="comp-sub" wx:elif="{{topTwo.length === 1}}">最突出：{{topTwo[0].name}}</text>
     </view>
 
-    <!-- 当前旺衰：决定各心性的状态强度 -->
-    <view class="ws-state">
-      <view class="ws-state-line">
-        <text class="ws-state-t">本气配比</text>
-        <text class="ws-state-v">生扶 {{sheng}}% · 克泄耗 {{ke}}%</text>
-        <text class="ws-state-tag tag-{{stateLabel === '偏旺' ? 'up' : (stateLabel === '偏弱' ? 'down' : 'mid')}}">{{stateLabel}}</text>
-      </view>
-      <view class="ws-state-sub">{{stateLabel === '中和' ? '强弱相当，各类心性收放自如' : flowGroup + '当前更顺势（强度 ' + inten + '%）'}}</view>
-      <view class="ws-shift" wx:if="{{hasLuck && wsShift}}">本命生扶 {{shengBase}}% → 此运 {{sheng}}%</view>
-    </view>
-
-    <view class="dax-cap">
-      <text class="cap-l">← 优点更显</text>
-      <text class="cap-r">缺点需留意 →</text>
-    </view>
-
     <view class="trait" wx:for="{{list}}" wx:key="god">
       <view class="trait-line">
         <text class="trait-name serif">{{item.name}}</text>
         <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
         <text class="trait-god">{{item.god}}</text>
-        <text class="trait-pct pct-{{item.dir}}">{{item.dir === 'pro' ? '优点' : (item.dir === 'con' ? '缺点' : '均衡')}} {{item.mag}}%</text>
       </view>
-      <view class="dax">
-        <view class="dax-half dax-left">
-          <view class="dax-fill dax-pro" wx:if="{{item.dir === 'pro'}}" style="width:{{item.mag}}%"></view>
+      <!-- 滑标轴：左端词(顺) ←指针→ 右端词(偏) -->
+      <view class="slider-row">
+        <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
+        <view class="sl-track">
+          <view class="sl-thumb" style="left:{{item.slider}}%"></view>
         </view>
-        <view class="dax-mid"></view>
-        <view class="dax-half dax-right">
-          <view class="dax-fill dax-con" wx:if="{{item.dir === 'con'}}" style="width:{{item.mag}}%"></view>
-        </view>
+        <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
       </view>
       <view class="trait-shift" wx:if="{{hasLuck && item.mag !== item.magBase}}">本命 {{item.magBase}}% → 此运 {{item.mag}}%</view>
       <view class="trait-pc">
-        <view class="pc {{item.dir === 'pro' ? 'pc-on' : ''}}"><text class="pc-k pc-k-pro">优点</text>{{item.pro}}</view>
-        <view class="pc {{item.dir === 'con' ? 'pc-on' : ''}}"><text class="pc-k pc-k-con">缺点</text>{{item.con}}</view>
+        <view class="pc pc-on"><text class="pc-k">{{item.dir === 'pro' ? '优点' : (item.dir === 'con' ? '缺点' : '特质')}}</text>{{item.dir === 'pro' ? item.pro : (item.dir === 'con' ? item.con : item.pro)}}</view>
       </view>
     </view>
 

@@ -163,58 +163,6 @@
   font-size: 22rpx;
   color: var(--ink-3);
 }
-/* 当前旺衰状态 */
-.ws-state {
-  margin: 16rpx 0 12rpx;
-  padding: 18rpx 20rpx;
-  background: var(--fill);
-  border-radius: 14rpx;
-}
-.ws-state-line {
-  display: flex;
-  align-items: center;
-}
-.ws-state-t {
-  font-size: 24rpx;
-  color: var(--ink-2);
-  font-weight: 600;
-}
-.ws-state-v {
-  margin-left: 14rpx;
-  font-size: 23rpx;
-  color: var(--ink-3);
-}
-.ws-state-tag {
-  margin-left: auto;
-  font-size: 20rpx;
-  font-weight: 600;
-  padding: 2rpx 14rpx;
-  border-radius: 100rpx;
-}
-.tag-up { color: #C97A2B; background: rgba(224, 168, 90, 0.18); }
-.tag-down { color: #2E86E6; background: rgba(90, 166, 242, 0.18); }
-.tag-mid { color: var(--ink-2); background: rgba(20, 21, 60, 0.06); }
-.ws-state-sub {
-  margin-top: 10rpx;
-  font-size: 22rpx;
-  color: var(--ink-2);
-  line-height: 1.5;
-}
-.ws-shift {
-  margin-top: 8rpx;
-  font-size: 21rpx;
-  color: var(--primary);
-}
-
-/* 优点(左) ←→ 缺点(右) 轴说明 */
-.dax-cap {
-  display: flex;
-  justify-content: space-between;
-  margin: 8rpx 2rpx 2rpx;
-  font-size: 20rpx;
-}
-.cap-l { color: #1E9E6A; }
-.cap-r { color: #C97A2B; }
 
 .trait {
   padding: 22rpx 0;
@@ -245,42 +193,38 @@
   font-size: 22rpx;
   color: var(--ink-3);
 }
-.trait-pct {
-  margin-left: auto;
-  font-size: 24rpx;
-  font-weight: 700;
-}
-.pct-pro { color: #1E9E6A; }
-.pct-con { color: #C97A2B; }
-.pct-mid { color: var(--ink-3); }
-
-/* 双向轴：中线为界，左优右缺 */
-.dax {
+/* 滑标轴 */
+.slider-row {
   display: flex;
   align-items: center;
-  height: 18rpx;
+  margin: 10rpx 0 6rpx;
+  gap: 12rpx;
 }
-.dax-half {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  background: var(--fill);
-}
-.dax-left { justify-content: flex-end; border-radius: 100rpx 0 0 100rpx; }
-.dax-right { justify-content: flex-start; border-radius: 0 100rpx 100rpx 0; }
-.dax-mid {
-  width: 2rpx;
-  height: 26rpx;
-  background: var(--ink-3);
-  opacity: 0.5;
+.sl-lbl {
+  font-size: 20rpx;
   flex-shrink: 0;
+  max-width: 160rpx;
 }
-.dax-fill {
-  height: 100%;
-  transition: width 0.4s ease;
+.sl-lbl-l { color: var(--primary); text-align: right; }
+.sl-lbl-r { color: var(--ink-3); text-align: left; }
+.sl-track {
+  flex: 1;
+  height: 10rpx;
+  background: var(--fill);
+  border-radius: 100rpx;
+  position: relative;
 }
-.dax-pro { background: linear-gradient(135deg, #1E9E6A, #3FD09A); border-radius: 100rpx 0 0 100rpx; }
-.dax-con { background: linear-gradient(135deg, #E0A85A, #C97A2B); border-radius: 0 100rpx 100rpx 0; }
+.sl-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 2rpx 8rpx rgba(124, 92, 224, 0.4);
+  transition: left 0.4s ease;
+}
 
 .trait-shift {
   margin-top: 10rpx;
@@ -301,10 +245,9 @@
 }
 .pc-k {
   font-weight: 600;
+  color: var(--primary);
   margin-right: 8rpx;
 }
-.pc-k-pro { color: #1E9E6A; }
-.pc-k-con { color: #C97A2B; }
 .comp-empty {
   padding: 30rpx 0;
   text-align: center;

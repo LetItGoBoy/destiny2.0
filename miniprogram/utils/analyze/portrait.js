@@ -7,18 +7,29 @@
 var energy = require('./energy.js');
 var base = require('./base.js');
 
-// 十神 → 外显心性（name 心性名，pol 正/偏，pro 优点，con 缺点-收敛措辞）
+// 十神 → 外显心性（name 心性名，pol 正/偏，lbl 左端顺，rbl 右端偏，pro 优点描述，con 缺点描述）
+// 七杀右端词依旺衰动态切换，用 rblStrong/rblWeak 分别存储
 var TEMP = {
-  比肩: { name: '自立', pol: '正', pro: '独立有主见，靠自己也扛得住，待人讲对等。', con: '主意定了不太肯改，偶尔显得倔。' },
-  劫财: { name: '果敢', pol: '偏', pro: '行动力强、敢拼，重义气、说做就做。', con: '上头时容易冲，花钱也容易没个准。' },
-  食神: { name: '从容', pol: '正', pro: '温和乐天，懂享受、有才情，自带松弛感。', con: '太舒服时容易松，少了点紧迫劲。' },
-  伤官: { name: '锋芒', pol: '偏', pro: '才华外露、脑子快，敢表达敢挑战。', con: '话偶尔太直，得理时记得留三分。' },
-  偏财: { name: '灵活', pol: '偏', pro: '交际广、嗅觉灵，慷慨会变通。', con: '精力和钱容易铺得太散，难聚焦。' },
-  正财: { name: '务实', pol: '正', pro: '踏实勤恳，重承诺、会规划，稳。', con: '偏求稳，有时和机会擦肩。' },
-  七杀: { name: '开拓', pol: '偏', pro: '果决有魄力、抗压，硬仗顶得上。', con: '急起来偏强势，无意中容易碰人。' },
-  正官: { name: '自律', pol: '正', pro: '端正守规、有章法，让人信任。', con: '偏循规，放开手脚需要点勇气。' },
-  偏印: { name: '钻研', pol: '偏', pro: '思维独特、悟性高，安静时最出灵感。', con: '想得多动得慢，偶尔会犯嘀咕。' },
-  正印: { name: '宽厚', pol: '正', pro: '仁厚好学、念旧重情，让人愿意靠近。', con: '心一软容易被牵着走，起步偏慢。' }
+  比肩: { name: '自立', pol: '正', lbl: '有主见、靠得住', rbl: '固执、不肯回头',
+          pro: '独立有主见，靠自己也扛得住，待人讲对等。', con: '主意定了不太肯改，偶尔显得倔。' },
+  劫财: { name: '果敢', pol: '偏', lbl: '当断则断', rbl: '冲动、意气用事',
+          pro: '行动力强、敢拼，重义气、说做就做。', con: '上头时容易冲，花钱也容易没个准。' },
+  食神: { name: '从容', pol: '正', lbl: '张弛有度', rbl: '贪图安逸',
+          pro: '温和乐天，懂享受、有才情，自带松弛感。', con: '太舒服时容易松，少了点紧迫劲。' },
+  伤官: { name: '锋芒', pol: '偏', lbl: '表达有度', rbl: '张扬、好辩',
+          pro: '才华外露、脑子快，敢表达敢挑战。', con: '话偶尔太直，得理时记得留三分。' },
+  偏财: { name: '灵活', pol: '偏', lbl: '圆融应变', rbl: '见异思迁',
+          pro: '交际广、嗅觉灵，慷慨会变通。', con: '精力和钱容易铺得太散，难聚焦。' },
+  正财: { name: '务实', pol: '正', lbl: '精打细算', rbl: '锱铢必较',
+          pro: '踏实勤恳，重承诺、会规划，稳。', con: '偏求稳，有时和机会擦肩。' },
+  七杀: { name: '开拓', pol: '偏', lbl: '果决担当', rbl: '强势压人', rblWeak: '胆小怕事',
+          pro: '果决有魄力、抗压，硬仗顶得上。', con: '急起来偏强势，无意中容易碰人。' },
+  正官: { name: '自律', pol: '正', lbl: '有章有法', rbl: '刻板拘谨',
+          pro: '端正守规、有章法，让人信任。', con: '偏循规，放开手脚需要点勇气。' },
+  偏印: { name: '钻研', pol: '偏', lbl: '深思专注', rbl: '钻牛角尖',
+          pro: '思维独特、悟性高，安静时最出灵感。', con: '想得多动得慢，偶尔会犯嘀咕。' },
+  正印: { name: '宽厚', pol: '正', lbl: '仁厚重情', rbl: '心软耳软',
+          pro: '仁厚好学、念旧重情，让人愿意靠近。', con: '心一软容易被牵着走，起步偏慢。' }
 };
 
 // 日主天干 → 外在底色（第一印象）
@@ -84,15 +95,24 @@ function build(chart, opts) {
 
   var list = [];
   for (g in agg) {
-    var t = TEMP[g] || { name: g, pol: '', pro: '', con: '' };
+    var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', pro: '', con: '' };
     var dir = direction(agg[g].party, P);
     var dirB = direction(agg[g].party, Pb);
     var w = maxE > 0 ? agg[g].energy / maxE : 1;
     var wb = maxEb > 0 ? agg[g].baseEnergy / maxEb : 1;
+    // 七杀右端词随旺衰切换
+    var rbl = t.rbl;
+    if (g === '七杀' && P < 50 && t.rblWeak) rbl = t.rblWeak;
+    // 滑标位置：0=纯左，100=纯右，50=中间
+    // dir=pro → 偏左，dir=con → 偏右，mid → 50
+    var mag = Math.round(inten * w);
+    var slider = dir === 'pro' ? Math.round(50 - mag / 2) : (dir === 'con' ? Math.round(50 + mag / 2) : 50);
+    slider = Math.max(0, Math.min(100, slider));
     list.push({
-      god: g, name: t.name, pol: t.pol, pro: t.pro, con: t.con, cls: agg[g].cls,
-      dir: dir,                                   // pro 偏优 / con 偏缺 / mid 均衡
-      mag: Math.round(inten * w),                 // 当前幅度
+      god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: rbl, pro: t.pro, con: t.con, cls: agg[g].cls,
+      dir: dir,
+      mag: mag,
+      slider: slider,
       magBase: Math.round(intenBase * wb),
       dirBase: dirB,
       energy: agg[g].energy

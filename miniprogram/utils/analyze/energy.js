@@ -23,7 +23,7 @@ var C_COST = 0.05;    // 克耗 −
 var C_ROOT = 0.30;    // 通根帮扶 +
 var ROOT_CROSS_DF = 0.6;
 var DELING_X = 1.8;   // 得令加成（月令本气属生扶）
-var SAME_X = 1.5;     // 生扶结构性修正
+var SAME_X = 1.2;     // 生扶结构性修正
 
 function stemDF(d) { d = Math.abs(d); return d === 1 ? 0.5 : (d === 2 ? 0.2 : 0.1); }
 
