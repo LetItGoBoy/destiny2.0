@@ -14,6 +14,7 @@ Page({
     solarDate: '1990-06-15',
     maxDate: THIS_YEAR + '-12-31',
     time: '12:00',
+    unknownTime: true,           // 默认不知道出生时辰（不排时柱）
     // 农历选择器
     lunarRange: [[], [], []],
     lunarIndex: [0, 0, 0],
@@ -86,6 +87,11 @@ Page({
     this.setData({ time: e.detail.value });
   },
 
+  // 是否知道出生时辰（开关：开=已知，关=未知）
+  onKnowTimeChange: function (e) {
+    this.setData({ unknownTime: !e.detail.value });
+  },
+
   // ---- 农历选择器 ----
   rebuildLunarRange: function (init) {
     var sel = this._lunarSel;
@@ -153,9 +159,10 @@ Page({
       name: d.name.trim(),
       gender: d.gender,
       calendar: d.calendar,
-      hour: Number(time[0]),
-      minute: Number(time[1]),
-      useTrueSolar: d.useTrueSolar
+      unknownTime: d.unknownTime,
+      hour: d.unknownTime ? null : Number(time[0]),
+      minute: d.unknownTime ? null : Number(time[1]),
+      useTrueSolar: d.unknownTime ? false : d.useTrueSolar
     };
     if (d.calendar === 'solar') {
       var sd = d.solarDate.split('-');
@@ -196,10 +203,10 @@ Page({
     this.castThenGo('/pages/result/result?input=' + encodeURIComponent(JSON.stringify(input)));
   },
 
-  // ---- 一键详批（跳过排盘，直达解读）----
+  // ---- 一键性格画像（跳过排盘，直达解读）----
   onQuickXiangPi: function () {
     var input = this.collectInput();
-    this.castThenGo('/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(input)));
+    this.castThenGo('/pages/portrait/portrait?input=' + encodeURIComponent(JSON.stringify(input)));
   },
 
   goRecord: function (e) {
@@ -207,7 +214,7 @@ Page({
     var input = {
       name: rec.name, gender: rec.gender, calendar: rec.calendar,
       year: rec.year, month: rec.month, day: rec.day,
-      hour: rec.hour, minute: rec.minute,
+      hour: rec.hour, minute: rec.minute, unknownTime: rec.unknownTime,
       province: rec.province, city: rec.city, lng: rec.lng,
       useTrueSolar: rec.useTrueSolar
     };

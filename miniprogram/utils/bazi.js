@@ -77,18 +77,23 @@ function buildPillarView(ctx, gan, zhi, isDayPillar) {
  * }
  */
 function computeChart(input) {
+  // 0. 时辰未知：内部以正午起盘（仅用于年月日柱与大运推导），不显示时柱、不做真太阳修正
+  var noTime = !!input.unknownTime || input.hour == null;
+  var hh = noTime ? 12 : input.hour;
+  var mm = noTime ? 0 : input.minute;
+
   // 1. 统一换算为公历钟表时间
   var clockDate;
   if (input.calendar === 'lunar') {
-    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, input.hour, input.minute, 0);
+    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, hh, mm, 0);
     var sd = ld.getSolar();
-    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), input.hour, input.minute, 0);
+    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), hh, mm, 0);
   } else {
-    clockDate = new Date(input.year, input.month - 1, input.day, input.hour, input.minute, 0);
+    clockDate = new Date(input.year, input.month - 1, input.day, hh, mm, 0);
   }
 
-  // 2. 真太阳时修正
-  var useTrueSolar = !!(input.useTrueSolar && typeof input.lng === 'number');
+  // 2. 真太阳时修正（时辰未知时不修正）
+  var useTrueSolar = !noTime && !!(input.useTrueSolar && typeof input.lng === 'number');
   var chartDate = clockDate;
   var offsetMinutes = 0;
   if (useTrueSolar) {
@@ -117,13 +122,15 @@ function computeChart(input) {
   var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
   var pillars = [];
   var wuXingCount = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
-  for (var i = 0; i < 4; i++) {
+  var pillarN = noTime ? 3 : 4; // 时辰未知则只计年月日三柱
+  for (var i = 0; i < pillarN; i++) {
     var p = buildPillarView(ctx, gans[i], zhis[i], i === 2);
     p.label = labels[i];
     pillars.push(p);
     wuXingCount[p.gan.wx]++;
     wuXingCount[p.zhi.wx]++;
   }
+  if (noTime) pillars.push({ label: '时柱', sub: '未知', empty: true, unknown: true });
   var wuXingList = ['木', '火', '土', '金', '水'].map(function (wx) {
     return { wx: wx, cls: WX_CLS[wx], count: wuXingCount[wx] };
   });
@@ -187,12 +194,13 @@ function computeChart(input) {
     gender: input.gender ? 1 : 0,
     genderText: input.gender ? '男' : '女',
     shengXiao: lunar.getYearShengXiaoByLiChun(),
-    clockStr: formatDate(clockDate),
+    unknownTime: noTime,
+    clockStr: noTime ? formatDateOnly(clockDate) + ' 时辰未知' : formatDate(clockDate),
     chartStr: formatDate(chartDate),
     timestamp: chartDate.getTime(),
     chartTime: pad(chartDate.getHours()) + ':' + pad(chartDate.getMinutes()),
-    lunarStr: lunar.toString() + ' ' + timeZhiName,
-    lunarShort: lunar.getMonthInChinese() + '月' + lunar.getDayInChinese() + ' ' + timeZhiName,
+    lunarStr: lunar.toString() + (noTime ? '' : ' ' + timeZhiName),
+    lunarShort: lunar.getMonthInChinese() + '月' + lunar.getDayInChinese() + (noTime ? '' : ' ' + timeZhiName),
     useTrueSolar: useTrueSolar,
     offsetMinutes: offsetMinutes,
     location: (input.province || '') + (input.city && input.city !== input.province ? ' ' + input.city : ''),
@@ -268,6 +276,10 @@ function quickBaZi(input) {
 function formatDate(date) {
   return date.getFullYear() + '年' + pad(date.getMonth() + 1) + '月' + pad(date.getDate()) + '日 ' +
     pad(date.getHours()) + ':' + pad(date.getMinutes());
+}
+
+function formatDateOnly(date) {
+  return date.getFullYear() + '年' + pad(date.getMonth() + 1) + '月' + pad(date.getDate()) + '日';
 }
 
 // ---- 农历选择器辅助 ----

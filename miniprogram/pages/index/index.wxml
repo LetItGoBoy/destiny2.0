@@ -56,6 +56,13 @@
     </view>
 
     <view class="form-row">
+      <view class="form-label">知道出生时辰
+        <view class="form-note">{{unknownTime ? '未知 · 只排年月日三柱' : '已知 · 排全四柱'}}</view>
+      </view>
+      <switch checked="{{!unknownTime}}" color="#6D5DF6" bindchange="onKnowTimeChange" />
+    </view>
+
+    <view class="form-row" wx:if="{{!unknownTime}}">
       <view class="form-label">出生时间</view>
       <picker class="form-picker" mode="time" value="{{time}}" bindchange="onTimeChange">
         <view class="picker-value">{{time}}<text class="arrow">›</text></view>
@@ -71,7 +78,7 @@
       </picker>
     </view>
 
-    <view class="form-row no-line">
+    <view class="form-row no-line" wx:if="{{!unknownTime}}">
       <view class="form-label">
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>

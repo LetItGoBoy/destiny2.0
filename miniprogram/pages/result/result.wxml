@@ -314,12 +314,12 @@
 
   <view class="bottom-space"></view>
 
-  <!-- 底部操作栏：保存 + 详批 -->
+  <!-- 底部操作栏：保存 + 性格画像 -->
   <view class="savebar">
     <button class="btn-save {{saved ? 'btn-saved' : ''}}" bindtap="onSave">
       {{saved ? '已保存' : '保存'}}
     </button>
-    <button class="btn-xiangpi" bindtap="onXiangPi">详批</button>
+    <button class="btn-xiangpi" bindtap="onXiangPi">性格画像</button>
   </view>
 
   <!-- 词条解读卡（十神/长生/神煞/纳音） -->

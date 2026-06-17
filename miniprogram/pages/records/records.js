@@ -229,7 +229,7 @@ Page({
     var input = rec.input || {
       name: rec.name, gender: rec.gender, calendar: rec.calendar,
       year: rec.year, month: rec.month, day: rec.day,
-      hour: rec.hour, minute: rec.minute,
+      hour: rec.hour, minute: rec.minute, unknownTime: rec.unknownTime,
       province: rec.province, city: rec.city, lng: rec.lng,
       useTrueSolar: rec.useTrueSolar
     };
@@ -269,7 +269,7 @@ Page({
         input: {
           name: rec.name, gender: rec.gender, calendar: rec.calendar,
           year: rec.year, month: rec.month, day: rec.day,
-          hour: rec.hour, minute: rec.minute,
+          hour: rec.hour, minute: rec.minute, unknownTime: rec.unknownTime,
           province: rec.province, city: rec.city, lng: rec.lng,
           useTrueSolar: rec.useTrueSolar
         }

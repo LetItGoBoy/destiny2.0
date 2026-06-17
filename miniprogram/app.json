@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/result/result",
+    "pages/portrait/portrait",
     "pages/analysis/analysis",
     "pages/astro/astro",
     "pages/records/records",

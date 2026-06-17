@@ -1,0 +1,94 @@
+<view class="page fs-{{fs}}" wx:if="{{loaded}}">
+
+  <!-- 外在底色（日主） -->
+  <view class="card core">
+    <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
+    <view class="core-body">
+      <view class="core-title serif">{{core.title}}</view>
+      <view class="core-text">{{core.text}}</view>
+    </view>
+  </view>
+
+  <!-- 框架说明 -->
+  <view class="intro">
+    大部分人身上都有不止一种心性，只是<text class="em">成分比例</text>不同。下面是你<text class="em">天干（外在表现）</text>所呈现的心性构成，它会随大运、流年此消彼长。
+    <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月干，外显更集中）</text>
+  </view>
+
+  <!-- 两种底色倾向：守正 ←→ 求变 -->
+  <view class="card pol">
+    <view class="pol-head">
+      <text class="pol-t serif">两种底色</text>
+      <text class="pol-sub">守正与求变的配比</text>
+    </view>
+    <view class="pol-bar">
+      <view class="pol-zheng" style="width:{{zhengNow}}%">{{zhengNow >= 16 ? zhengNow + '%' : ''}}</view>
+      <view class="pol-pian" style="width:{{pianNow}}%">{{pianNow >= 16 ? pianNow + '%' : ''}}</view>
+    </view>
+    <view class="pol-legend">
+      <text class="lg-zheng">守正 · 稳健循常</text>
+      <text class="lg-pian">求变 · 突破不拘</text>
+    </view>
+    <view class="pol-shift" wx:if="{{hasLuck && polShift}}">
+      此运守正由本命 {{zhengBase}}% → {{zhengNow}}%
+    </view>
+  </view>
+
+  <!-- 心性构成 -->
+  <view class="card comp">
+    <view class="comp-head">
+      <text class="comp-t serif">心性构成</text>
+      <text class="comp-sub" wx:if="{{topTwo.length >= 2}}">最突出：{{topTwo[0].name}} · {{topTwo[1].name}}</text>
+      <text class="comp-sub" wx:elif="{{topTwo.length === 1}}">最突出：{{topTwo[0].name}}</text>
+    </view>
+
+    <view class="trait {{item.major ? 'trait-major' : ''}}" wx:for="{{list}}" wx:key="god">
+      <view class="trait-line">
+        <text class="trait-name serif">{{item.name}}</text>
+        <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+        <text class="trait-god">{{item.god}}</text>
+        <text class="trait-pct">{{item.nowPct}}%</text>
+      </view>
+      <view class="trait-track">
+        <view class="trait-fill bg-{{item.cls}}" style="width:{{item.nowPct}}%"></view>
+      </view>
+      <view class="trait-shift" wx:if="{{hasLuck && item.nowPct !== item.basePct}}">本命 {{item.basePct}}% → 此运 {{item.nowPct}}%</view>
+      <view class="trait-desc">{{item.desc}}</view>
+    </view>
+
+    <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
+  </view>
+
+  <!-- 岁运叠加：看比例变化 -->
+  <view class="card luck">
+    <view class="luck-cur">{{curLabel}}</view>
+
+    <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
+    <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="yun-strip">
+        <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
+          wx:for="{{daYunList}}" wx:key="index" bindtap="onDaYun" data-index="{{item.index}}">
+          <view class="yun-ss">{{item.god}}</view>
+          <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
+          <view class="yun-age">{{item.age}}岁</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <block wx:if="{{liuNianList.length}}">
+      <view class="section-title serif">流年 <text class="section-note">{{daYunList[dyIndex].gz}} 运内</text></view>
+      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="yun-strip">
+          <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
+            wx:for="{{liuNianList}}" wx:key="index" bindtap="onLiuNian" data-index="{{item.index}}">
+            <view class="yun-ss">{{item.god}}</view>
+            <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
+            <view class="yun-year">{{item.year}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
+  </view>
+
+  <view class="foot">性格画像基于天干十神能量构成，仅供传统文化娱乐参考</view>
+</view>

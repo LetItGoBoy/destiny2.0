@@ -1,0 +1,276 @@
+.page {
+  padding: 28rpx 28rpx 60rpx;
+}
+
+/* 外在底色 */
+.core {
+  display: flex;
+  align-items: center;
+  padding: 30rpx 30rpx;
+}
+.core-seal {
+  flex-shrink: 0;
+  width: 108rpx;
+  height: 108rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 60rpx;
+  font-weight: 700;
+  margin-right: 26rpx;
+}
+.core-body {
+  flex: 1;
+  min-width: 0;
+}
+.core-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+.core-text {
+  margin-top: 10rpx;
+  font-size: 25rpx;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+/* 框架说明 */
+.intro {
+  padding: 18rpx 14rpx 4rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.intro .em {
+  color: var(--primary);
+  font-weight: 600;
+}
+.intro-note {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+
+/* 两种底色：守正 / 求变 */
+.pol {
+  margin-top: 18rpx;
+  padding: 28rpx 30rpx;
+}
+.pol-head {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 18rpx;
+}
+.pol-t {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.pol-sub {
+  margin-left: 14rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.pol-bar {
+  display: flex;
+  height: 52rpx;
+  border-radius: 100rpx;
+  overflow: hidden;
+  background: var(--fill);
+}
+.pol-zheng, .pol-pian {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 600;
+  transition: width 0.4s ease;
+}
+.pol-zheng { background: linear-gradient(135deg, #5BB58C, #2E8C63); }
+.pol-pian { background: linear-gradient(135deg, #9D78F8, #6C4BD9); }
+.pol-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14rpx;
+  font-size: 22rpx;
+}
+.lg-zheng { color: #2E8C63; }
+.lg-pian { color: #6C4BD9; }
+.pol-shift {
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: var(--primary);
+  background: var(--tint);
+  border-radius: 10rpx;
+  padding: 8rpx 16rpx;
+  display: inline-block;
+}
+
+/* 心性构成 */
+.comp {
+  margin-top: 18rpx;
+  padding: 28rpx 30rpx 12rpx;
+}
+.comp-head {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8rpx;
+}
+.comp-t {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.comp-sub {
+  margin-left: 14rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.trait {
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.trait:last-child {
+  border-bottom: none;
+}
+.trait-major .trait-name {
+  color: var(--primary);
+}
+.trait-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.trait-name {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+.trait-tag {
+  margin-left: 12rpx;
+  font-size: 18rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 6rpx;
+}
+.tag-z { color: #2E8C63; background: rgba(91, 181, 140, 0.16); }
+.tag-p { color: #6C4BD9; background: rgba(157, 120, 248, 0.16); }
+.trait-god {
+  margin-left: 12rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.trait-pct {
+  margin-left: auto;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--ink);
+}
+.trait-track {
+  height: 16rpx;
+  border-radius: 100rpx;
+  background: var(--fill);
+  overflow: hidden;
+}
+.trait-fill {
+  height: 100%;
+  border-radius: 100rpx;
+  transition: width 0.4s ease;
+}
+.trait-shift {
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  color: var(--primary);
+}
+.trait-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.comp-empty {
+  padding: 30rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+/* 岁运叠加 */
+.luck {
+  margin-top: 18rpx;
+  padding: 26rpx 26rpx 20rpx;
+}
+.luck-cur {
+  font-size: 24rpx;
+  color: var(--primary);
+  background: var(--tint);
+  border-radius: 10rpx;
+  padding: 12rpx 18rpx;
+  margin-bottom: 22rpx;
+}
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  margin: 8rpx 0 16rpx;
+}
+.section-note {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  font-weight: 400;
+  margin-left: 12rpx;
+}
+.yun-scroll {
+  white-space: nowrap;
+  margin-bottom: 8rpx;
+}
+.yun-strip {
+  display: inline-flex;
+}
+.yun-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14rpx 0;
+  width: 124rpx;
+  margin-right: 12rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid var(--line);
+  background: var(--fill);
+}
+.yun-on {
+  background: var(--tint);
+  border-color: var(--primary);
+  box-shadow: 0 4rpx 16rpx rgba(124, 92, 224, 0.3);
+}
+.yun-ss {
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+.yun-gz {
+  font-size: 36rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  margin: 4rpx 0;
+}
+.yun-year {
+  font-size: 22rpx;
+  color: var(--ink-2);
+}
+.yun-age {
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+
+.foot {
+  margin-top: 36rpx;
+  text-align: center;
+  font-size: 21rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+}
+
+/* 字号档位 */
+.fs-l .core-text, .fs-l .trait-desc, .fs-l .intro { font-size: 27rpx; }
+.fs-xl .core-text, .fs-xl .trait-desc, .fs-xl .intro { font-size: 30rpx; }

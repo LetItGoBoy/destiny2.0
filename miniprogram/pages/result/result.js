@@ -100,7 +100,7 @@ Page({
       meta: chart.meta,
       wuXing: chart.wuXing,
       daYunBar: daYunBar,
-      baZiStr: chart.pillars.map(function (p) { return p.ganZhi; }).join('　')
+      baZiStr: chart.pillars.map(function (p) { return p.empty ? '时柱未知' : p.ganZhi; }).join('　')
     });
 
     // 默认选中当前所处大运
@@ -300,10 +300,10 @@ Page({
 
   noop: function () {},
 
-  // 详批：调候/旺衰/格局三派合参
+  // 性格画像：天干外显心性构成（随大运流年此消彼长）
   onXiangPi: function () {
     wx.navigateTo({
-      url: '/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(this._input))
+      url: '/pages/portrait/portrait?input=' + encodeURIComponent(JSON.stringify(this._input))
     });
   },
 
@@ -339,7 +339,8 @@ Page({
       hour: input.hour, minute: input.minute,
       province: input.province || '', city: input.city || '',
       lng: input.lng, useTrueSolar: input.useTrueSolar,
-      baZi: chart.pillars.map(function (p) { return p.ganZhi; }).join(' '),
+      unknownTime: !!input.unknownTime,
+      baZi: chart.pillars.filter(function (p) { return !p.empty; }).map(function (p) { return p.ganZhi; }).join(' '),
       solarStr: chart.meta.clockStr,
       lunarStr: chart.meta.lunarStr
     };
@@ -355,7 +356,7 @@ Page({
   onShareAppMessage: function () {
     var meta = this.data.meta;
     return {
-      title: (meta.name || '八字') + ' · ' + this._chart.pillars.map(function (p) { return p.ganZhi; }).join(' '),
+      title: (meta.name || '八字') + ' · ' + this._chart.pillars.filter(function (p) { return !p.empty; }).map(function (p) { return p.ganZhi; }).join(' '),
       path: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(this._input))
     };
   }

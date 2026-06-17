@@ -40,26 +40,30 @@ function partyOf(dm, el) {
 }
 
 // 计算原局每个字的终值
-function computeNatal(gans, zhis, dayGan) {
+// plist: [{ pos, gan, zhi }]，pos 为柱序（年0/月1/日2/时3），日柱 pos===2；缺时柱则少一项
+function computeNatal(plist, dayGan) {
   var dm = ganWx(dayGan);
+  var i, j;
   var stems = [];
-  for (var i = 0; i < 4; i++) {
-    stems.push({ char: gans[i], el: ganWx(gans[i]), val: GAN_BASE[i], pillar: i, isDay: i === 2 });
+  for (i = 0; i < plist.length; i++) {
+    var P = plist[i];
+    stems.push({ char: P.gan, el: ganWx(P.gan), val: GAN_BASE[P.pos], pillar: P.pos, isDay: P.pos === 2 });
   }
   var hidden = [];
-  for (var p = 0; p < 4; p++) {
-    var hg = LunarUtil.ZHI_HIDE_GAN[zhis[p]];
+  for (i = 0; i < plist.length; i++) {
+    var Q = plist[i];
+    var hg = LunarUtil.ZHI_HIDE_GAN[Q.zhi];
     var ws = HIDE_W[hg.length];
-    for (var j = 0; j < hg.length; j++) {
-      hidden.push({ char: hg[j], el: ganWx(hg[j]), val: ZHI_W[p] * ws[j], pillar: p, rank: j });
+    for (j = 0; j < hg.length; j++) {
+      hidden.push({ char: hg[j], el: ganWx(hg[j]), val: ZHI_W[Q.pos] * ws[j], pillar: Q.pos, rank: j });
     }
   }
 
   // Step1 同柱：地支藏干 → 同柱天干（天干无法克/生地支）
-  for (var s1 = 0; s1 < 4; s1++) {
+  for (var s1 = 0; s1 < stems.length; s1++) {
     var st = stems[s1];
     for (var h = 0; h < hidden.length; h++) {
-      if (hidden[h].pillar !== s1) continue;
+      if (hidden[h].pillar !== st.pillar) continue;
       var hd = hidden[h];
       if (hd.el === st.el) { st.val += C_ROOT * hd.val; }                       // 同柱通根
       else if (SHENG[hd.el] === st.el) { st.val += C_SHENG * hd.val; hd.val *= (1 - C_XIE); }  // 藏干生天干
@@ -67,12 +71,12 @@ function computeNatal(gans, zhis, dayGan) {
     }
   }
 
-  // Step2 异柱天干生克（按距离 df，快照后统一加减）
-  var snap = [stems[0].val, stems[1].val, stems[2].val, stems[3].val];
-  var delta = [0, 0, 0, 0];
-  for (var a = 0; a < 4; a++) {
-    for (var b = a + 1; b < 4; b++) {
-      var ea = stems[a].el, eb = stems[b].el, df = stemDF(a - b);
+  // Step2 异柱天干生克（按柱距 df，快照后统一加减）
+  var snap = stems.map(function (s) { return s.val; });
+  var delta = stems.map(function () { return 0; });
+  for (var a = 0; a < stems.length; a++) {
+    for (var b = a + 1; b < stems.length; b++) {
+      var ea = stems[a].el, eb = stems[b].el, df = stemDF(stems[a].pillar - stems[b].pillar);
       var va = snap[a], vb = snap[b];
       if (ea === eb) continue;
       if (SHENG[ea] === eb) { delta[b] += C_SHENG * va * df; delta[a] += -C_XIE * va * df; }
@@ -81,13 +85,13 @@ function computeNatal(gans, zhis, dayGan) {
       else if (KE[eb] === ea) { delta[a] += -C_KE * vb * df; delta[b] += -C_COST * vb * df; }
     }
   }
-  for (var d2 = 0; d2 < 4; d2++) stems[d2].val += delta[d2];
+  for (var d2 = 0; d2 < stems.length; d2++) stems[d2].val += delta[d2];
 
   // Step3 异柱通根
-  for (var s3 = 0; s3 < 4; s3++) {
+  for (var s3 = 0; s3 < stems.length; s3++) {
     var stm = stems[s3], sum = 0;
     for (var hh = 0; hh < hidden.length; hh++) {
-      if (hidden[hh].pillar !== s3 && hidden[hh].el === stm.el) sum += hidden[hh].val;
+      if (hidden[hh].pillar !== stm.pillar && hidden[hh].el === stm.el) sum += hidden[hh].val;
     }
     if (sum > 0) stm.val += C_ROOT * sum * ROOT_CROSS_DF;
   }
@@ -159,33 +163,40 @@ function shiShen(dayGan, ch, isDay) {
 // opts: { daYunGZ, liuNianGZ }  传入岁运干支字符串则计算改写
 function build(chart, opts) {
   opts = opts || {};
-  var gans = chart.pillars.map(function (p) { return p.gan.text; });
-  var zhis = chart.pillars.map(function (p) { return p.zhi.text; });
   var dayGan = chart.meta.dayGan;
-  var natal = computeNatal(gans, zhis, dayGan);
+  // 有效柱（时辰未知时时柱为占位，跳过）
+  var plist = [];
+  for (var pi = 0; pi < chart.pillars.length; pi++) {
+    var pp = chart.pillars[pi];
+    if (pp.empty || !pp.gan) continue;
+    plist.push({ pos: pi, gan: pp.gan.text, zhi: pp.zhi.text });
+  }
+  var natal = computeNatal(plist, dayGan);
   var actors = buildActors(opts.daYunGZ, opts.liuNianGZ);
   var hasLuck = actors.length > 0;
 
   function valAfter(node) { return hasLuck ? affect(node.el, node.val, actors) : node.val; }
 
   var ganCells = [];
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < natal.stems.length; i++) {
     var s = natal.stems[i];
     var av = valAfter(s);
     ganCells.push({
-      pos: PLBL[i], char: s.char, cls: WX_CLS[s.el], el: s.el,
+      pos: PLBL[s.pillar], char: s.char, cls: WX_CLS[s.el], el: s.el,
       god: shiShen(dayGan, s.char, s.isDay), isDay: s.isDay,
       base: round2(s.val), val: round2(av), delta: round2(av - s.val),
       party: s.isDay ? 'day' : partyOf(natal.dm, s.el)
     });
   }
   var zhiCells = [];
-  for (var z = 0; z < 4; z++) {
-    var hs = natal.hidden.filter(function (h) { return h.pillar === z; });
+  for (var z = 0; z < plist.length; z++) {
+    var pos = plist[z].pos;
+    var hs = natal.hidden.filter(function (h) { return h.pillar === pos; });
+    if (!hs.length) continue;
     var baseSum = 0, valSum = 0, mainEl = hs[0].el;
     for (var k = 0; k < hs.length; k++) { baseSum += hs[k].val; valSum += valAfter(hs[k]); }
     zhiCells.push({
-      pos: PLBL[z], char: zhis[z], cls: WX_CLS[mainEl], el: mainEl,
+      pos: PLBL[pos], char: plist[z].zhi, cls: WX_CLS[mainEl], el: mainEl,
       god: LunarUtil.SHI_SHEN[dayGan + hs[0].char],
       base: round2(baseSum), val: round2(valSum), delta: round2(valSum - baseSum),
       party: partyOf(natal.dm, mainEl)
