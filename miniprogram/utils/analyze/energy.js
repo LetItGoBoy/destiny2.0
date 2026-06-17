@@ -60,12 +60,14 @@ function computeNatal(plist, dayGan) {
   }
 
   // Step1 同柱：地支藏干 → 同柱天干（天干无法克/生地支）
+  // 通根只认「同字」：五行相同但干支不同（如戌中辛金 vs 天干庚金）不作通根
   for (var s1 = 0; s1 < stems.length; s1++) {
     var st = stems[s1];
     for (var h = 0; h < hidden.length; h++) {
       if (hidden[h].pillar !== st.pillar) continue;
       var hd = hidden[h];
-      if (hd.el === st.el) { st.val += C_ROOT * hd.val; }                       // 同柱通根
+      if (hd.char === st.char) { st.val += C_ROOT * hd.val; }                   // 同柱通根（同字）
+      else if (hd.el === st.el) { /* 同五行异字：非通根，无加成 */ }
       else if (SHENG[hd.el] === st.el) { st.val += C_SHENG * hd.val; hd.val *= (1 - C_XIE); }  // 藏干生天干
       else if (KE[hd.el] === st.el) { st.val += -C_KE * hd.val; hd.val *= (1 - C_COST); }      // 藏干克天干
     }
@@ -87,11 +89,11 @@ function computeNatal(plist, dayGan) {
   }
   for (var d2 = 0; d2 < stems.length; d2++) stems[d2].val += delta[d2];
 
-  // Step3 异柱通根
+  // Step3 异柱通根（同字才算根，同五行异字不算）
   for (var s3 = 0; s3 < stems.length; s3++) {
     var stm = stems[s3], sum = 0;
     for (var hh = 0; hh < hidden.length; hh++) {
-      if (hidden[hh].pillar !== stm.pillar && hidden[hh].el === stm.el) sum += hidden[hh].val;
+      if (hidden[hh].pillar !== stm.pillar && hidden[hh].char === stm.char) sum += hidden[hh].val;
     }
     if (sum > 0) stm.val += C_ROOT * sum * ROOT_CROSS_DF;
   }
@@ -130,9 +132,9 @@ function buildActors(dyGZ, lnGZ) {
   var actors = [];
   function push(gz, ganF, zhiF) {
     if (!gz || gz.length < 2) return;
-    actors.push({ el: ganWx(gz.charAt(0)), f: ganF });
+    actors.push({ char: gz.charAt(0), el: ganWx(gz.charAt(0)), f: ganF });
     var hg = LunarUtil.ZHI_HIDE_GAN[gz.charAt(1)], ws = HIDE_W[hg.length];
-    for (var j = 0; j < hg.length; j++) actors.push({ el: ganWx(hg[j]), f: zhiF * ws[j] });
+    for (var j = 0; j < hg.length; j++) actors.push({ char: hg[j], el: ganWx(hg[j]), f: zhiF * ws[j] });
   }
   push(dyGZ, DY_GAN_F, DY_ZHI_F);
   push(lnGZ, LN_GAN_F, LN_ZHI_F);
@@ -140,12 +142,14 @@ function buildActors(dyGZ, lnGZ) {
 }
 
 // 岁运对单字作用，返回新能量
-function affect(el, v, actors) {
+// 帮扶（同类生扶）只认「同字」：同五行异字（如岁运辛金 vs 命局庚金）不帮扶，亦不生克
+function affect(ch, el, v, actors) {
   var d = 0;
   for (var i = 0; i < actors.length; i++) {
     var a = actors[i];
-    if (SHENG[a.el] === el) d += C_SHENG * a.f * LUCK_DF;          // 岁运生它
-    else if (a.el === el) d += LUCK_SAME * a.f * LUCK_DF;          // 同类帮扶
+    if (a.char === ch) d += LUCK_SAME * a.f * LUCK_DF;            // 同字帮扶
+    else if (a.el === el) { /* 同五行异字：不帮扶、不生克 */ }
+    else if (SHENG[a.el] === el) d += C_SHENG * a.f * LUCK_DF;     // 岁运生它
     else if (KE[a.el] === el) d += -C_KE * a.f * LUCK_DF;          // 岁运克它
     else if (SHENG[el] === a.el) d += -C_XIE * v * LUCK_DF;        // 它生岁运·泄
     else if (KE[el] === a.el) d += -C_COST * v * LUCK_DF;          // 它克岁运·耗
@@ -175,7 +179,7 @@ function build(chart, opts) {
   var actors = buildActors(opts.daYunGZ, opts.liuNianGZ);
   var hasLuck = actors.length > 0;
 
-  function valAfter(node) { return hasLuck ? affect(node.el, node.val, actors) : node.val; }
+  function valAfter(node) { return hasLuck ? affect(node.char, node.el, node.val, actors) : node.val; }
 
   var ganCells = [];
   for (var i = 0; i < natal.stems.length; i++) {

@@ -8,7 +8,6 @@ var energy = require('./energy.js');
 var base = require('./base.js');
 
 // 十神 → 外显心性（name 心性名，pol 正/偏，lbl 左端顺，rbl 右端偏，desc 综合特质描述）
-// 七杀右端词与描述依旺衰动态切换，用 rblWeak/descWeak 存储身弱版本
 var TEMP = {
   比肩: { name: '自立', pol: '正', lbl: '有主见、靠得住', rbl: '固执、不肯回头',
           desc: '独立、有主见，靠自己也扛得住，待人讲对等、不爱占便宜；这股自立劲一旦走偏，主意定了就不太肯回头，认死理时旁人很难劝得动，偶尔显得倔。' },
@@ -22,9 +21,8 @@ var TEMP = {
           desc: '交际广、嗅觉灵，慷慨大方又懂变通，遇事能圆融应变、左右逢源；但兴趣来得快去得也快，精力和钱容易铺得太散，见异思迁、难长久聚焦在一件事上。' },
   正财: { name: '务实', pol: '正', lbl: '精打细算', rbl: '锱铢必较',
           desc: '踏实勤恳、重承诺、会规划，过日子精打细算、稳当可靠；可一旦太计较得失，容易锱铢必较、放不开手脚，偏求稳时也常和好机会擦肩。' },
-  七杀: { name: '开拓', pol: '偏', lbl: '果决担当', rbl: '胆大妄为', rblWeak: '胆小懦弱',
-          desc: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；这股劲一旦走偏，也可能贪图捷径、好赌爱投机，行事胆大妄为、不太计较后果。',
-          descWeak: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；但这股劲过头压不住时，反而容易胆小懦弱、遇事先怵，不敢出头、错过本可争取的机会。' },
+  七杀: { name: '开拓', pol: '偏', lbl: '果决担当', rbl: '冒进或内耗',
+          desc: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；这股劲一旦走偏，可能贪图捷径、好赌爱投机，行事胆大妄为、不计后果，或者反过来胆小懦弱、内心纠结内耗。' },
   正官: { name: '自律', pol: '正', lbl: '有章有法', rbl: '刻板拘谨',
           desc: '端正守规、做事有章有法，让人信得过、托付得下；但太守规矩时容易刻板拘谨，凡事讲究分寸反倒放不开，要迈出常规需要点勇气。' },
   偏印: { name: '钻研', pol: '偏', lbl: '深思专注', rbl: '钻牛角尖',
@@ -98,19 +96,13 @@ function build(chart, opts) {
     var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', desc: '' };
     var dir = direction(agg[g].party, P);
     var w = maxE > 0 ? agg[g].energy / maxE : 1;
-    // 七杀右端词与描述随旺衰切换（身弱用 rblWeak/descWeak）
-    var rbl = t.rbl, desc = t.desc;
-    if (g === '七杀' && P < 50) {
-      if (t.rblWeak) rbl = t.rblWeak;
-      if (t.descWeak) desc = t.descWeak;
-    }
     // 滑标位置：0=纯左，100=纯右，50=中间
     // dir=pro → 偏左，dir=con → 偏右，mid → 50
     var mag = Math.round(inten * w);
     var slider = dir === 'pro' ? Math.round(50 - mag / 2) : (dir === 'con' ? Math.round(50 + mag / 2) : 50);
     slider = Math.max(0, Math.min(100, slider));
     list.push({
-      god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: rbl, desc: desc, cls: agg[g].cls,
+      god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, cls: agg[g].cls,
       slider: slider,
       energy: agg[g].energy
     });
