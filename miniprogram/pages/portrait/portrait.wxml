@@ -37,7 +37,7 @@
   <view class="card pol">
     <view class="pol-head">
       <text class="pol-t serif">两种底色</text>
-      <text class="pol-sub">守正与求变的配比</text>
+      <text class="pol-sub">守正与求变的配比 · 含天干地支全部十神</text>
     </view>
     <view class="pol-bar">
       <view class="pol-zheng" style="width:{{zhengNow}}%">{{zhengNow >= 16 ? zhengNow + '%' : ''}}</view>
@@ -69,25 +69,32 @@
       <view class="ws-shift" wx:if="{{hasLuck && wsShift}}">本命生扶 {{shengBase}}% → 此运 {{sheng}}%</view>
     </view>
 
-    <view class="flow-legend">
-      <text class="fl fl-flow">顺势 · 合拍顺手</text>
-      <text class="fl fl-mid">均衡 · 收放自如</text>
-      <text class="fl fl-store">蓄势 · 收着更有后劲</text>
+    <view class="dax-cap">
+      <text class="cap-l">← 优点更显</text>
+      <text class="cap-r">缺点需留意 →</text>
     </view>
 
     <view class="trait" wx:for="{{list}}" wx:key="god">
       <view class="trait-line">
         <text class="trait-name serif">{{item.name}}</text>
         <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-        <text class="flow-tag flow-{{item.dir}}">{{item.tag}}</text>
         <text class="trait-god">{{item.god}}</text>
-        <text class="trait-pct">{{item.pct}}%</text>
+        <text class="trait-pct pct-{{item.dir}}">{{item.dir === 'pro' ? '优点' : (item.dir === 'con' ? '缺点' : '均衡')}} {{item.mag}}%</text>
       </view>
-      <view class="trait-track">
-        <view class="trait-fill fill-{{item.dir}}" style="width:{{item.pct}}%"></view>
+      <view class="dax">
+        <view class="dax-half dax-left">
+          <view class="dax-fill dax-pro" wx:if="{{item.dir === 'pro'}}" style="width:{{item.mag}}%"></view>
+        </view>
+        <view class="dax-mid"></view>
+        <view class="dax-half dax-right">
+          <view class="dax-fill dax-con" wx:if="{{item.dir === 'con'}}" style="width:{{item.mag}}%"></view>
+        </view>
       </view>
-      <view class="trait-shift" wx:if="{{hasLuck && item.pct !== item.basePct}}">本命 {{item.basePct}}% → 此运 {{item.pct}}%</view>
-      <view class="trait-desc">{{item.desc}}</view>
+      <view class="trait-shift" wx:if="{{hasLuck && item.mag !== item.magBase}}">本命 {{item.magBase}}% → 此运 {{item.mag}}%</view>
+      <view class="trait-pc">
+        <view class="pc {{item.dir === 'pro' ? 'pc-on' : ''}}"><text class="pc-k pc-k-pro">优点</text>{{item.pro}}</view>
+        <view class="pc {{item.dir === 'con' ? 'pc-on' : ''}}"><text class="pc-k pc-k-con">缺点</text>{{item.con}}</view>
+      </view>
     </view>
 
     <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>

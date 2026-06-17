@@ -203,6 +203,18 @@ function build(chart, opts) {
     });
   }
 
+  // 全部藏干的十神单元（供「两种底色」按天干地支所有十神统计）
+  var hiddenUnits = [];
+  for (var hu = 0; hu < natal.hidden.length; hu++) {
+    var hn = natal.hidden[hu];
+    hiddenUnits.push({
+      god: LunarUtil.SHI_SHEN[dayGan + hn.char],
+      base: round2(hn.val),
+      val: round2(valAfter(hn)),
+      party: partyOf(natal.dm, hn.el)
+    });
+  }
+
   // 旺衰（岁运后）
   var aggBase = aggregate(natal);
   var aggNow = aggBase;
@@ -223,6 +235,7 @@ function build(chart, opts) {
   return {
     ganCells: ganCells,
     zhiCells: zhiCells,
+    hiddenUnits: hiddenUnits,
     maxRef: maxRef,
     hasLuck: hasLuck,
     pBase: Math.round(aggBase.p * 100),
