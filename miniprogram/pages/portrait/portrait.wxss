@@ -279,7 +279,7 @@
 .rel:last-child {
   border-bottom: none;
 }
-.rel-line {
+.rel-head-line {
   display: flex;
   align-items: center;
   margin-bottom: 10rpx;
@@ -300,12 +300,6 @@
 .rel-chong { background: #FF4D4D; }
 .rel-xing { background: #B47BF0; }
 .rel-hai { background: #FF7A33; }
-.rel-zhis {
-  margin-left: 16rpx;
-  font-size: 32rpx;
-  font-weight: 700;
-  letter-spacing: 4rpx;
-}
 .rel-tag {
   margin-left: 16rpx;
   font-size: 22rpx;
@@ -319,6 +313,24 @@
   background: var(--tint);
   padding: 3rpx 14rpx;
   border-radius: 100rpx;
+}
+.rel-zhis-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: 10rpx;
+}
+.rel-zhis {
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  color: var(--ink-1);
+}
+.rel-zhis-luck {
+  font-size: 18rpx;
+  color: var(--primary);
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 /* 岁运叠加 */

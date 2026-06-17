@@ -24,7 +24,7 @@ var TYPE_ORDER = { 合: 0, 冲: 1, 刑: 2, 害: 3 };
 
 /**
  * @param {Array} branches [{ zhi, label }]，label 如 年/月/日/时/大运/流年
- * @returns {Array} [{ type, cls, zhis, tag, text, luck, key }]
+ * @returns {Array} 按类型分组 [{ type, cls, tag, text, items:[{zhis,luck}], anyLuck }]
  */
 function detect(branches) {
   var zhiSet = {};
@@ -33,7 +33,8 @@ function detect(branches) {
     (zhiSet[b.zhi] = zhiSet[b.zhi] || []).push(b.label);
   });
 
-  var res = [], seen = {};
+  // 先收集所有原子条目（去重）
+  var rawRes = [], seen = {};
   function luckIn(zhis) {
     for (var i = 0; i < zhis.length; i++) {
       var ls = zhiSet[zhis[i]] || [];
@@ -47,11 +48,7 @@ function detect(branches) {
     var key = type + ':' + zhis.slice().sort().join('');
     if (seen[key]) return;
     seen[key] = 1;
-    var info = TYPE_INFO[type];
-    res.push({
-      type: type, cls: info.cls, zhis: zhis.join(' '),
-      tag: info.tag, text: info.text, luck: luckIn(zhis), key: key
-    });
+    rawRes.push({ type: type, zhis: zhis.join(' '), luck: luckIn(zhis) });
   }
 
   // 六合
@@ -84,8 +81,18 @@ function detect(branches) {
     if (zhiSet[z] && zhiSet[z].length >= 2) add('刑', [z, z]);
   });
 
-  res.sort(function (a, b) { return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]; });
-  return res;
+  // 按类型分组，每种只出一次描述
+  var grouped = {}, ORDER = ['合', '冲', '刑', '害'];
+  rawRes.forEach(function (r) {
+    if (!grouped[r.type]) {
+      var info = TYPE_INFO[r.type];
+      grouped[r.type] = { type: r.type, cls: info.cls, tag: info.tag, text: info.text, items: [], anyLuck: false };
+    }
+    grouped[r.type].items.push({ zhis: r.zhis, luck: r.luck });
+    if (r.luck) grouped[r.type].anyLuck = true;
+  });
+
+  return ORDER.filter(function (t) { return grouped[t]; }).map(function (t) { return grouped[t]; });
 }
 
 module.exports = { detect: detect };

@@ -125,12 +125,14 @@
       地支之间的<text class="tip-l">合</text>、<text class="tip-r">冲</text>、<text class="tip-r">刑</text>、<text class="tip-r">害</text>，是内心潜藏的动力与情结。叠加大运、流年后，新形成的关系会被引动，对应的心结也会浮现。
     </view>
 
-    <view class="rel" wx:for="{{relations}}" wx:key="key">
-      <view class="rel-line">
+    <view class="rel" wx:for="{{relations}}" wx:key="type">
+      <view class="rel-head-line">
         <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
-        <text class="rel-zhis serif">{{item.zhis}}</text>
         <text class="rel-tag">{{item.tag}}</text>
-        <text class="rel-luck" wx:if="{{item.luck}}">岁运引动</text>
+        <text class="rel-luck" wx:if="{{item.anyLuck}}">岁运引动</text>
+      </view>
+      <view class="rel-zhis-row">
+        <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
       </view>
       <view class="pc pc-on">{{item.text}}</view>
     </view>
