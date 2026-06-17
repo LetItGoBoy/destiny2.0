@@ -1,25 +1,26 @@
 // 性格画像（外显·天干版）
-// 思路：大部分人身上都有不止一种心性，只是成分比例不同；
-// 这里取天干（最外显的一层）所代表的十神，按其能量占比构成「心性」，
-// 并随大运/流年作用而此消彼长（能量改写沿用 energy.js）。
+// 大部分人身上都有不止一种心性，只是成分比例不同；这里取天干（最外显的一层）
+// 所代表的十神构成「心性」，并按身强身弱程度给出每种心性当前的状态（顺势/蓄势/均衡），
+// 状态强度 = 失衡度 |P-50|×2，方向随旺衰而定；P 随大运/流年改写，故状态此消彼长。
+// 措辞保持中立，不出现喜忌等评价性字眼。
 var energy = require('./energy.js');
 var base = require('./base.js');
 
 // 十神 → 外显心性（name 心性名，pol 正/偏 倾向，desc 外在表现）
 var TEMP = {
-  比肩: { name: '自立', pol: '正', desc: '独立有主见，凡事先靠自己，能扛事、讲对等，不爱被支配；用力过头时会显得固执、不肯低头。' },
-  劫财: { name: '果敢', pol: '偏', desc: '行动力强、敢拼敢争，重朋友义气、输人不输阵；情绪上头时容易冲动，也容易破财。' },
-  食神: { name: '从容', pol: '正', desc: '温和乐天，懂享受、会生活，才情与口才自然流露；节奏从容，但有时偏安逸、缺一点紧迫感。' },
-  伤官: { name: '锋芒', pol: '偏', desc: '才华外露、脑子快，敢表达敢挑战、不服权威；话锋利时容易得罪人，也容易心高气傲。' },
-  偏财: { name: '灵活', pol: '偏', desc: '交际广、嗅觉灵，慷慨会变通，对机会与人脉敏感；爱热闹，注意精力与钱财别太分散。' },
-  正财: { name: '务实', pol: '正', desc: '踏实勤恳，重承诺、会规划，钱与事都打理得有条理；偏爱稳妥，有时会与机会擦肩。' },
-  七杀: { name: '开拓', pol: '偏', desc: '果决有魄力、抗压强，乱局里反而能成事，自带威势；急起来较强势，无意间易树敌。' },
-  正官: { name: '自律', pol: '正', desc: '端正守规，重名誉与责任，做事有章法、让人信任；在框架里最安心，放开手脚需要练习。' },
-  偏印: { name: '钻研', pol: '偏', desc: '思维独特、直觉与悟性高，偏爱冷门与深度；偏内向，想得多、做得慢，易多思多疑。' },
-  正印: { name: '宽厚', pol: '正', desc: '仁厚好学、念旧重情，耐心包容、贵人缘佳；遇事先求安稳，行动偏慢、依赖性稍强。' }
+  比肩: { name: '自立', pol: '正', desc: '独立有主见，凡事先靠自己，能扛事、讲对等；这股劲收放得宜时格外可靠。' },
+  劫财: { name: '果敢', pol: '偏', desc: '行动力强、敢拼敢争，重朋友义气、说做就做；爆发力是你天然的底牌。' },
+  食神: { name: '从容', pol: '正', desc: '温和乐天，懂享受、会生活，才情与口才自然流露；节奏从容，自带松弛感。' },
+  伤官: { name: '锋芒', pol: '偏', desc: '才华外露、脑子快，敢表达敢挑战、不服权威；锋芒用对地方就是亮点。' },
+  偏财: { name: '灵活', pol: '偏', desc: '交际广、嗅觉灵，慷慨会变通，对机会与人脉敏感；活络是你打开局面的方式。' },
+  正财: { name: '务实', pol: '正', desc: '踏实勤恳，重承诺、会规划，钱与事都打理得有条理；稳，是你的护城河。' },
+  七杀: { name: '开拓', pol: '偏', desc: '果决有魄力、抗压强，乱局里反而能成事，自带威势；越是硬仗越能顶上。' },
+  正官: { name: '自律', pol: '正', desc: '端正守规，重名誉与责任，做事有章法、让人信任；框架感是你的稳定器。' },
+  偏印: { name: '钻研', pol: '偏', desc: '思维独特、直觉与悟性高，偏爱冷门与深度；安静下来时最出灵感。' },
+  正印: { name: '宽厚', pol: '正', desc: '仁厚好学、念旧重情，耐心包容、贵人缘佳；这份温度让人愿意靠近。' }
 };
 
-// 日主天干 → 外在底色（第一印象，区别于详批旧文案）
+// 日主天干 → 外在底色（第一印象）
 var CORE = {
   甲: { title: '甲木 · 栋梁', text: '像向上生长的大树，第一印象正直、有方向感，认定的事愿意一路扛到底；自带带头的气场。' },
   乙: { title: '乙木 · 藤蔓', text: '像柔韧的花草藤蔓，温和、有弹性，懂得借力与迂回；待人细腻，适应环境的本事很强。' },
@@ -33,56 +34,86 @@ var CORE = {
   癸: { title: '癸水 · 雨露', text: '像细润的雨露，安静、聪慧、直觉准，温柔又有渗透力；心思深，外柔而内里有韧劲。' }
 };
 
-function pct(part, total) { return total > 0 ? Math.round((part / total) * 100) : 0; }
+function intensity(p) { return Math.round(Math.abs(p - 50) * 2); }
+
+// 某党羽在某 P 下的状态：顺势 / 蓄势 / 均衡（中立措辞）
+// party: 'same' 生扶（印比） / 'diff' 克泄耗（财官食伤）
+function flowState(party, p) {
+  var inten = intensity(p);
+  if (inten < 10) return { tag: '均衡', dir: 'mid', pct: inten };
+  var favorable = p >= 50 ? 'diff' : 'same'; // 偏旺时克泄耗顺势，偏弱时生扶顺势
+  if (party === favorable) return { tag: '顺势', dir: 'flow', pct: inten };
+  return { tag: '蓄势', dir: 'store', pct: inten };
+}
 
 /**
  * @param {object} chart bazi.computeChart 返回值
- * @param {object} opts  { daYunGZ, liuNianGZ } 叠加岁运则比例随之改写
+ * @param {object} opts  { daYunGZ, liuNianGZ } 叠加岁运则 P 随之改写，状态联动
  */
 function build(chart, opts) {
   opts = opts || {};
   var dayGan = chart.meta.dayGan;
   var m = energy.build(chart, opts);
+  var P = m.pNow, Pb = m.pBase;
 
   // 仅取非日主天干（最外显的一层）
   var stems = m.ganCells.filter(function (c) { return !c.isDay; });
 
+  // 按十神聚合（能量仅用于排序与「最突出」判断，不作为百分比）
   var agg = {};
-  var baseTotal = 0, nowTotal = 0;
+  var zb = 0, zn = 0, baseTotal = 0, nowTotal = 0;
   stems.forEach(function (c) {
-    if (!agg[c.god]) agg[c.god] = { god: c.god, base: 0, now: 0, cls: c.cls };
-    agg[c.god].base += c.base;
-    agg[c.god].now += c.val;
+    if (!agg[c.god]) agg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0 };
+    agg[c.god].energy += c.val;
     baseTotal += c.base;
     nowTotal += c.val;
+    var tt = TEMP[c.god];
+    if (tt && tt.pol === '正') { zb += c.base; zn += c.val; }
   });
 
   var list = [];
   for (var g in agg) {
     var t = TEMP[g] || { name: g, pol: '', desc: '' };
+    var st = flowState(agg[g].party, P);
+    var stb = flowState(agg[g].party, Pb);
     list.push({
-      god: g,
-      name: t.name,
-      pol: t.pol,
-      desc: t.desc,
-      cls: agg[g].cls,
-      basePct: pct(agg[g].base, baseTotal),
-      nowPct: pct(agg[g].now, nowTotal)
+      god: g, name: t.name, pol: t.pol, desc: t.desc, cls: agg[g].cls,
+      tag: st.tag, dir: st.dir, pct: st.pct,
+      basePct: stb.pct, energy: agg[g].energy
     });
   }
-  list.sort(function (a, b) { return b.nowPct - a.nowPct; });
-  list.forEach(function (it, i) { it.major = i < 2; });
-
-  // 正/偏 两种底色倾向（守正 vs 求变）
-  var zb = 0, zn = 0;
-  stems.forEach(function (c) {
-    var t = TEMP[c.god];
-    if (t && t.pol === '正') { zb += c.base; zn += c.val; }
+  // 排序：顺势在前 → 均衡 → 蓄势，让正向状态先出现；同组按能量
+  var rank = { flow: 0, mid: 1, store: 2 };
+  list.sort(function (a, b) {
+    if (rank[a.dir] !== rank[b.dir]) return rank[a.dir] - rank[b.dir];
+    return b.energy - a.energy;
   });
-  var zhengBase = pct(zb, baseTotal);
-  var zhengNow = pct(zn, nowTotal);
+
+  // 最突出两种（按外显能量，体现「两种心性」）
+  var byEnergy = list.slice().sort(function (a, b) { return b.energy - a.energy; });
+  var topTwo = byEnergy.slice(0, 2);
+
+  // 守正 / 求变（正神 vs 偏神，能量占比，保留）
+  var zhengNow = nowTotal ? Math.round(zn / nowTotal * 100) : 50;
+  var zhengBase = baseTotal ? Math.round(zb / baseTotal * 100) : 50;
+
+  // 当前旺衰状态
+  var inten = intensity(P);
+  var stateLabel = P > 55 ? '偏旺' : (P < 45 ? '偏弱' : '中和');
+  var flowGroup = P >= 50 ? '向外发挥的一类（食伤·财·官杀）' : '向内蓄养的一类（印星·比劫）';
 
   var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
+
+  // 盘面（紧凑四柱）
+  var paimian = chart.pillars.map(function (p) {
+    if (p.empty) return { label: p.label, empty: true };
+    return {
+      label: p.label,
+      gan: p.gan.text, ganCls: p.gan.cls,
+      zhi: p.zhi.text, zhiCls: p.zhi.cls,
+      god: p.shiShenGan, isDay: p.shiShenGan === '日主'
+    };
+  });
 
   return {
     core: {
@@ -91,13 +122,17 @@ function build(chart, opts) {
       title: coreInfo.title,
       text: coreInfo.text
     },
+    paimian: paimian,
     list: list,
-    topTwo: list.slice(0, 2),
-    zhengNow: zhengNow,
-    pianNow: 100 - zhengNow,
-    zhengBase: zhengBase,
-    pianBase: 100 - zhengBase,
+    topTwo: topTwo,
+    zhengNow: zhengNow, pianNow: 100 - zhengNow,
+    zhengBase: zhengBase, pianBase: 100 - zhengBase,
     polShift: zhengNow !== zhengBase,
+    sheng: P, ke: 100 - P, shengBase: Pb,
+    inten: inten,
+    stateLabel: stateLabel,
+    flowGroup: flowGroup,
+    wsShift: P !== Pb,
     hasLuck: m.hasLuck,
     hasTime: !chart.meta.unknownTime
   };

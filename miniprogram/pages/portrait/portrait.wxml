@@ -1,5 +1,23 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
 
+  <!-- 盘面 -->
+  <view class="card pan">
+    <view class="pan-col {{item.isDay ? 'pan-day' : ''}}" wx:for="{{paimian}}" wx:key="label">
+      <view class="pan-label">{{item.label}}</view>
+      <block wx:if="{{item.empty}}">
+        <view class="pan-god dim">—</view>
+        <view class="pan-gz serif dim">未知</view>
+      </block>
+      <block wx:else>
+        <view class="pan-god">{{item.god}}</view>
+        <view class="pan-gz serif">
+          <text class="wx-{{item.ganCls}}">{{item.gan}}</text>
+          <text class="wx-{{item.zhiCls}}">{{item.zhi}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+
   <!-- 外在底色（日主） -->
   <view class="card core">
     <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
@@ -11,7 +29,7 @@
 
   <!-- 框架说明 -->
   <view class="intro">
-    大部分人身上都有不止一种心性，只是<text class="em">成分比例</text>不同。下面是你<text class="em">天干（外在表现）</text>所呈现的心性构成，它会随大运、流年此消彼长。
+    大部分人身上都有不止一种心性，只是<text class="em">配比</text>不同。下面是你<text class="em">天干（外在表现）</text>所呈现的心性构成，它会随大运、流年此消彼长。
     <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月干，外显更集中）</text>
   </view>
 
@@ -29,9 +47,7 @@
       <text class="lg-zheng">守正 · 稳健循常</text>
       <text class="lg-pian">求变 · 突破不拘</text>
     </view>
-    <view class="pol-shift" wx:if="{{hasLuck && polShift}}">
-      此运守正由本命 {{zhengBase}}% → {{zhengNow}}%
-    </view>
+    <view class="pol-shift" wx:if="{{hasLuck && polShift}}">此运守正由本命 {{zhengBase}}% → {{zhengNow}}%</view>
   </view>
 
   <!-- 心性构成 -->
@@ -42,24 +58,42 @@
       <text class="comp-sub" wx:elif="{{topTwo.length === 1}}">最突出：{{topTwo[0].name}}</text>
     </view>
 
-    <view class="trait {{item.major ? 'trait-major' : ''}}" wx:for="{{list}}" wx:key="god">
+    <!-- 当前旺衰：决定各心性的状态强度 -->
+    <view class="ws-state">
+      <view class="ws-state-line">
+        <text class="ws-state-t">本气配比</text>
+        <text class="ws-state-v">生扶 {{sheng}}% · 克泄耗 {{ke}}%</text>
+        <text class="ws-state-tag tag-{{stateLabel === '偏旺' ? 'up' : (stateLabel === '偏弱' ? 'down' : 'mid')}}">{{stateLabel}}</text>
+      </view>
+      <view class="ws-state-sub">{{stateLabel === '中和' ? '强弱相当，各类心性收放自如' : flowGroup + '当前更顺势（强度 ' + inten + '%）'}}</view>
+      <view class="ws-shift" wx:if="{{hasLuck && wsShift}}">本命生扶 {{shengBase}}% → 此运 {{sheng}}%</view>
+    </view>
+
+    <view class="flow-legend">
+      <text class="fl fl-flow">顺势 · 合拍顺手</text>
+      <text class="fl fl-mid">均衡 · 收放自如</text>
+      <text class="fl fl-store">蓄势 · 收着更有后劲</text>
+    </view>
+
+    <view class="trait" wx:for="{{list}}" wx:key="god">
       <view class="trait-line">
         <text class="trait-name serif">{{item.name}}</text>
         <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+        <text class="flow-tag flow-{{item.dir}}">{{item.tag}}</text>
         <text class="trait-god">{{item.god}}</text>
-        <text class="trait-pct">{{item.nowPct}}%</text>
+        <text class="trait-pct">{{item.pct}}%</text>
       </view>
       <view class="trait-track">
-        <view class="trait-fill bg-{{item.cls}}" style="width:{{item.nowPct}}%"></view>
+        <view class="trait-fill fill-{{item.dir}}" style="width:{{item.pct}}%"></view>
       </view>
-      <view class="trait-shift" wx:if="{{hasLuck && item.nowPct !== item.basePct}}">本命 {{item.basePct}}% → 此运 {{item.nowPct}}%</view>
+      <view class="trait-shift" wx:if="{{hasLuck && item.pct !== item.basePct}}">本命 {{item.basePct}}% → 此运 {{item.pct}}%</view>
       <view class="trait-desc">{{item.desc}}</view>
     </view>
 
     <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
   </view>
 
-  <!-- 岁运叠加：看比例变化 -->
+  <!-- 岁运叠加：看状态变化 -->
   <view class="card luck">
     <view class="luck-cur">{{curLabel}}</view>
 
@@ -90,5 +124,5 @@
     </block>
   </view>
 
-  <view class="foot">性格画像基于天干十神能量构成，仅供传统文化娱乐参考</view>
+  <view class="foot">性格画像基于天干十神的能量与旺衰，仅供传统文化娱乐参考</view>
 </view>

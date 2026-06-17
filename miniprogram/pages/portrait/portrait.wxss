@@ -2,6 +2,40 @@
   padding: 28rpx 28rpx 60rpx;
 }
 
+/* 盘面 */
+.pan {
+  display: flex;
+  padding: 24rpx 16rpx;
+  margin-bottom: 18rpx;
+}
+.pan-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pan-day {
+  background: var(--tint);
+  border-radius: 14rpx;
+}
+.pan-label {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  margin-bottom: 8rpx;
+}
+.pan-god {
+  font-size: 21rpx;
+  color: var(--ink-2);
+  margin-bottom: 6rpx;
+}
+.pan-gz {
+  font-size: 46rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  display: flex;
+  gap: 2rpx;
+}
+
 /* 外在底色 */
 .core {
   display: flex;
@@ -129,6 +163,77 @@
   font-size: 22rpx;
   color: var(--ink-3);
 }
+/* 当前旺衰状态 */
+.ws-state {
+  margin: 16rpx 0 12rpx;
+  padding: 18rpx 20rpx;
+  background: var(--fill);
+  border-radius: 14rpx;
+}
+.ws-state-line {
+  display: flex;
+  align-items: center;
+}
+.ws-state-t {
+  font-size: 24rpx;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.ws-state-v {
+  margin-left: 14rpx;
+  font-size: 23rpx;
+  color: var(--ink-3);
+}
+.ws-state-tag {
+  margin-left: auto;
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 2rpx 14rpx;
+  border-radius: 100rpx;
+}
+.tag-up { color: #C97A2B; background: rgba(224, 168, 90, 0.18); }
+.tag-down { color: #2E86E6; background: rgba(90, 166, 242, 0.18); }
+.tag-mid { color: var(--ink-2); background: rgba(20, 21, 60, 0.06); }
+.ws-state-sub {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.ws-shift {
+  margin-top: 8rpx;
+  font-size: 21rpx;
+  color: var(--primary);
+}
+
+/* 状态图例 */
+.flow-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18rpx;
+  margin: 6rpx 0 4rpx;
+  padding: 0 2rpx;
+}
+.fl {
+  font-size: 20rpx;
+  color: var(--ink-3);
+  position: relative;
+  padding-left: 22rpx;
+}
+.fl::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 14rpx;
+  height: 14rpx;
+  margin-top: -7rpx;
+  border-radius: 50%;
+}
+.fl-flow::before { background: #34C88A; }
+.fl-mid::before { background: #B9BCD6; }
+.fl-store::before { background: #9D78F8; }
+
 .trait {
   padding: 22rpx 0;
   border-bottom: 1rpx solid var(--line);
@@ -156,6 +261,16 @@
 }
 .tag-z { color: #2E8C63; background: rgba(91, 181, 140, 0.16); }
 .tag-p { color: #6C4BD9; background: rgba(157, 120, 248, 0.16); }
+.flow-tag {
+  margin-left: 10rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  padding: 2rpx 12rpx;
+  border-radius: 6rpx;
+}
+.flow-flow { color: #1E9E6A; background: rgba(52, 200, 138, 0.16); }
+.flow-mid { color: #6E7290; background: rgba(20, 21, 60, 0.06); }
+.flow-store { color: #6C4BD9; background: rgba(157, 120, 248, 0.16); }
 .trait-god {
   margin-left: 12rpx;
   font-size: 22rpx;
@@ -178,6 +293,9 @@
   border-radius: 100rpx;
   transition: width 0.4s ease;
 }
+.fill-flow { background: linear-gradient(135deg, #3FD09A, #1E9E6A); }
+.fill-mid { background: linear-gradient(135deg, #C7CAE0, #A8ABC9); }
+.fill-store { background: linear-gradient(135deg, #9D78F8, #6C4BD9); }
 .trait-shift {
   margin-top: 10rpx;
   font-size: 21rpx;
