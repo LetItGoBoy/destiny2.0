@@ -271,6 +271,56 @@
   color: var(--ink-3);
 }
 
+/* 心结与张力（刑冲合害） */
+.rel {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.rel:last-child {
+  border-bottom: none;
+}
+.rel-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+.rel-badge {
+  flex-shrink: 0;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rel-he { background: #5BD08A; }
+.rel-chong { background: #FF4D4D; }
+.rel-xing { background: #B47BF0; }
+.rel-hai { background: #FF7A33; }
+.rel-zhis {
+  margin-left: 16rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+}
+.rel-tag {
+  margin-left: 16rpx;
+  font-size: 22rpx;
+  color: var(--ink-2);
+}
+.rel-luck {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 18rpx;
+  color: var(--primary);
+  background: var(--tint);
+  padding: 3rpx 14rpx;
+  border-radius: 100rpx;
+}
+
 /* 岁运叠加 */
 .luck {
   margin-top: 18rpx;

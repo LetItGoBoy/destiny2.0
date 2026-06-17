@@ -49,10 +49,11 @@
     </view>
   </view>
 
-  <!-- 心性构成 -->
+  <!-- 外显心性（天干） -->
   <view class="card comp">
     <view class="comp-head">
-      <text class="comp-t serif">心性构成</text>
+      <text class="comp-t serif">外显心性</text>
+      <text class="comp-sub">天干 · 别人眼中的你</text>
     </view>
 
     <view class="comp-tip">
@@ -82,6 +83,57 @@
     </view>
 
     <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
+  </view>
+
+  <!-- 内在心性（地支） -->
+  <view class="card comp">
+    <view class="comp-head">
+      <text class="comp-t serif">内在心性</text>
+      <text class="comp-sub">地支 · 私下真实的你</text>
+    </view>
+
+    <view class="comp-tip">
+      天干是<text class="tip-l">外在表现</text>，地支则是<text class="tip-l">内在底色</text>——你私下真实的样子、安全感的来源。圆点越多，这股内在越主导。它比外显更稳定，但岁运的刑冲合害会牵动它。
+    </view>
+
+    <view class="trait" wx:for="{{branchList}}" wx:key="god">
+      <view class="trait-line">
+        <text class="trait-name serif">{{item.name}}</text>
+        <text class="trait-main" wx:if="{{item.isMain}}">主内在</text>
+        <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+        <text class="trait-god">{{item.zhis}}</text>
+        <view class="trait-energy">
+          <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
+        </view>
+      </view>
+      <view class="trait-pc">
+        <view class="pc pc-on">{{item.desc}}</view>
+      </view>
+    </view>
+
+    <view class="comp-empty" wx:if="{{branchList.length === 0}}">地支能量不足，暂无明显内在心性。</view>
+  </view>
+
+  <!-- 心结与张力（地支刑冲合害） -->
+  <view class="card comp" wx:if="{{relations.length}}">
+    <view class="comp-head">
+      <text class="comp-t serif">心结与张力</text>
+      <text class="comp-sub">地支刑冲合害 · 内在的牵动</text>
+    </view>
+
+    <view class="comp-tip">
+      地支之间的<text class="tip-l">合</text>、<text class="tip-r">冲</text>、<text class="tip-r">刑</text>、<text class="tip-r">害</text>，是内心潜藏的动力与情结。叠加大运、流年后，新形成的关系会被引动，对应的心结也会浮现。
+    </view>
+
+    <view class="rel" wx:for="{{relations}}" wx:key="key">
+      <view class="rel-line">
+        <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
+        <text class="rel-zhis serif">{{item.zhis}}</text>
+        <text class="rel-tag">{{item.tag}}</text>
+        <text class="rel-luck" wx:if="{{item.luck}}">岁运引动</text>
+      </view>
+      <view class="pc pc-on">{{item.text}}</view>
+    </view>
   </view>
 
   <!-- 岁运叠加：看状态变化 -->

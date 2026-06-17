@@ -6,6 +6,21 @@
 //   故各心性会随大运/流年各自此消彼长，而非同步。措辞保持中立、收敛。
 var energy = require('./energy.js');
 var base = require('./base.js');
+var relations = require('./relations.js');
+
+// 十神 → 地支「内在心性」文案（安全感 / 内在驱动力视角；与天干外显文案区分）
+var INNER = {
+  比肩: '骨子里要强、不服输，自尊的根扎得深；独立自主是本能，内心更信自己，也在意能不能掌控自己的节奏。',
+  劫财: '内心有股不肯认输的冲劲，渴望被看见、被认可；很看重伙伴与圈子，行动的底气往往来自身边人。',
+  食神: '内心向往轻松自在，安全感来自衣食无忧与被善待；对喜欢的事很投入，不喜欢被逼着赶着走。',
+  伤官: '内心藏着表达和被欣赏的渴望，不甘平庸、想活出自己；反感束缚，越被框住越想挣脱。',
+  偏财: '内心活络、看得开，安全感来自资源与人脉的流动；喜欢热闹和机会，对得失拿得起放得下。',
+  正财: '内心求稳务实，安全感来自踏实的积累与可掌控的生活；在意安稳，不太愿意冒没把握的险。',
+  七杀: '内心压着股危机感与狠劲，越有压力越能逼出潜力；习惯自我加压，也容易暗自紧绷、跟自己较劲。',
+  正官: '内心有一把尺，自我要求高，安稳感来自规则与秩序；怕越界、怕出错，在意自己做得对不对。',
+  偏印: '内心敏感、好琢磨，安全感来自独处与精神世界；习惯往内收，凡事先在心里过一遍才放心。',
+  正印: '内心渴望被理解与庇护，安全感来自亲情、归属与依靠；习惯向内求安稳，也容易心软放不下。'
+};
 
 // 十神 → 外显心性（name 心性名，pol 正/偏，lbl 左端顺，rbl 右端偏，desc 综合特质描述）
 var TEMP = {
@@ -120,6 +135,45 @@ function build(chart, opts) {
     it.isMain = idx === 0;
   });
 
+  // —— 内在心性：地支本气十神，按能量聚合（不用滑标，叙述内在底色） ——
+  var bagg = {};
+  (m.zhiCells || []).forEach(function (c) {
+    if (!bagg[c.god]) bagg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0, zhis: [] };
+    bagg[c.god].energy += c.val;
+    bagg[c.god].zhis.push(c.char);
+  });
+  var maxBE = 0, bg;
+  for (bg in bagg) { if (bagg[bg].energy > maxBE) maxBE = bagg[bg].energy; }
+  var branchList = [];
+  for (bg in bagg) {
+    var bt = TEMP[bg] || { name: bg, pol: '' };
+    branchList.push({
+      god: bg, name: bt.name, pol: bt.pol, cls: bagg[bg].cls,
+      desc: INNER[bg] || '',
+      zhis: bagg[bg].zhis.join('、'),
+      energy: bagg[bg].energy
+    });
+  }
+  branchList.sort(function (a, b) { return b.energy - a.energy; });
+  branchList.forEach(function (it, idx) {
+    var ratio = maxBE > 0 ? it.energy / maxBE : 1;
+    var n = Math.max(1, Math.min(5, Math.round(ratio * 5)));
+    var dots = [];
+    for (var k = 1; k <= 5; k++) dots.push({ i: k, on: k <= n });
+    it.dots = dots;
+    it.isMain = idx === 0;
+  });
+
+  // —— 心结与张力：地支刑冲合害（原局四支 + 已叠加的岁运地支） ——
+  var branches = [];
+  chart.pillars.forEach(function (p) {
+    if (p.empty || !p.zhi) return;
+    branches.push({ zhi: p.zhi.text, label: p.label.charAt(0) });
+  });
+  if (opts.daYunGZ && opts.daYunGZ.length >= 2) branches.push({ zhi: opts.daYunGZ.charAt(1), label: '大运' });
+  if (opts.liuNianGZ && opts.liuNianGZ.length >= 2) branches.push({ zhi: opts.liuNianGZ.charAt(1), label: '流年' });
+  var rels = relations.detect(branches);
+
   var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
 
   // 盘面
@@ -142,6 +196,8 @@ function build(chart, opts) {
     },
     paimian: paimian,
     list: list,
+    branchList: branchList,
+    relations: rels,
     zhengNow: zhengNow, pianNow: 100 - zhengNow,
     hasLuck: m.hasLuck,
     hasTime: !chart.meta.unknownTime
