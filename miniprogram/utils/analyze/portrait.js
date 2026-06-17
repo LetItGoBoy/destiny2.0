@@ -22,9 +22,9 @@ var TEMP = {
           desc: '交际广、嗅觉灵，慷慨大方又懂变通，遇事能圆融应变、左右逢源；但兴趣来得快去得也快，精力和钱容易铺得太散，见异思迁、难长久聚焦在一件事上。' },
   正财: { name: '务实', pol: '正', lbl: '精打细算', rbl: '锱铢必较',
           desc: '踏实勤恳、重承诺、会规划，过日子精打细算、稳当可靠；可一旦太计较得失，容易锱铢必较、放不开手脚，偏求稳时也常和好机会擦肩。' },
-  七杀: { name: '开拓', pol: '偏', lbl: '果决担当', rbl: '强势压人', rblWeak: '胆小怕事',
-          desc: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；只是劲头太足、急起来时偏强势，无意中容易压到旁人、碰着人。',
-          descWeak: '骨子里有开拓、担当的一面，但身弱而杀重，这股劲压不太住反被压制，遇事先怵三分，容易畏缩、不敢出头，错过本可争取的机会。' },
+  七杀: { name: '开拓', pol: '偏', lbl: '果决担当', rbl: '胆大妄为', rblWeak: '胆小懦弱',
+          desc: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；这股劲一旦走偏，也可能贪图捷径、好赌爱投机，行事胆大妄为、不太计较后果。',
+          descWeak: '果决有魄力、扛得住压力，敢挑硬仗、敢担责任，是能开拓局面的一类人；但这股劲过头压不住时，反而容易胆小懦弱、遇事先怵，不敢出头、错过本可争取的机会。' },
   正官: { name: '自律', pol: '正', lbl: '有章有法', rbl: '刻板拘谨',
           desc: '端正守规、做事有章有法，让人信得过、托付得下；但太守规矩时容易刻板拘谨，凡事讲究分寸反倒放不开，要迈出常规需要点勇气。' },
   偏印: { name: '钻研', pol: '偏', lbl: '深思专注', rbl: '钻牛角尖',
@@ -66,8 +66,8 @@ function build(chart, opts) {
   opts = opts || {};
   var dayGan = chart.meta.dayGan;
   var m = energy.build(chart, opts);
-  var P = m.pNow, Pb = m.pBase;
-  var inten = intensity(P), intenBase = intensity(Pb);
+  var P = m.pNow;
+  var inten = intensity(P);
 
   // 仅取非日主天干（最外显的一层）
   var stems = m.ganCells.filter(function (c) { return !c.isDay; });
@@ -87,20 +87,17 @@ function build(chart, opts) {
   // —— 心性构成：天干十神，按能量聚合 ——
   var agg = {};
   stems.forEach(function (c) {
-    if (!agg[c.god]) agg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0, baseEnergy: 0 };
+    if (!agg[c.god]) agg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0 };
     agg[c.god].energy += c.val;
-    agg[c.god].baseEnergy += c.base;
   });
-  var maxE = 0, maxEb = 0, g;
-  for (g in agg) { if (agg[g].energy > maxE) maxE = agg[g].energy; if (agg[g].baseEnergy > maxEb) maxEb = agg[g].baseEnergy; }
+  var maxE = 0, g;
+  for (g in agg) { if (agg[g].energy > maxE) maxE = agg[g].energy; }
 
   var list = [];
   for (g in agg) {
     var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', desc: '' };
     var dir = direction(agg[g].party, P);
-    var dirB = direction(agg[g].party, Pb);
     var w = maxE > 0 ? agg[g].energy / maxE : 1;
-    var wb = maxEb > 0 ? agg[g].baseEnergy / maxEb : 1;
     // 七杀右端词与描述随旺衰切换（身弱用 rblWeak/descWeak）
     var rbl = t.rbl, desc = t.desc;
     if (g === '七杀' && P < 50) {
@@ -114,28 +111,22 @@ function build(chart, opts) {
     slider = Math.max(0, Math.min(100, slider));
     list.push({
       god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: rbl, desc: desc, cls: agg[g].cls,
-      dir: dir,
-      mag: mag,
       slider: slider,
-      magBase: Math.round(intenBase * wb),
-      dirBase: dirB,
       energy: agg[g].energy
     });
   }
-  // 排序：偏优在前 → 均衡 → 偏缺；同组按能量
-  var rank = { pro: 0, mid: 1, con: 2 };
-  list.sort(function (a, b) {
-    if (rank[a.dir] !== rank[b.dir]) return rank[a.dir] - rank[b.dir];
-    return b.energy - a.energy;
+  // 能量从大到小排序：第一位为主心性
+  list.sort(function (a, b) { return b.energy - a.energy; });
+
+  // 用「能量圆点」表达各心性的突出程度（不露具体数字）
+  list.forEach(function (it, idx) {
+    var ratio = maxE > 0 ? it.energy / maxE : 1;
+    var n = Math.max(1, Math.min(5, Math.round(ratio * 5)));
+    var dots = [];
+    for (var k = 1; k <= 5; k++) dots.push({ i: k, on: k <= n });
+    it.dots = dots;
+    it.isMain = idx === 0;
   });
-
-  // 最突出两种（按外显能量）
-  var byEnergy = list.slice().sort(function (a, b) { return b.energy - a.energy; });
-  var topTwo = byEnergy.slice(0, 2);
-
-  // 当前旺衰
-  var stateLabel = P > 55 ? '偏旺' : (P < 45 ? '偏弱' : '中和');
-  var flowGroup = P >= 50 ? '向外发挥的一类（食伤·财·官杀）' : '向内蓄养的一类（印星·比劫）';
 
   var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
 
@@ -159,15 +150,7 @@ function build(chart, opts) {
     },
     paimian: paimian,
     list: list,
-    topTwo: topTwo,
     zhengNow: zhengNow, pianNow: 100 - zhengNow,
-    zhengBase: zhengBase, pianBase: 100 - zhengBase,
-    polShift: zhengNow !== zhengBase,
-    sheng: P, ke: 100 - P, shengBase: Pb,
-    inten: inten,
-    stateLabel: stateLabel,
-    flowGroup: flowGroup,
-    wsShift: P !== Pb,
     hasLuck: m.hasLuck,
     hasTime: !chart.meta.unknownTime
   };
