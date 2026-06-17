@@ -64,7 +64,6 @@
         <text class="trait-name serif">{{item.name}}</text>
         <text class="trait-main" wx:if="{{item.isMain}}">主心性</text>
         <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-        <text class="trait-god">{{item.god}}</text>
         <view class="trait-energy">
           <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
         </view>
@@ -88,6 +87,7 @@
   <!-- 岁运叠加：看状态变化 -->
   <view class="card luck">
     <view class="luck-cur">{{curLabel}}</view>
+    <view class="luck-tip">点击<text class="luck-tip-em">大运</text>，可叠加该运气场，看心性在这段岁月里如何消长；点击<text class="luck-tip-em">流年</text>可进一步精确到某一年。再次点击同一格则取消叠加。</view>
 
     <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
     <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
