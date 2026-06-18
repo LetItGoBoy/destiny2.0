@@ -46,6 +46,42 @@ var TEMP = {
           desc: '仁慈、心地善良，安静平和、有同情心，有修养、有智慧，注重内涵、有精神追求，是让人愿意靠近的温暖；只是容易懒惰、行动力偏弱，依赖性强，有时不思进取，优柔寡断、难下决心。' }
 };
 
+// 十神 → 人生阶段「主旋律」（该柱天干在那段岁月的着力点；软措辞，不作硬性预测）
+var STAGE = {
+  比肩: '主旋律是靠自己打拼。独立自主、亲力亲为，凡事更想攥在自己手里，靠实力一点点站稳脚跟。',
+  劫财: '主旋律是敢闯敢拼、人来人往。靠胆识和人脉打开局面，机会与起伏并存，有得也有失。',
+  食神: '主旋律是顺势而为、张弛有度。节奏偏舒缓，重在享受与发挥才情，福气往往不请自来。',
+  伤官: '主旋律是想突破、想被看见。才华外露、不甘平庸，靠本事出头，也最有棱角、最敢表达。',
+  偏财: '主旋律是机会多、人脉广。靠灵活的眼光和八面玲珑取势，钱财与缘分来去都比较活络。',
+  正财: '主旋律是踏实积累、稳扎稳打。重在守成与经营，靠勤俭和专注立身，不爱冒没把握的险。',
+  七杀: '主旋律是压力与机遇并存。靠魄力闯关、在磨砺中成长，扛得住的话往往也是成就最快的时候。',
+  正官: '主旋律是重规矩、担责任。靠自律和口碑立足，适合按部就班、循序渐进地往上走。',
+  偏印: '主旋律是向内沉淀、钻研专精。靠思考与专业立身，宜静不宜躁，独处时反而最有收获。',
+  正印: '主旋律是有庇护、重学习。常得长辈贵人之助，靠信誉与情义铺路，在温润的环境里成长。'
+};
+
+// 十神 → 该阶段「内心」一句话（地支本气，简短）
+var STAGE_INNER = {
+  比肩: '内心要强，想掌握主动',
+  劫财: '内心好胜，看重同伴',
+  食神: '内心向往轻松自在',
+  伤官: '内心不甘平庸、想被看见',
+  偏财: '内心活络，看重情义与机会',
+  正财: '内心求稳，在意踏实安稳',
+  七杀: '内心有压力感，习惯自我加压',
+  正官: '内心重规矩，在意对错',
+  偏印: '内心好静，爱琢磨',
+  正印: '内心念旧，渴望依靠与被理解'
+};
+
+// 四柱 → 人生阶段（宫位/分限）
+var STAGE_META = {
+  年柱: { label: '少年', sub: '出身 · 童年根基' },
+  月柱: { label: '青年', sub: '求学 · 事业起步' },
+  日柱: { label: '中年', sub: '立身 · 婚姻家庭' },
+  时柱: { label: '晚年', sub: '子女 · 晚景归宿' }
+};
+
 // 日主天干 → 外在底色（第一印象）
 var CORE = {
   甲: { title: '甲木 · 栋梁', text: '像向上生长的大树，第一印象正直、有方向感，认定的事愿意一路扛到底；自带带头的气场。' },
@@ -174,6 +210,32 @@ function build(chart, opts) {
   if (opts.liuNianGZ && opts.liuNianGZ.length >= 2) branches.push({ zhi: opts.liuNianGZ.charAt(1), label: '流年' });
   var rels = relations.detect(branches);
 
+  // —— 人生四季：四柱分限速览（天干主旋律 + 地支内心） ——
+  var zhiGodByPos = {};
+  (m.zhiCells || []).forEach(function (c) { zhiGodByPos[c.pos] = c.god; });
+  var stages = chart.pillars.map(function (p) {
+    var sm = STAGE_META[p.label] || { label: p.label, sub: '' };
+    if (p.empty || !p.gan) return { label: sm.label, sub: sm.sub, empty: true };
+    var posChar = p.label.charAt(0);          // 年/月/日/时
+    var innerGod = zhiGodByPos[posChar];
+    var isDay = p.shiShenGan === '日主';
+    var theme, themeGod, desc;
+    if (isDay) {
+      theme = '自己'; themeGod = '日主';
+      desc = '主旋律是「自己做主」。前半生的积累在此定型，也最看清自己要什么、想成为谁；婚姻与家庭多在这一程落定。';
+    } else {
+      var tt = TEMP[p.shiShenGan] || { name: p.shiShenGan };
+      theme = tt.name; themeGod = p.shiShenGan;
+      desc = STAGE[p.shiShenGan] || '';
+    }
+    return {
+      label: sm.label, sub: sm.sub, empty: false,
+      gan: p.gan.text, ganCls: p.gan.cls, zhi: p.zhi.text, zhiCls: p.zhi.cls,
+      theme: theme, themeGod: themeGod, desc: desc,
+      innerName: (TEMP[innerGod] || {}).name || '', inner: STAGE_INNER[innerGod] || ''
+    };
+  });
+
   var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
 
   // 盘面
@@ -198,6 +260,7 @@ function build(chart, opts) {
     list: list,
     branchList: branchList,
     relations: rels,
+    stages: stages,
     zhengNow: zhengNow, pianNow: 100 - zhengNow,
     hasLuck: m.hasLuck,
     hasTime: !chart.meta.unknownTime

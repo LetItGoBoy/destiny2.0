@@ -333,6 +333,83 @@
   letter-spacing: 0;
 }
 
+/* 人生四季 */
+.stage {
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.stage:last-child {
+  border-bottom: none;
+}
+.stage-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.stage-badge {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
+  padding: 6rpx 18rpx;
+  border-radius: 100rpx;
+}
+.stage-sub {
+  margin-left: 14rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.stage-gz {
+  margin-left: auto;
+  font-size: 38rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+.stage-theme {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 6rpx;
+}
+.stage-key {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  color: var(--primary);
+  background: var(--tint);
+  padding: 3rpx 12rpx;
+  border-radius: 6rpx;
+}
+.stage-key-in {
+  color: var(--ink-2);
+  background: var(--fill);
+}
+.stage-theme-name {
+  margin-left: 12rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.stage-god {
+  margin-left: 10rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.stage-inner {
+  display: flex;
+  align-items: baseline;
+  margin-top: 10rpx;
+}
+.stage-inner-name {
+  margin-left: 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.stage-inner-txt {
+  margin-left: 10rpx;
+  font-size: 23rpx;
+  color: var(--ink-3);
+}
+
 /* 岁运叠加 */
 .luck {
   margin-top: 18rpx;

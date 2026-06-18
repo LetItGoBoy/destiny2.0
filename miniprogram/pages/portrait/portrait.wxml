@@ -138,6 +138,43 @@
     </view>
   </view>
 
+  <!-- 人生四季：四柱分限速览 -->
+  <view class="card comp">
+    <view class="comp-head">
+      <text class="comp-t serif">人生四季</text>
+      <text class="comp-sub">四柱分限 · 各阶段的主旋律</text>
+    </view>
+
+    <view class="comp-tip">
+      把四柱看作人生的四程：<text class="tip-l">少年</text>看年柱、<text class="tip-l">青年</text>看月柱、<text class="tip-l">中年</text>看日柱、<text class="tip-l">晚年</text>看时柱。天干是那一程的主旋律，地支是那时的内心。此为概览，<text class="tip-l">精确的起落看下方大运</text>。
+    </view>
+
+    <view class="stage" wx:for="{{stages}}" wx:key="label">
+      <view class="stage-head">
+        <text class="stage-badge">{{item.label}}</text>
+        <text class="stage-sub">{{item.sub}}</text>
+        <view class="stage-gz serif" wx:if="{{!item.empty}}">
+          <text class="wx-{{item.ganCls}}">{{item.gan}}</text><text class="wx-{{item.zhiCls}}">{{item.zhi}}</text>
+        </view>
+        <text class="stage-gz dim" wx:else>未知</text>
+      </view>
+      <block wx:if="{{!item.empty}}">
+        <view class="stage-theme">
+          <text class="stage-key">主旋律</text>
+          <text class="stage-theme-name serif">{{item.theme}}</text>
+          <text class="stage-god">{{item.themeGod}}</text>
+        </view>
+        <view class="pc pc-on">{{item.desc}}</view>
+        <view class="stage-inner" wx:if="{{item.inner}}">
+          <text class="stage-key stage-key-in">内心</text>
+          <text class="stage-inner-name">{{item.innerName}}</text>
+          <text class="stage-inner-txt">{{item.inner}}</text>
+        </view>
+      </block>
+      <view class="pc" wx:else>未填出生时辰，晚年一程暂不可见。</view>
+    </view>
+  </view>
+
   <!-- 岁运叠加：看状态变化 -->
   <view class="card luck">
     <view class="luck-cur">{{curLabel}}</view>
