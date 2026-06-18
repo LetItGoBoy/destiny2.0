@@ -222,7 +222,7 @@ function build(chart, opts) {
     var theme, themeGod, desc;
     if (isDay) {
       theme = '自己'; themeGod = '日主';
-      desc = '主旋律是「自己做主」。前半生的积累在此定型，也最看清自己要什么、想成为谁；婚姻与家庭多在这一程落定。';
+      desc = INNER[innerGod] || '';
     } else {
       var tt = TEMP[p.shiShenGan] || { name: p.shiShenGan };
       theme = tt.name; themeGod = p.shiShenGan;
