@@ -50,7 +50,7 @@
   </view>
 
   <!-- 外显心性（天干） -->
-  <view class="card comp">
+  <view class="card comp" id="sec-tiangan">
     <view class="comp-head">
       <text class="comp-t serif">外显心性</text>
       <text class="comp-sub">天干 · 别人眼中的你</text>
@@ -142,11 +142,6 @@
   <view class="card comp">
     <view class="comp-head">
       <text class="comp-t serif">人生四季</text>
-      <text class="comp-sub">四柱分限 · 各阶段的主旋律</text>
-    </view>
-
-    <view class="comp-tip">
-      把四柱看作人生的四程：<text class="tip-l">少年</text>看年柱、<text class="tip-l">青年</text>看月柱、<text class="tip-l">中年</text>看日柱、<text class="tip-l">晚年</text>看时柱。天干是那一程的主旋律，地支是那时的内心。此为概览，<text class="tip-l">精确的起落看下方大运</text>。
     </view>
 
     <view class="stage" wx:for="{{stages}}" wx:key="label">
@@ -175,37 +170,64 @@
     </view>
   </view>
 
-  <!-- 岁运叠加：看状态变化 -->
-  <view class="card luck">
-    <view class="luck-cur">{{curLabel}}</view>
-    <view class="luck-tip">点击<text class="luck-tip-em">大运</text>，可叠加该运气场，看心性在这段岁月里如何消长；点击<text class="luck-tip-em">流年</text>可进一步精确到某一年。再次点击同一格则取消叠加。</view>
+  <view class="foot">性格画像基于天干十神的能量与旺衰，仅供传统文化娱乐参考</view>
 
-    <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
+  <!-- 底部时光条占位（避免内容被吸底栏遮挡） -->
+  <view class="bar-holder"></view>
+</view>
+
+<!-- 底部常驻时光条 -->
+<view class="timebar" wx:if="{{loaded}}">
+  <view class="tb-natal {{hasLuck ? '' : 'tb-dim'}}" bindtap="backToNatal">
+    <text class="tb-natal-ic">↺</text>
+    <text>本命</text>
+  </view>
+  <view class="tb-step">
+    <text class="tb-arrow" bindtap="stepYear" data-d="-1">‹</text>
+    <view class="tb-mid">
+      <text class="tb-year {{barActive ? 'on' : ''}}">{{barYearShow}}</text>
+      <text class="tb-gz" wx:if="{{barGz}}">{{barGz}}</text>
+      <text class="tb-gz tb-hint" wx:else>本命 · 点箭头看流年</text>
+    </view>
+    <text class="tb-arrow" bindtap="stepYear" data-d="1">›</text>
+  </view>
+  <view class="tb-expand" bindtap="openPanel">
+    <text>岁运</text>
+    <text class="tb-expand-ic">▴</text>
+  </view>
+</view>
+
+<!-- 滑出选择面板 -->
+<view class="panel-mask {{panelOpen ? 'show' : ''}}" bindtap="closePanel"></view>
+<view class="panel {{panelOpen ? 'show' : ''}}" wx:if="{{loaded}}">
+  <view class="panel-head">
+    <text class="panel-cur">{{curLabel}}</text>
+    <text class="panel-close" bindtap="closePanel">收起</text>
+  </view>
+
+  <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
+  <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="yun-strip">
+      <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
+        wx:for="{{daYunList}}" wx:key="index" bindtap="onDaYun" data-index="{{item.index}}">
+        <view class="yun-ss">{{item.god}}</view>
+        <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
+        <view class="yun-age">{{item.age}}岁</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <block wx:if="{{liuNianList.length}}">
+    <view class="section-title serif">流年 <text class="section-note">{{daYunList[dyIndex].gz}} 运内</text></view>
     <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="yun-strip">
-        <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
-          wx:for="{{daYunList}}" wx:key="index" bindtap="onDaYun" data-index="{{item.index}}">
+        <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
+          wx:for="{{liuNianList}}" wx:key="index" bindtap="onLiuNian" data-index="{{item.index}}">
           <view class="yun-ss">{{item.god}}</view>
           <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
-          <view class="yun-age">{{item.age}}岁</view>
+          <view class="yun-year">{{item.year}}</view>
         </view>
       </view>
     </scroll-view>
-
-    <block wx:if="{{liuNianList.length}}">
-      <view class="section-title serif">流年 <text class="section-note">{{daYunList[dyIndex].gz}} 运内</text></view>
-      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-        <view class="yun-strip">
-          <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
-            wx:for="{{liuNianList}}" wx:key="index" bindtap="onLiuNian" data-index="{{item.index}}">
-            <view class="yun-ss">{{item.god}}</view>
-            <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
-            <view class="yun-year">{{item.year}}</view>
-          </view>
-        </view>
-      </scroll-view>
-    </block>
-  </view>
-
-  <view class="foot">性格画像基于天干十神的能量与旺衰，仅供传统文化娱乐参考</view>
+  </block>
 </view>

@@ -22,7 +22,13 @@ Page({
     daYunList: [],
     liuNianList: [],
     dyIndex: -1,
-    lnIndex: -1
+    lnIndex: -1,
+    // 底部时光条
+    panelOpen: false,
+    curYear: null,        // 当前流年（null=本命/未选流年）
+    barGz: '',            // 时光条上的干支摘要
+    barYearShow: '',      // 时光条上显示的年份
+    barActive: false      // 流年是否已激活
   },
 
   onLoad: function (options) {
@@ -59,14 +65,28 @@ Page({
       };
     });
 
+    // 年份 → {dy, ln} 映射，供流年快进
+    this._yearMap = {};
+    var minY = Infinity, maxY = -Infinity, self = this;
+    this._dy.forEach(function (d) {
+      (d._liuNian || []).forEach(function (x, i) {
+        self._yearMap[x.year] = { dy: d.index, ln: i };
+        if (x.year < minY) minY = x.year;
+        if (x.year > maxY) maxY = x.year;
+      });
+    });
+    this._yearMin = minY === Infinity ? null : minY;
+    this._yearMax = maxY === -Infinity ? null : maxY;
+
     this.setData({ loaded: true, meta: chart.meta, daYunList: this._dy });
     this.recompute();
   },
 
+  // 在面板中点选大运（仅大运，清掉流年）
   onDaYun: function (e) {
     var idx = Number(e.currentTarget.dataset.index);
     if (idx === this.data.dyIndex) {
-      this.setData({ dyIndex: -1, lnIndex: -1, liuNianList: [] });
+      this.setData({ dyIndex: -1, lnIndex: -1, liuNianList: [], curYear: null });
       this.recompute();
       return;
     }
@@ -74,26 +94,82 @@ Page({
     var ln = (d._liuNian || []).map(function (x, i) {
       return { index: i, gz: x.ganZhi, gan: x.gan, zhi: x.zhi, god: x.shiShenGan, year: x.year };
     });
-    this.setData({ dyIndex: idx, lnIndex: -1, liuNianList: ln });
+    this.setData({ dyIndex: idx, lnIndex: -1, liuNianList: ln, curYear: null });
     this.recompute();
   },
 
+  // 在面板中点选流年
   onLiuNian: function (e) {
     var idx = Number(e.currentTarget.dataset.index);
-    this.setData({ lnIndex: idx === this.data.lnIndex ? -1 : idx });
+    var off = idx === this.data.lnIndex;
+    var year = off ? null : this.data.liuNianList[idx].year;
+    this.setData({ lnIndex: off ? -1 : idx, curYear: year });
     this.recompute();
+  },
+
+  // 跳到某一年（自动定位所属大运）
+  selectYear: function (year) {
+    var m = this._yearMap[year];
+    if (!m) return;
+    var d = this._dy[m.dy];
+    var ln = (d._liuNian || []).map(function (x, i) {
+      return { index: i, gz: x.ganZhi, gan: x.gan, zhi: x.zhi, god: x.shiShenGan, year: x.year };
+    });
+    this.setData({ dyIndex: m.dy, lnIndex: m.ln, liuNianList: ln, curYear: year });
+    this.recompute();
+  },
+
+  // 时光条逐年快进
+  stepYear: function (e) {
+    if (this._yearMin == null) return;
+    var delta = Number(e.currentTarget.dataset.d);
+    var base;
+    if (this.data.curYear == null) {
+      var today = new Date().getFullYear();
+      base = Math.min(this._yearMax, Math.max(this._yearMin, today));   // 首次落到今年
+    } else {
+      base = this.data.curYear + delta;
+    }
+    base = Math.min(this._yearMax, Math.max(this._yearMin, base));
+    this.selectYear(base);
+  },
+
+  backToNatal: function () {
+    this.setData({ dyIndex: -1, lnIndex: -1, liuNianList: [], curYear: null });
+    this.recompute();
+  },
+
+  openPanel: function () {
+    var self = this;
+    this.setData({ panelOpen: true });
+    // 小心机：滚到「外显心性」，让滑标停在面板上方可视区
+    wx.createSelectorQuery().select('#sec-tiangan').boundingClientRect().selectViewport().scrollOffset().exec(function (res) {
+      var rect = res[0], scroll = res[1];
+      if (rect && scroll) {
+        wx.pageScrollTo({ scrollTop: scroll.scrollTop + rect.top - 16, duration: 300 });
+      }
+    });
+  },
+
+  closePanel: function () {
+    this.setData({ panelOpen: false });
   },
 
   recompute: function () {
     var dyGZ = null, lnGZ = null, label = '本命 · 未叠加岁运';
+    var barGz = '', barActive = false;
     if (this.data.dyIndex >= 0) {
       var d = this._dy[this.data.dyIndex];
-      dyGZ = d.gz; label = '大运 ' + d.gz;
+      dyGZ = d.gz; label = '大运 ' + d.gz; barGz = d.gz;
       if (this.data.lnIndex >= 0) {
         var ln = this.data.liuNianList[this.data.lnIndex];
         lnGZ = ln.gz; label += ' · 流年 ' + ln.gz + '（' + ln.year + '）';
+        barGz = d.gz + ' · ' + ln.gz; barActive = true;
       }
     }
+    var barYearShow = this.data.curYear != null ? this.data.curYear
+      : (this._yearMin != null ? Math.min(this._yearMax, Math.max(this._yearMin, new Date().getFullYear())) : '');
+
     var p = portrait.build(this._chart, { daYunGZ: dyGZ, liuNianGZ: lnGZ });
     this.setData({
       core: p.core,
@@ -105,7 +181,10 @@ Page({
       zhengNow: p.zhengNow, pianNow: p.pianNow,
       hasLuck: p.hasLuck,
       hasTime: p.hasTime,
-      curLabel: label
+      curLabel: label,
+      barGz: barGz,
+      barYearShow: barYearShow,
+      barActive: barActive
     });
   },
 
