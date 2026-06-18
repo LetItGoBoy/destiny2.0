@@ -605,35 +605,6 @@
   color: var(--ink-3);
 }
 
-/* 外显·内在组合注记 */
-.combo-note {
-  margin-top: 18rpx;
-  padding: 26rpx 30rpx 28rpx;
-  border-left: 5rpx solid var(--primary);
-}
-.combo-head {
-  display: flex;
-  align-items: center;
-  margin-bottom: 14rpx;
-  gap: 10rpx;
-}
-.combo-icon {
-  font-size: 26rpx;
-  color: var(--primary);
-  opacity: 0.7;
-}
-.combo-title {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: var(--primary);
-  letter-spacing: 1rpx;
-}
-.combo-text {
-  font-size: 24rpx;
-  line-height: 1.85;
-  color: var(--ink-2);
-}
-
 .foot {
   margin-top: 36rpx;
   text-align: center;
@@ -643,5 +614,5 @@
 }
 
 /* 字号档位 */
-.fs-l .core-text, .fs-l .pc, .fs-l .intro, .fs-l .combo-text { font-size: 26rpx; }
-.fs-xl .core-text, .fs-xl .pc, .fs-xl .intro, .fs-xl .combo-text { font-size: 29rpx; }
+.fs-l .core-text, .fs-l .pc, .fs-l .intro { font-size: 26rpx; }
+.fs-xl .core-text, .fs-xl .pc, .fs-xl .intro { font-size: 29rpx; }
