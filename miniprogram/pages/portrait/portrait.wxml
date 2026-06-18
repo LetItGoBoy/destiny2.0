@@ -85,6 +85,15 @@
     <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
   </view>
 
+  <!-- 外显·内在组合注记 -->
+  <view class="card combo-note" wx:if="{{comboNote}}">
+    <view class="combo-head">
+      <text class="combo-icon">◈</text>
+      <text class="combo-title serif">外显与内在的交汇</text>
+    </view>
+    <text class="combo-text">{{comboNote}}</text>
+  </view>
+
   <!-- 内在心性（地支） -->
   <view class="card comp">
     <view class="comp-head">
