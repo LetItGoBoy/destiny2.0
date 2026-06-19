@@ -1,6 +1,6 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
 
-  <!-- 盘面 -->
+  <!-- 盘面（两模块共用的命盘参照） -->
   <view class="card pan">
     <view class="pan-col {{item.isDay ? 'pan-day' : ''}}" wx:for="{{paimian}}" wx:key="label">
       <view class="pan-label">{{item.label}}</view>
@@ -18,166 +18,195 @@
     </view>
   </view>
 
-  <!-- 外在底色（日主） -->
-  <view class="card core">
-    <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
-    <view class="core-body">
-      <view class="core-title serif">{{core.title}}</view>
-      <view class="core-text">{{core.text}}</view>
+  <!-- 模块切换 -->
+  <view class="seg">
+    <view class="seg-item {{tab === 'trait' ? 'on' : ''}}" bindtap="switchTab" data-tab="trait">
+      <text class="seg-t serif">主心性</text>
+      <text class="seg-sub">贯穿一生</text>
+    </view>
+    <view class="seg-item {{tab === 'season' ? 'on' : ''}}" bindtap="switchTab" data-tab="season">
+      <text class="seg-t serif">性格四季</text>
+      <text class="seg-sub">不同阶段</text>
     </view>
   </view>
 
-  <!-- 框架说明 -->
-  <view class="intro">
-    大部分人身上都有不止一种心性，只是<text class="em">配比</text>不同。下面是你<text class="em">天干（外在表现）</text>所呈现的心性构成，它会随大运、流年此消彼长。
-    <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月干，外显更集中）</text>
-  </view>
+  <!-- ══════════ 模块一：主心性 · 贯穿一生 ══════════ -->
+  <block wx:if="{{tab === 'trait'}}">
 
-  <!-- 两种底色倾向：守正 ←→ 求变 -->
-  <view class="card pol">
-    <view class="pol-head">
-      <text class="pol-t serif">两种底色</text>
-      <text class="pol-sub">守正与求变的配比 · 含天干地支全部十神</text>
-    </view>
-    <view class="pol-bar">
-      <view class="pol-zheng" style="width:{{zhengNow}}%"></view>
-      <view class="pol-pian" style="width:{{pianNow}}%"></view>
-    </view>
-    <view class="pol-legend">
-      <text class="lg-zheng">守正 · 稳健循常</text>
-      <text class="lg-pian">求变 · 突破不拘</text>
-    </view>
-  </view>
-
-  <!-- 外显心性（天干） -->
-  <view class="card comp" id="sec-tiangan">
-    <view class="comp-head">
-      <text class="comp-t serif">外显心性</text>
-      <text class="comp-sub">天干 · 别人眼中的你</text>
+    <!-- 外在底色（日主） -->
+    <view class="card core">
+      <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
+      <view class="core-body">
+        <view class="core-title serif">{{core.title}}</view>
+        <view class="core-text">{{core.text}}</view>
+      </view>
     </view>
 
-    <view class="comp-tip">
-      圆点越多，代表这股心性越突出；排在最前的是你的<text class="tip-l">主心性</text>。每条心性都有两面：滑标越靠<text class="tip-l">左</text>，越发挥得顺、显出好的一面；越靠<text class="tip-r">右</text>，则越容易走偏、需要留意。指针会随大运、流年左右移动。
+    <!-- 框架说明 -->
+    <view class="intro">
+      大部分人身上都有不止一种心性，只是<text class="em">配比</text>不同。下面是你<text class="em">天干（外在表现）</text>所呈现的心性构成，它会随大运、流年此消彼长。
+      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月干，外显更集中）</text>
     </view>
 
-    <view class="trait" wx:for="{{list}}" wx:key="god">
-      <view class="trait-line">
-        <text class="trait-name serif">{{item.name}}</text>
-        <text class="trait-main" wx:if="{{item.isMain}}">主心性</text>
-        <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-        <view class="trait-energy">
-          <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
+    <!-- 两种底色倾向：守正 ←→ 求变 -->
+    <view class="card pol">
+      <view class="pol-head">
+        <text class="pol-t serif">两种底色</text>
+        <text class="pol-sub">守正与求变的配比 · 含天干地支全部十神</text>
+      </view>
+      <view class="pol-bar">
+        <view class="pol-zheng" style="width:{{zhengNow}}%"></view>
+        <view class="pol-pian" style="width:{{pianNow}}%"></view>
+      </view>
+      <view class="pol-legend">
+        <text class="lg-zheng">守正 · 稳健循常</text>
+        <text class="lg-pian">求变 · 突破不拘</text>
+      </view>
+    </view>
+
+    <!-- 外显心性（天干） -->
+    <view class="card comp" id="sec-tiangan">
+      <view class="comp-head">
+        <text class="comp-t serif">外显心性</text>
+        <text class="comp-sub">天干 · 别人眼中的你</text>
+      </view>
+
+      <view class="comp-tip">
+        圆点越多，代表这股心性越突出；排在最前的是你的<text class="tip-l">主心性</text>。每条心性都有两面：滑标越靠<text class="tip-l">左</text>，越发挥得顺、显出好的一面；越靠<text class="tip-r">右</text>，则越容易走偏、需要留意。指针会随大运、流年左右移动。
+      </view>
+
+      <view class="trait" wx:for="{{list}}" wx:key="god">
+        <view class="trait-line">
+          <text class="trait-name serif">{{item.name}}</text>
+          <text class="trait-main" wx:if="{{item.isMain}}">主心性</text>
+          <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+          <view class="trait-energy">
+            <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
+          </view>
+        </view>
+        <!-- 滑标轴：左端词(顺) ←指针→ 右端词(偏) -->
+        <view class="slider-row">
+          <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
+          <view class="sl-track">
+            <view class="sl-thumb" style="left:{{item.slider}}%"></view>
+          </view>
+          <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
+        </view>
+        <view class="trait-pc">
+          <view class="pc pc-on">{{item.desc}}</view>
         </view>
       </view>
-      <!-- 滑标轴：左端词(顺) ←指针→ 右端词(偏) -->
-      <view class="slider-row">
-        <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
-        <view class="sl-track">
-          <view class="sl-thumb" style="left:{{item.slider}}%"></view>
+
+      <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
+    </view>
+
+    <!-- 内在心性（地支） -->
+    <view class="card comp">
+      <view class="comp-head">
+        <text class="comp-t serif">内在心性</text>
+        <text class="comp-sub">地支 · 私下真实的你</text>
+      </view>
+
+      <view class="comp-tip">
+        天干是<text class="tip-l">外在表现</text>，地支则是<text class="tip-l">内在底色</text>——你私下真实的样子、安全感的来源。圆点越多，这股内在越主导。它比外显更稳定，但岁运的刑冲合害会牵动它。
+      </view>
+
+      <view class="trait" wx:for="{{branchList}}" wx:key="god">
+        <view class="trait-line">
+          <text class="trait-name serif">{{item.name}}</text>
+          <text class="trait-main" wx:if="{{item.isMain}}">主内在</text>
+          <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+          <text class="trait-god">{{item.zhis}}</text>
+          <view class="trait-energy">
+            <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
+          </view>
         </view>
-        <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
-      </view>
-      <view class="trait-pc">
-        <view class="pc pc-on">{{item.desc}}</view>
-      </view>
-    </view>
-
-    <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
-  </view>
-
-  <!-- 内在心性（地支） -->
-  <view class="card comp">
-    <view class="comp-head">
-      <text class="comp-t serif">内在心性</text>
-      <text class="comp-sub">地支 · 私下真实的你</text>
-    </view>
-
-    <view class="comp-tip">
-      天干是<text class="tip-l">外在表现</text>，地支则是<text class="tip-l">内在底色</text>——你私下真实的样子、安全感的来源。圆点越多，这股内在越主导。它比外显更稳定，但岁运的刑冲合害会牵动它。
-    </view>
-
-    <view class="trait" wx:for="{{branchList}}" wx:key="god">
-      <view class="trait-line">
-        <text class="trait-name serif">{{item.name}}</text>
-        <text class="trait-main" wx:if="{{item.isMain}}">主内在</text>
-        <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-        <text class="trait-god">{{item.zhis}}</text>
-        <view class="trait-energy">
-          <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
+        <view class="trait-pc">
+          <view class="pc pc-on">{{item.desc}}</view>
         </view>
       </view>
-      <view class="trait-pc">
-        <view class="pc pc-on">{{item.desc}}</view>
+
+      <view class="comp-empty" wx:if="{{branchList.length === 0}}">地支能量不足，暂无明显内在心性。</view>
+    </view>
+
+    <!-- 心结与张力（地支刑冲合害） -->
+    <view class="card comp" wx:if="{{relations.length}}">
+      <view class="comp-head">
+        <text class="comp-t serif">心结与张力</text>
+        <text class="comp-sub">地支刑冲合害 · 内在的牵动</text>
       </view>
-    </view>
 
-    <view class="comp-empty" wx:if="{{branchList.length === 0}}">地支能量不足，暂无明显内在心性。</view>
-  </view>
-
-  <!-- 心结与张力（地支刑冲合害） -->
-  <view class="card comp" wx:if="{{relations.length}}">
-    <view class="comp-head">
-      <text class="comp-t serif">心结与张力</text>
-      <text class="comp-sub">地支刑冲合害 · 内在的牵动</text>
-    </view>
-
-    <view class="comp-tip">
-      地支之间的<text class="tip-l">合</text>、<text class="tip-r">冲</text>、<text class="tip-r">刑</text>、<text class="tip-r">害</text>，是内心潜藏的动力与情结。叠加大运、流年后，新形成的关系会被引动，对应的心结也会浮现。
-    </view>
-
-    <view class="rel" wx:for="{{relations}}" wx:key="type">
-      <view class="rel-head-line">
-        <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
-        <text class="rel-tag">{{item.tag}}</text>
-        <text class="rel-luck" wx:if="{{item.anyLuck}}">岁运引动</text>
+      <view class="comp-tip">
+        地支之间的<text class="tip-l">合</text>、<text class="tip-r">冲</text>、<text class="tip-r">刑</text>、<text class="tip-r">害</text>，是内心潜藏的动力与情结。叠加大运、流年后，新形成的关系会被引动，对应的心结也会浮现。
       </view>
-      <view class="rel-zhis-row">
-        <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
-      </view>
-      <view class="pc pc-on">{{item.text}}</view>
-    </view>
-  </view>
 
-  <!-- 人生四季：四柱分限速览 -->
-  <view class="card comp">
-    <view class="comp-head">
-      <text class="comp-t serif">人生四季</text>
-    </view>
-
-    <view class="stage" wx:for="{{stages}}" wx:key="label">
-      <view class="stage-head">
-        <text class="stage-badge">{{item.label}}</text>
-        <text class="stage-sub">{{item.sub}}</text>
-        <view class="stage-gz serif" wx:if="{{!item.empty}}">
-          <text class="wx-{{item.ganCls}}">{{item.gan}}</text><text class="wx-{{item.zhiCls}}">{{item.zhi}}</text>
+      <view class="rel" wx:for="{{relations}}" wx:key="type">
+        <view class="rel-head-line">
+          <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
+          <text class="rel-tag">{{item.tag}}</text>
+          <text class="rel-luck" wx:if="{{item.anyLuck}}">岁运引动</text>
         </view>
-        <text class="stage-gz dim" wx:else>未知</text>
+        <view class="rel-zhis-row">
+          <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
+        </view>
+        <view class="pc pc-on">{{item.text}}</view>
       </view>
-      <block wx:if="{{!item.empty}}">
-        <view class="stage-theme">
-          <text class="stage-key">主旋律</text>
-          <text class="stage-theme-name serif">{{item.theme}}</text>
-          <text class="stage-god">{{item.themeGod}}</text>
-        </view>
-        <view class="pc pc-on">{{item.desc}}</view>
-        <view class="stage-inner" wx:if="{{item.inner}}">
-          <text class="stage-key stage-key-in">内心</text>
-          <text class="stage-inner-name">{{item.innerName}}</text>
-          <text class="stage-inner-txt">{{item.inner}}</text>
-        </view>
-      </block>
-      <view class="pc" wx:else>未填出生时辰，晚年一程暂不可见。</view>
     </view>
-  </view>
+
+  </block>
+
+  <!-- ══════════ 模块二：性格四季 ══════════ -->
+  <block wx:else>
+
+    <!-- 模块说明 -->
+    <view class="intro">
+      人生分四程：<text class="em">少年、青年、中年、晚年</text>，分别由年、月、日、时四柱主导。下面是每一程的主旋律与内心底色——这是<text class="em">阶段性</text>的着力点，与「主心性」里贯穿一生的底色互为表里。
+      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，晚年一程暂不可见）</text>
+    </view>
+
+    <!-- 人生四季：四柱分限速览 -->
+    <view class="card comp">
+      <view class="comp-head">
+        <text class="comp-t serif">人生四季</text>
+        <text class="comp-sub">四柱分限 · 各阶段的着力点</text>
+      </view>
+
+      <view class="stage" wx:for="{{stages}}" wx:key="label">
+        <view class="stage-head">
+          <text class="stage-badge">{{item.label}}</text>
+          <text class="stage-sub">{{item.sub}}</text>
+          <view class="stage-gz serif" wx:if="{{!item.empty}}">
+            <text class="wx-{{item.ganCls}}">{{item.gan}}</text><text class="wx-{{item.zhiCls}}">{{item.zhi}}</text>
+          </view>
+          <text class="stage-gz dim" wx:else>未知</text>
+        </view>
+        <block wx:if="{{!item.empty}}">
+          <view class="stage-theme">
+            <text class="stage-key">主旋律</text>
+            <text class="stage-theme-name serif">{{item.theme}}</text>
+            <text class="stage-god">{{item.themeGod}}</text>
+          </view>
+          <view class="pc pc-on">{{item.desc}}</view>
+          <view class="stage-inner" wx:if="{{item.inner}}">
+            <text class="stage-key stage-key-in">内心</text>
+            <text class="stage-inner-name">{{item.innerName}}</text>
+            <text class="stage-inner-txt">{{item.inner}}</text>
+          </view>
+        </block>
+        <view class="pc" wx:else>未填出生时辰，晚年一程暂不可见。</view>
+      </view>
+    </view>
+
+  </block>
 
   <view class="foot">性格画像基于天干十神的能量与旺衰，仅供传统文化娱乐参考</view>
 
   <!-- 底部时光条占位（避免内容被吸底栏遮挡） -->
-  <view class="bar-holder"></view>
+  <view class="bar-holder" wx:if="{{tab === 'trait'}}"></view>
 </view>
 
-<!-- 底部常驻时光条 -->
-<view class="timebar" wx:if="{{loaded}}">
+<!-- 底部常驻时光条（仅「主心性」模块，随大运流年此消彼长） -->
+<view class="timebar" wx:if="{{loaded && tab === 'trait'}}">
   <view class="tb-natal {{hasLuck ? '' : 'tb-dim'}}" bindtap="backToNatal">
     <text class="tb-natal-ic">↺</text>
     <text>本命</text>

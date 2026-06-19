@@ -36,6 +36,46 @@
   gap: 2rpx;
 }
 
+/* 模块分段切换 */
+.seg {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 18rpx;
+  padding: 8rpx;
+  background: var(--fill);
+  border-radius: 20rpx;
+}
+.seg-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 0;
+  border-radius: 16rpx;
+  transition: all 0.25s ease;
+}
+.seg-item.on {
+  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
+  box-shadow: 0 6rpx 18rpx rgba(108, 75, 217, 0.28);
+}
+.seg-t {
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  color: var(--ink-2);
+}
+.seg-item.on .seg-t {
+  color: #fff;
+}
+.seg-sub {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+.seg-item.on .seg-sub {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 /* 外在底色 */
 .core {
   display: flex;

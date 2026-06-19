@@ -7,6 +7,7 @@ Page({
   data: {
     loaded: false,
     fs: 'std',
+    tab: 'trait',         // 模块：trait=主心性(贯穿一生) / season=性格四季
     meta: {},
     core: {},
     paimian: [],
@@ -80,6 +81,14 @@ Page({
 
     this.setData({ loaded: true, meta: chart.meta, daYunList: this._dy });
     this.recompute();
+  },
+
+  // 切换模块：主心性 / 性格四季
+  switchTab: function (e) {
+    var tab = e.currentTarget.dataset.tab;
+    if (tab === this.data.tab) return;
+    this.setData({ tab: tab, panelOpen: false });
+    wx.pageScrollTo({ scrollTop: 0, duration: 0 });
   },
 
   // 在面板中点选大运（仅大运，清掉流年）
