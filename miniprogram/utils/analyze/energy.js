@@ -22,8 +22,113 @@ var C_KE = 0.25;      // 受克 −
 var C_COST = 0.05;    // 克耗 −
 var C_ROOT = 0.30;    // 通根帮扶 +
 var ROOT_CROSS_DF = 0.6;
-var DELING_X = 1.8;   // 得令加成（月令本气属生扶）
+var DELING_X = 1.3;   // 得令加成（叠在旺相休囚死的「旺×1.4」之上）
 var SAME_X = 1.0;     // 生扶结构性修正
+
+// ── 旺相休囚死（月令/大运地支 季节加权）──
+var WANG = 1.4, XIANG = 1.15, XIU = 0.85, QIU = 0.6, SI = 0.4;
+var DY_SEASON_W = 0.5;   // 大运地支季节力度（约半个月令）
+
+// 由某地支本气五行，得五行旺相休囚死乘数表
+function seasonRaw(zhi) {
+  var M = ganWx(LunarUtil.ZHI_HIDE_GAN[zhi][0]);
+  var t = {};
+  ['木', '火', '土', '金', '水'].forEach(function (E) {
+    if (E === M) t[E] = WANG;              // 旺：与令同
+    else if (SHENG[M] === E) t[E] = XIANG; // 相：令所生
+    else if (SHENG[E] === M) t[E] = XIU;   // 休：生令者
+    else if (KE[E] === M) t[E] = QIU;      // 囚：克令者
+    else t[E] = SI;                        // 死：令所克
+  });
+  return t;
+}
+
+// 月令满力 ⊗ 大运地支半力（zhis[0]=月令，zhis[1..]=大运地支）
+function combinedSeason(zhis) {
+  var t = seasonRaw(zhis[0]);
+  for (var k = 1; k < zhis.length; k++) {
+    if (!zhis[k]) continue;
+    var dy = seasonRaw(zhis[k]);
+    ['木', '火', '土', '金', '水'].forEach(function (E) {
+      t[E] *= 1 + (dy[E] - 1) * DY_SEASON_W;
+    });
+  }
+  return t;
+}
+
+// ── 刑冲合害（先合，再刑冲害；只作用于地支根气）──
+var LIU_HE = { 子: '丑', 丑: '子', 寅: '亥', 亥: '寅', 卯: '戌', 戌: '卯', 辰: '酉', 酉: '辰', 巳: '申', 申: '巳', 午: '未', 未: '午' };
+var LIU_CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
+var LIU_HAI = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '寅', 卯: '辰', 辰: '卯', 申: '亥', 亥: '申', 酉: '戌', 戌: '酉' };
+var ZI_XING = { 辰: 1, 午: 1, 酉: 1, 亥: 1 };
+var XING_PAIR = { 子卯: 1, 卯子: 1, 寅巳: 1, 巳寅: 1, 丑戌: 1, 戌丑: 1, 戌未: 1, 未戌: 1 };
+var REL_D = { 刑: 0.30, 冲: 0.25, 合: 0.15, 害: 0.12 };
+var REL_FLOOR = 0.3, REL_CEIL = 1.8;   // 累计倍率封顶
+
+// 一对地支的关系归类（先合 → 刑 → 冲 → 害）
+function classifyRel(a, b) {
+  if (a === b && ZI_XING[a]) return '刑';
+  if (LIU_HE[a] === b) return '合';
+  if (XING_PAIR[a + b]) return '刑';
+  if (LIU_CHONG[a] === b) return '冲';
+  if (LIU_HAI[a] === b) return '害';
+  return null;
+}
+
+// 两本气五行关系
+function elemRel(eA, eB) {
+  if (eA === eB) return 'same';
+  if (KE[eA] === eB) return 'AkB';
+  if (KE[eB] === eA) return 'BkA';
+  if (SHENG[eA] === eB) return 'AsB';
+  return 'BsA';
+}
+
+// 刑冲合害修正地支根气：原局相邻 + 流年地支与四支全相邻（无距离）
+function applyRelations(hidden, plist, lnZhi) {
+  var fac = hidden.map(function () { return 1; });
+  function mainOf(pos) { for (var i = 0; i < hidden.length; i++) if (hidden[i].pillar === pos && hidden[i].rank === 0) return i; return -1; }
+  function subsOf(pos) { var r = []; for (var i = 0; i < hidden.length; i++) if (hidden[i].pillar === pos && hidden[i].rank > 0) r.push(i); return r; }
+  function elOfZhi(z) { return ganWx(LunarUtil.ZHI_HIDE_GAN[z][0]); }
+
+  // a：原局柱 {pos, zhi}；b：对手 {zhi, isOrig, pos}（流年 isOrig=false，不改 b）
+  function applyPair(a, b) {
+    var t = classifyRel(a.zhi, b.zhi);
+    if (!t) return;
+    var d = REL_D[t];
+    var iaM = mainOf(a.pos), ibM = b.isOrig ? mainOf(b.pos) : -1;
+    var elA = elOfZhi(a.zhi), elB = elOfZhi(b.zhi);
+    function mul(i, m) { if (i >= 0) fac[i] *= m; }
+    function mulSubs(pos, m) { subsOf(pos).forEach(function (i) { fac[i] *= m; }); }
+    if (t === '合') { mul(iaM, 1 - d); if (b.isOrig) mul(ibM, 1 - d); return; }
+    var er = elemRel(elA, elB);
+    if (er === 'same') {                       // 同五行：库冲/同气刑 → 本气增、库余气散
+      mul(iaM, 1 + d); if (b.isOrig) mul(ibM, 1 + d);
+      if (t === '冲') { mulSubs(a.pos, 1 - 0.5 * d); if (b.isOrig) mulSubs(b.pos, 1 - 0.5 * d); }
+    } else if (er === 'AkB') {                  // a 克 b
+      mul(iaM, 1 - 0.4 * d); if (b.isOrig) mul(ibM, 1 - d);
+    } else if (er === 'BkA') {                  // b 克 a
+      mul(iaM, 1 - d); if (b.isOrig) mul(ibM, 1 - 0.4 * d);
+    } else if (er === 'AsB') {                  // a 生 b
+      mul(iaM, 1 - 0.4 * d); if (b.isOrig) mul(ibM, 1 - 0.6 * d);
+    } else {                                    // b 生 a
+      mul(iaM, 1 - 0.6 * d); if (b.isOrig) mul(ibM, 1 - 0.4 * d);
+    }
+  }
+
+  for (var i = 0; i < plist.length - 1; i++) {
+    applyPair({ pos: plist[i].pos, zhi: plist[i].zhi },
+              { pos: plist[i + 1].pos, zhi: plist[i + 1].zhi, isOrig: true });
+  }
+  if (lnZhi) {
+    for (var j = 0; j < plist.length; j++) {
+      applyPair({ pos: plist[j].pos, zhi: plist[j].zhi }, { zhi: lnZhi, isOrig: false });
+    }
+  }
+  for (var k = 0; k < hidden.length; k++) {
+    hidden[k].val *= Math.max(REL_FLOOR, Math.min(REL_CEIL, fac[k]));
+  }
+}
 
 function stemDF(d) { d = Math.abs(d); return d === 1 ? 0.5 : (d === 2 ? 0.2 : 0.1); }
 
@@ -41,7 +146,9 @@ function partyOf(dm, el) {
 
 // 计算原局每个字的终值
 // plist: [{ pos, gan, zhi }]，pos 为柱序（年0/月1/日2/时3），日柱 pos===2；缺时柱则少一项
-function computeNatal(plist, dayGan) {
+// opts: { seasonZhis:[月令(,大运地支)], lnZhi:流年地支 } —— 岁运结构层
+function computeNatal(plist, dayGan, opts) {
+  opts = opts || {};
   var dm = ganWx(dayGan);
   var i, j;
   var stems = [];
@@ -58,6 +165,16 @@ function computeNatal(plist, dayGan) {
       hidden.push({ char: hg[j], el: ganWx(hg[j]), val: ZHI_W[Q.pos] * ws[j], pillar: Q.pos, rank: j });
     }
   }
+
+  // Step0a 刑冲合害（先合，再刑冲害；原局相邻 + 流年无距离）改写地支根气
+  applyRelations(hidden, plist, opts.lnZhi || null);
+  // Step0b 旺相休囚死（月令 ⊗ 大运地支）作用于天干、地支、日元
+  var monthZhi = null;
+  for (i = 0; i < plist.length; i++) if (plist[i].pos === 1) monthZhi = plist[i].zhi;
+  var seasonZhis = (opts.seasonZhis && opts.seasonZhis.length) ? opts.seasonZhis : [monthZhi || (plist[0] && plist[0].zhi)];
+  var season = combinedSeason(seasonZhis);
+  for (i = 0; i < stems.length; i++) stems[i].val *= season[stems[i].el];
+  for (i = 0; i < hidden.length; i++) hidden[i].val *= season[hidden[i].el];
 
   // Step1 同柱：地支藏干 → 同柱天干（天干无法克/生地支）
   // 通根只认「同字」：五行相同但干支不同（如戌中辛金 vs 天干庚金）不作通根
@@ -150,10 +267,8 @@ function buildActors(dyGZ, lnGZ) {
       else if (KE[hd.el] === ge) { ganEff += -C_KE * hd.f; hd.f *= (1 - C_COST); }       // 藏干克天干
     }
     ganEff = Math.max(0.02, ganEff);
+    // 只把岁运天干作为 overlay actor：大运地支已进旺衰、流年地支已进刑冲合害
     actors.push({ char: gc, el: ge, f: ganEff, isStem: true });
-    for (var m = 0; m < hiddens.length; m++) {
-      actors.push({ char: hiddens[m].char, el: hiddens[m].el, f: hiddens[m].f, isStem: false });
-    }
   }
   push(dyGZ, DY_GAN_F, DY_ZHI_F);
   push(lnGZ, LN_GAN_F, LN_ZHI_F);
@@ -200,59 +315,75 @@ function build(chart, opts) {
     if (pp.empty || !pp.gan) continue;
     plist.push({ pos: pi, gan: pp.gan.text, zhi: pp.zhi.text });
   }
-  var natal = computeNatal(plist, dayGan);
+  // 月令地支（旺衰基准）
+  var monthZhi = null;
+  for (var mz = 0; mz < plist.length; mz++) if (plist[mz].pos === 1) monthZhi = plist[mz].zhi;
+  if (!monthZhi && plist.length) monthZhi = plist[0].zhi;
+  // 岁运地支：大运管旺衰叠加，流年管刑冲合害
+  var dyZhi = (opts.daYunGZ && opts.daYunGZ.length >= 2) ? opts.daYunGZ.charAt(1) : null;
+  var lnZhi = (opts.liuNianGZ && opts.liuNianGZ.length >= 2) ? opts.liuNianGZ.charAt(1) : null;
+
+  // 本命：仅月令旺衰 + 原局相邻刑冲合害
+  var natalBase = computeNatal(plist, dayGan, { seasonZhis: [monthZhi] });
+  // 岁运后：大运地支叠加旺衰 + 流年地支刑冲合害（无距离）
+  var hasStruct = !!(dyZhi || lnZhi);
+  var natalNow = hasStruct
+    ? computeNatal(plist, dayGan, { seasonZhis: dyZhi ? [monthZhi, dyZhi] : [monthZhi], lnZhi: lnZhi })
+    : natalBase;
+
+  // 天干 overlay：大运/流年天干 生克帮扶原局天干（带 cap）
   var actors = buildActors(opts.daYunGZ, opts.liuNianGZ);
   var hasLuck = actors.length > 0;
-
-  // 岁运只作用于原局天干；原局地支（藏干）为固定根基，不受岁运改写
   function valAfter(node) { return hasLuck ? affect(node.char, node.el, node.val, actors) : node.val; }
 
   var ganCells = [];
-  for (var i = 0; i < natal.stems.length; i++) {
-    var s = natal.stems[i];
+  for (var i = 0; i < natalNow.stems.length; i++) {
+    var s = natalNow.stems[i], sb = natalBase.stems[i];
     var av = valAfter(s);
     ganCells.push({
       pos: PLBL[s.pillar], char: s.char, cls: WX_CLS[s.el], el: s.el,
       god: shiShen(dayGan, s.char, s.isDay), isDay: s.isDay,
-      base: round2(s.val), val: round2(av), delta: round2(av - s.val),
-      party: s.isDay ? 'day' : partyOf(natal.dm, s.el)
+      base: round2(sb.val), val: round2(av), delta: round2(av - sb.val),
+      party: s.isDay ? 'day' : partyOf(natalNow.dm, s.el)
     });
   }
   var zhiCells = [];
   for (var z = 0; z < plist.length; z++) {
     var pos = plist[z].pos;
-    var hs = natal.hidden.filter(function (h) { return h.pillar === pos; });
+    var hs = natalNow.hidden.filter(function (h) { return h.pillar === pos; });
+    var hb = natalBase.hidden.filter(function (h) { return h.pillar === pos; });
     if (!hs.length) continue;
-    var baseSum = 0, mainEl = hs[0].el;
-    for (var k = 0; k < hs.length; k++) { baseSum += hs[k].val; }   // 地支不受岁运改写
+    var nowSum = 0, baseSum = 0, mainEl = hs[0].el;
+    for (var k = 0; k < hs.length; k++) nowSum += hs[k].val;
+    for (var kb = 0; kb < hb.length; kb++) baseSum += hb[kb].val;
     zhiCells.push({
       pos: PLBL[pos], char: plist[z].zhi, cls: WX_CLS[mainEl], el: mainEl,
       god: LunarUtil.SHI_SHEN[dayGan + hs[0].char],
-      base: round2(baseSum), val: round2(baseSum), delta: 0,
-      party: partyOf(natal.dm, mainEl)
+      base: round2(baseSum), val: round2(nowSum), delta: round2(nowSum - baseSum),
+      party: partyOf(natalNow.dm, mainEl)
     });
   }
 
   // 全部藏干的十神单元（供「两种底色」按天干地支所有十神统计）
   var hiddenUnits = [];
-  for (var hu = 0; hu < natal.hidden.length; hu++) {
-    var hn = natal.hidden[hu];
+  for (var hu = 0; hu < natalNow.hidden.length; hu++) {
+    var hn = natalNow.hidden[hu], hbn = natalBase.hidden[hu];
     hiddenUnits.push({
       god: LunarUtil.SHI_SHEN[dayGan + hn.char],
-      base: round2(hn.val),
-      val: round2(hn.val),                 // 地支不受岁运改写
-      party: partyOf(natal.dm, hn.el)
+      base: round2(hbn.val),
+      val: round2(hn.val),
+      party: partyOf(natalNow.dm, hn.el)
     });
   }
 
-  // 旺衰（岁运后）
-  var aggBase = aggregate(natal);
+  // 旺衰：本命 / 岁运后
+  var aggBase = aggregate(natalBase);
   var aggNow = aggBase;
-  if (hasLuck) {
+  if (hasStruct || hasLuck) {
     var affected = {
-      dm: natal.dm, dayGan: dayGan,
-      stems: natal.stems.map(function (s) { return { char: s.char, el: s.el, val: valAfter(s), pillar: s.pillar, isDay: s.isDay }; }),
-      hidden: natal.hidden.map(function (h) { return { char: h.char, el: h.el, val: h.val, pillar: h.pillar, rank: h.rank }; })  // 地支不变
+      dm: natalNow.dm, dayGan: dayGan,
+      stems: natalNow.stems.map(function (s) { return { char: s.char, el: s.el, val: valAfter(s), pillar: s.pillar, isDay: s.isDay }; }),
+      hidden: natalNow.hidden.map(function (h) { return { char: h.char, el: h.el, val: h.val, pillar: h.pillar, rank: h.rank }; })
     };
     aggNow = aggregate(affected);
   }
