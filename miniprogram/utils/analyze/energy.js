@@ -176,17 +176,19 @@ function computeNatal(plist, dayGan, opts) {
   for (i = 0; i < stems.length; i++) stems[i].val *= season[stems[i].el];
   for (i = 0; i < hidden.length; i++) hidden[i].val *= season[hidden[i].el];
 
-  // Step1 同柱：地支藏干 → 同柱天干（天干无法克/生地支）
+  // Step1 同柱：天干↔地支藏干（双向：支生干/截脚 + 干生支/盖头）
   // 通根只认「同字」：五行相同但干支不同（如戌中辛金 vs 天干庚金）不作通根
   for (var s1 = 0; s1 < stems.length; s1++) {
     var st = stems[s1];
     for (var h = 0; h < hidden.length; h++) {
       if (hidden[h].pillar !== st.pillar) continue;
       var hd = hidden[h];
-      if (hd.char === st.char) { st.val += C_ROOT * hd.val; }                   // 同柱通根（同字）
-      else if (hd.el === st.el) { /* 同五行异字：非通根，无加成 */ }
-      else if (SHENG[hd.el] === st.el) { st.val += C_SHENG * hd.val; hd.val *= (1 - C_XIE); }  // 藏干生天干
-      else if (KE[hd.el] === st.el) { st.val += -C_KE * hd.val; hd.val *= (1 - C_COST); }      // 藏干克天干
+      if (hd.char === st.char) { st.val += C_ROOT * hd.val; }                                    // 同柱通根（同字）
+      else if (hd.el === st.el) { /* 同五行异字：无互动 */ }
+      else if (SHENG[hd.el] === st.el) { st.val += C_SHENG * hd.val; hd.val *= (1 - C_XIE); }   // 支生干
+      else if (KE[hd.el] === st.el) { st.val -= C_KE * hd.val; hd.val *= (1 - C_COST); }        // 截脚：支克干
+      else if (SHENG[st.el] === hd.el) { hd.val += C_SHENG * st.val; st.val *= (1 - C_XIE); }   // 干生支
+      else if (KE[st.el] === hd.el) { hd.val -= C_KE * st.val; st.val *= (1 - C_COST); }        // 盖头：干克支
     }
   }
 
@@ -370,6 +372,7 @@ function build(chart, opts) {
     var hn = natalNow.hidden[hu], hbn = natalBase.hidden[hu];
     hiddenUnits.push({
       god: LunarUtil.SHI_SHEN[dayGan + hn.char],
+      el: hn.el,
       base: round2(hbn.val),
       val: round2(hn.val),
       party: partyOf(natalNow.dm, hn.el)
