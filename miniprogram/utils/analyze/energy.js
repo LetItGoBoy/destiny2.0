@@ -35,14 +35,15 @@ var ROOT_CROSS_DF = 0.6;
 var DELING_X = 1.3;   // 得令加成（月令本气同党）
 var SAME_X = 1.0;     // 生扶结构性修正
 
-// 天干按根缩放 base：本气根×1.0 / 仅中余气弱根×0.55 / 无根×0.35
-var ROOT_MAIN = 1.0, ROOT_WEAK = 0.55, ROOT_NONE = 0.35;
-function rootFactorOf(el, hidden) {
-  var main = false, weak = false;
+// 天干按根缩放 base（坐支优先）：坐支有同五行根×1.0 / 仅他柱远根×0.6 / 全盘无根×0.35
+// 坐支得地才算真根；远柱根、被合之根只算"虚透"，不给满档。
+var ROOT_OWN = 1.0, ROOT_OTHER = 0.6, ROOT_NONE = 0.35;
+function rootFactorOf(el, pillar, hidden) {
+  var own = false, other = false;
   for (var i = 0; i < hidden.length; i++) {
-    if (hidden[i].el === el) { if (hidden[i].rank === 0) main = true; else weak = true; }
+    if (hidden[i].el === el) { if (hidden[i].pillar === pillar) own = true; else other = true; }
   }
-  return main ? ROOT_MAIN : (weak ? ROOT_WEAK : ROOT_NONE);
+  return own ? ROOT_OWN : (other ? ROOT_OTHER : ROOT_NONE);
 }
 
 // ── 刑冲合害（先合，再刑冲害；只作用于地支根气）──
@@ -159,7 +160,7 @@ function computeNatal(plist, dayGan, opts) {
   for (i = 0; i < stemSpecs.length; i++) {
     var sp = stemSpecs[i];
     var sel = ganWx(sp.char);
-    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
+    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, sp.pillar, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
   }
 
   // Step0a 刑冲合害：原局相邻 + 岁运对全盘地支无距离 + 岁运彼此
