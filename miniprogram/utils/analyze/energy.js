@@ -295,6 +295,10 @@ function build(chart, opts) {
   var aggBase = aggregate(natalBase);
   var aggNow = hasLuck ? aggregate(natalNow) : aggBase;
 
+  // 全池五行占比（原局 + 岁运，含日元）—— 决策树输入
+  var poolNow = poolPct(natalNow);
+  var poolBase = poolPct(natalBase);
+
   // 归一化参考值（含上浮空间，便于看到增长）
   var maxRef = 0;
   ganCells.concat(zhiCells).forEach(function (c) { if (c.base > maxRef) maxRef = c.base; if (c.val > maxRef) maxRef = c.val; });
@@ -307,8 +311,21 @@ function build(chart, opts) {
     maxRef: maxRef,
     hasLuck: hasLuck,
     pBase: Math.round(aggBase.p * 100),
-    pNow: Math.round(aggNow.p * 100)
+    pNow: Math.round(aggNow.p * 100),
+    pool: poolNow,
+    poolBase: poolBase
   };
+}
+
+// 全池五行占比（百分数 map）
+function poolPct(model) {
+  var WX = ['木', '火', '土', '金', '水'], sum = {}, tot = 0;
+  WX.forEach(function (e) { sum[e] = 0; });
+  model.stems.forEach(function (s) { sum[s.el] += s.val; tot += s.val; });
+  model.hidden.forEach(function (h) { sum[h.el] += h.val; tot += h.val; });
+  var p = {};
+  WX.forEach(function (e) { p[e] = tot > 0 ? sum[e] / tot * 100 : 0; });
+  return p;
 }
 
 function round2(n) { return Math.round(n * 100) / 100; }

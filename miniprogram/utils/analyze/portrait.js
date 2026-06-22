@@ -7,6 +7,85 @@
 var energy = require('./energy.js');
 var base = require('./base.js');
 var relations = require('./relations.js');
+var lunarLib = require('../lunar.js');
+var LunarUtil = lunarLib.LunarUtil;
+
+// ── 占比决策树：全池五行占比 → 每个五行 喜(+,左)/忌(-,右) ──
+var WX = ['木', '火', '土', '金', '水'];
+function wxIdx(e) { return WX.indexOf(e); }
+function shengI(i) { return (i + 1) % 5; }   // e 生 的对象
+function keI(i) { return (i + 2) % 5; }       // e 克 的对象
+
+// 相对日主的党派（比劫/食伤/财/官杀/印）
+function partyGod(dmEl, e) {
+  var di = wxIdx(dmEl), ei = wxIdx(e);
+  if (ei === di) return '比劫';
+  if (ei === shengI(di)) return '食伤';
+  if (ei === keI(di)) return '财';
+  if (ei === (di + 3) % 5) return '官杀';
+  return '印';
+}
+
+// p: {木:pct,...}；dmEl 日主五行；rootEls: {五行:1} 有本气根的五行集合
+// 返回 { dir:{木:'+'/'-',...}, mode, disease }
+function decideXiji(p, dmEl, rootEls) {
+  rootEls = rootEls || {};
+  var top = WX[0];
+  WX.forEach(function (e) { if (p[e] > p[top]) top = e; });
+  var dir = {}, mode, disease = null;
+
+  if (p[top] >= 40) {
+    // 病重型：围绕病 D 的生克五位
+    mode = '病重';
+    disease = top;
+    var D = top, di = wxIdx(D), diseaseIsBi = (partyGod(dmEl, D) === '比劫');
+    var bodyWeak = (p[dmEl] < p[top]) && !diseaseIsBi;
+    WX.forEach(function (e) {
+      var i = wxIdx(e), v;
+      if (e === D) v = '-';                                   // 病本身
+      else if (shengI(i) === di) v = '-';                     // 生病：喂病
+      else if (keI(i) === di) v = '+';                        // 克病：药
+      else if (shengI(di) === i) {                            // 病生：泄口
+        if (diseaseIsBi) v = '+';                             // 身旺泄秀
+        else if ((partyGod(dmEl, e) === '官杀' || partyGod(dmEl, e) === '食伤') && bodyWeak) v = '-'; // 攻弱身
+        else v = '+';
+      } else if (keI(di) === i) {                             // 病克：受害者
+        v = (p[e] >= 20 && rootEls[e]) ? '+' : '-';          // 有根且能量够→反制成格
+      } else v = '-';
+      dir[e] = v;
+    });
+  } else {
+    // 均衡型：看体 = 食伤 + 比劫
+    var ti = 0;
+    WX.forEach(function (e) { var g = partyGod(dmEl, e); if (g === '食伤' || g === '比劫') ti += p[e]; });
+    if (ti >= 40) {
+      mode = '体旺';   // 喜财官印，忌食伤比劫
+      WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '财' || g === '官杀' || g === '印') ? '+' : '-'; });
+    } else {
+      mode = '体弱';   // 喜比劫印，忌财官食伤
+      WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '比劫' || g === '印') ? '+' : '-'; });
+    }
+  }
+  return { dir: dir, mode: mode, disease: disease };
+}
+
+// 滑标位置：喜(+)→左、忌(-)→右；强度 = |占比−20| 限幅 [0,25] → 钳到 [25%,75%]
+function sliderPos(d, pct) {
+  var mag = Math.min(25, Math.round(Math.abs(pct - 20) * 1.2));
+  if (d === '+') return 50 - mag;
+  if (d === '-') return 50 + mag;
+  return 50;
+}
+
+// 全盘地支（原局+岁运）有本气根的五行集合
+function rootElsOf(chart, opts) {
+  var s = {};
+  function add(zhi) { if (!zhi) return; s[base.ganWx(LunarUtil.ZHI_HIDE_GAN[zhi][0])] = 1; }
+  chart.pillars.forEach(function (p) { if (!p.empty && p.zhi) add(p.zhi.text); });
+  if (opts.daYunGZ && opts.daYunGZ.length >= 2) add(opts.daYunGZ.charAt(1));
+  if (opts.liuNianGZ && opts.liuNianGZ.length >= 2) add(opts.liuNianGZ.charAt(1));
+  return s;
+}
 
 // 十神 → 地支「内在心性」文案（安全感 / 内在驱动力视角；与天干外显文案区分）
 var INNER = {
@@ -114,9 +193,18 @@ function direction(party, p) {
 function build(chart, opts) {
   opts = opts || {};
   var dayGan = chart.meta.dayGan;
+  var dmEl = base.ganWx(dayGan);
   var m = energy.build(chart, opts);
   var P = m.pNow;
   var inten = intensity(P);
+
+  // —— 占比决策树：全池五行占比 → 各五行喜忌 ——
+  var rootEls = rootElsOf(chart, opts);
+  var xiji = decideXiji(m.pool || {}, dmEl, rootEls);
+
+  // 流年干支（显示层只看流年引动）
+  var lnGan = (opts.liuNianGZ && opts.liuNianGZ.length >= 2) ? opts.liuNianGZ.charAt(0) : null;
+  var lnZhi = (opts.liuNianGZ && opts.liuNianGZ.length >= 2) ? opts.liuNianGZ.charAt(1) : null;
 
   // 仅取非日主天干（最外显的一层）
   var stems = m.ganCells.filter(function (c) { return !c.isDay; });
@@ -133,72 +221,82 @@ function build(chart, opts) {
   var zhengNow = nt ? Math.round(zn / nt * 100) : 50;
   var zhengBase = bt ? Math.round(zb / bt * 100) : 50;
 
-  // —— 心性构成：天干十神，按能量聚合 ——
-  var agg = {};
-  stems.forEach(function (c) {
-    if (!agg[c.god]) agg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0 };
-    agg[c.god].energy += c.val;
-  });
-  var maxE = 0, g;
-  for (g in agg) { if (agg[g].energy > maxE) maxE = agg[g].energy; }
-
+  // —— 外显心性（list）——
+  // 选了流年：只显示「流年天干」一条当年主旋律；方向由决策树定、强度由占比定（钳 25–75%）。
+  // 本命/未选流年：保留原局天干多条，方向同样改用决策树。
+  function fullDots() { var d = []; for (var k = 1; k <= 5; k++) d.push({ i: k, on: true }); return d; }
+  function energyDots(ratio) { var n = Math.max(1, Math.min(5, Math.round(ratio * 5))); var d = []; for (var k = 1; k <= 5; k++) d.push({ i: k, on: k <= n }); return d; }
   var list = [];
-  for (g in agg) {
-    var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', desc: '' };
-    var dir = direction(agg[g].party, P);
-    var w = maxE > 0 ? agg[g].energy / maxE : 1;
-    // 滑标位置：0=纯左，100=纯右，50=中间
-    // dir=pro → 偏左，dir=con → 偏右，mid → 50
-    var mag = Math.round(inten * w);
-    var slider = dir === 'pro' ? Math.round(50 - mag / 2) : (dir === 'con' ? Math.round(50 + mag / 2) : 50);
-    slider = Math.max(0, Math.min(100, slider));
+  if (lnGan) {
+    var lg = LunarUtil.SHI_SHEN[dayGan + lnGan];
+    var lgEl = base.ganWx(lnGan);
+    var t0 = TEMP[lg] || { name: lg, pol: '', lbl: '', rbl: '', desc: '' };
     list.push({
-      god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, cls: agg[g].cls,
-      slider: slider,
-      energy: agg[g].energy
+      god: lg, name: t0.name, pol: t0.pol, lbl: t0.lbl, rbl: t0.rbl, desc: t0.desc,
+      cls: base.WX_CLS[lgEl],
+      slider: sliderPos(xiji.dir[lgEl], (m.pool || {})[lgEl] || 0),
+      energy: 1, dots: fullDots(), isMain: true
+    });
+  } else {
+    var agg = {};
+    stems.forEach(function (c) {
+      if (!agg[c.god]) agg[c.god] = { god: c.god, el: c.el, cls: c.cls, energy: 0 };
+      agg[c.god].energy += c.val;
+    });
+    var maxE = 0, g;
+    for (g in agg) { if (agg[g].energy > maxE) maxE = agg[g].energy; }
+    for (g in agg) {
+      var t = TEMP[g] || { name: g, pol: '', lbl: '', rbl: '', desc: '' };
+      list.push({
+        god: g, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, cls: agg[g].cls,
+        slider: sliderPos(xiji.dir[agg[g].el], (m.pool || {})[agg[g].el] || 0),
+        energy: agg[g].energy
+      });
+    }
+    list.sort(function (a, b) { return b.energy - a.energy; });
+    list.forEach(function (it, idx) {
+      it.dots = energyDots(maxE > 0 ? it.energy / maxE : 1);
+      it.isMain = idx === 0;
     });
   }
-  // 能量从大到小排序：第一位为主心性
-  list.sort(function (a, b) { return b.energy - a.energy; });
 
-  // 用「能量圆点」表达各心性的突出程度（不露具体数字）
-  list.forEach(function (it, idx) {
-    var ratio = maxE > 0 ? it.energy / maxE : 1;
-    var n = Math.max(1, Math.min(5, Math.round(ratio * 5)));
-    var dots = [];
-    for (var k = 1; k <= 5; k++) dots.push({ i: k, on: k <= n });
-    it.dots = dots;
-    it.isMain = idx === 0;
-  });
-
-  // —— 内在心性：地支本气十神，按能量聚合（不用滑标，叙述内在底色） ——
-  var bagg = {};
-  (m.zhiCells || []).forEach(function (c) {
-    if (!bagg[c.god]) bagg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0, zhis: [] };
-    bagg[c.god].energy += c.val;
-    bagg[c.god].zhis.push(c.char);
-  });
-  var maxBE = 0, bg;
-  for (bg in bagg) { if (bagg[bg].energy > maxBE) maxBE = bagg[bg].energy; }
+  // —— 内在心性（branchList）——
+  // 选了流年：只显示「流年地支本气十神」一条内在主旋律。
+  // 本命/未选流年：保留原局地支本气多条。
   var branchList = [];
-  for (bg in bagg) {
-    var bt = TEMP[bg] || { name: bg, pol: '' };
+  if (lnZhi) {
+    var lzMain = LunarUtil.ZHI_HIDE_GAN[lnZhi][0];
+    var lzGod = LunarUtil.SHI_SHEN[dayGan + lzMain];
+    var lzEl = base.ganWx(lzMain);
+    var bt0 = TEMP[lzGod] || { name: lzGod, pol: '' };
     branchList.push({
-      god: bg, name: bt.name, pol: bt.pol, cls: bagg[bg].cls,
-      desc: INNER[bg] || '',
-      zhis: bagg[bg].zhis.join('、'),
-      energy: bagg[bg].energy
+      god: lzGod, name: bt0.name, pol: bt0.pol, cls: base.WX_CLS[lzEl],
+      desc: INNER[lzGod] || '', zhis: lnZhi,
+      energy: 1, dots: fullDots(), isMain: true
+    });
+  } else {
+    var bagg = {};
+    (m.zhiCells || []).forEach(function (c) {
+      if (!bagg[c.god]) bagg[c.god] = { god: c.god, party: c.party, cls: c.cls, energy: 0, zhis: [] };
+      bagg[c.god].energy += c.val;
+      bagg[c.god].zhis.push(c.char);
+    });
+    var maxBE = 0, bg;
+    for (bg in bagg) { if (bagg[bg].energy > maxBE) maxBE = bagg[bg].energy; }
+    for (bg in bagg) {
+      var bt = TEMP[bg] || { name: bg, pol: '' };
+      branchList.push({
+        god: bg, name: bt.name, pol: bt.pol, cls: bagg[bg].cls,
+        desc: INNER[bg] || '', zhis: bagg[bg].zhis.join('、'),
+        energy: bagg[bg].energy
+      });
+    }
+    branchList.sort(function (a, b) { return b.energy - a.energy; });
+    branchList.forEach(function (it, idx) {
+      it.dots = energyDots(maxBE > 0 ? it.energy / maxBE : 1);
+      it.isMain = idx === 0;
     });
   }
-  branchList.sort(function (a, b) { return b.energy - a.energy; });
-  branchList.forEach(function (it, idx) {
-    var ratio = maxBE > 0 ? it.energy / maxBE : 1;
-    var n = Math.max(1, Math.min(5, Math.round(ratio * 5)));
-    var dots = [];
-    for (var k = 1; k <= 5; k++) dots.push({ i: k, on: k <= n });
-    it.dots = dots;
-    it.isMain = idx === 0;
-  });
 
   // —— 心结与张力：地支刑冲合害（原局四支 + 已叠加的岁运地支） ——
   var branches = [];
