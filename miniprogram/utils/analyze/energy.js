@@ -168,45 +168,32 @@ function computeNatal(plist, dayGan, opts) {
 
   // Step0a 刑冲合害（先合，再刑冲害；原局相邻 + 流年无距离）改写地支根气
   applyRelations(hidden, plist, opts.lnZhi || null);
-  // Step0b 旺相休囚死（月令 ⊗ 大运地支）作用于天干、地支、日元
-  var monthZhi = null;
-  for (i = 0; i < plist.length; i++) if (plist[i].pos === 1) monthZhi = plist[i].zhi;
-  var seasonZhis = (opts.seasonZhis && opts.seasonZhis.length) ? opts.seasonZhis : [monthZhi || (plist[0] && plist[0].zhi)];
-  var season = combinedSeason(seasonZhis);
-  for (i = 0; i < stems.length; i++) stems[i].val *= season[stems[i].el];
-  for (i = 0; i < hidden.length; i++) hidden[i].val *= season[hidden[i].el];
+  // Step0b 旺相休囚死：已移除（第①批），不再做季节加权
 
-  // Step1 同柱：天干↔地支藏干（双向：支生干/截脚 + 干生支/盖头）
-  // 通根只认「同字」：五行相同但干支不同（如戌中辛金 vs 天干庚金）不作通根
+  // Step1 同柱：通根认全部藏干（同字，含中气/余气），生克只限本气（rank=0）；
+  //        天干与本气双方都用「同步初值」计算，避免先后顺序偏差。
   for (var s1 = 0; s1 < stems.length; s1++) {
     var st = stems[s1];
+    var stv0 = st.val;          // 固定天干初值
+    var dSt = 0, multSt = 1;
     for (var h = 0; h < hidden.length; h++) {
       if (hidden[h].pillar !== st.pillar) continue;
       var hd = hidden[h];
-      if (hd.char === st.char) { st.val += C_ROOT * hd.val; }                                    // 同柱通根（同字）
-      else if (hd.el === st.el) { /* 同五行异字：无互动 */ }
-      else if (SHENG[hd.el] === st.el) { st.val += C_SHENG * hd.val; hd.val *= (1 - C_XIE); }   // 支生干
-      else if (KE[hd.el] === st.el) { st.val -= C_KE * hd.val; hd.val *= (1 - C_COST); }        // 截脚：支克干
-      else if (SHENG[st.el] === hd.el) { hd.val += C_SHENG * st.val; st.val *= (1 - C_XIE); }   // 干生支
-      else if (KE[st.el] === hd.el) { hd.val -= C_KE * st.val; st.val *= (1 - C_COST); }        // 盖头：干克支
+      var hdv = hd.val;
+      if (hd.char === st.char) {                                                                  // 同柱通根（同字，全rank）
+        dSt += C_ROOT * hdv;
+      } else if (hd.rank === 0) {                                                                  // 仅本气参与生克
+        if (hd.el === st.el) { /* 同五行异字：无互动 */ }
+        else if (SHENG[hd.el] === st.el) { dSt += C_SHENG * hdv; hd.val = hdv * (1 - C_XIE); }    // 支生干
+        else if (KE[hd.el] === st.el) { dSt -= C_KE * hdv; hd.val = hdv * (1 - C_COST); }         // 截脚：支克干
+        else if (SHENG[st.el] === hd.el) { hd.val = hdv + C_SHENG * stv0; multSt *= (1 - C_XIE); } // 干生支
+        else if (KE[st.el] === hd.el) { hd.val = hdv - C_KE * stv0; multSt *= (1 - C_COST); }      // 盖头：干克支
+      }
     }
+    st.val = stv0 * multSt + dSt;
   }
 
-  // Step2 异柱天干生克（按柱距 df，快照后统一加减）
-  var snap = stems.map(function (s) { return s.val; });
-  var delta = stems.map(function () { return 0; });
-  for (var a = 0; a < stems.length; a++) {
-    for (var b = a + 1; b < stems.length; b++) {
-      var ea = stems[a].el, eb = stems[b].el, df = stemDF(stems[a].pillar - stems[b].pillar);
-      var va = snap[a], vb = snap[b];
-      if (ea === eb) continue;
-      if (SHENG[ea] === eb) { delta[b] += C_SHENG * va * df; delta[a] += -C_XIE * va * df; }
-      else if (SHENG[eb] === ea) { delta[a] += C_SHENG * vb * df; delta[b] += -C_XIE * vb * df; }
-      else if (KE[ea] === eb) { delta[b] += -C_KE * va * df; delta[a] += -C_COST * va * df; }
-      else if (KE[eb] === ea) { delta[a] += -C_KE * vb * df; delta[b] += -C_COST * vb * df; }
-    }
-  }
-  for (var d2 = 0; d2 < stems.length; d2++) stems[d2].val += delta[d2];
+  // Step2 异柱天干生克：已移除（第①批）
 
   // Step3 异柱通根（同字才算根，同五行异字不算）
   for (var s3 = 0; s3 < stems.length; s3++) {
