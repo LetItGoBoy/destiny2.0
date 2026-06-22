@@ -35,19 +35,22 @@ var ROOT_CROSS_DF = 0.6;
 var DELING_X = 1.3;   // 得令加成（月令本气同党）
 var SAME_X = 1.0;     // 生扶结构性修正
 
-// 天干按根缩放 base：根力 = max(位置权重 × 藏干档)，base系数 = 0.35 + 0.65×根力
-// 位置：月令最重，日支次之，年支再次，时支最轻（远根分档，非一刀切）
-// 藏干：本气最硬，中气次之，余气最虚
-var ROOT_POS_W = { 0: 0.5, 1: 1.0, 2: 0.7, 3: 0.45, 4: 0.6, 5: 0.5 };   // 年/月/日/时/大运/流年（月令最重，明显高于其他）
-var ROOT_RANK_W = [1.0, 0.7, 0.45];                                       // 本气/中气/余气
-var ROOT_FLOOR = 0.35;                                                    // 全盘无根的虚浮底
-function rootFactorOf(el, hidden) {
+// 天干按根缩放 base：区分自坐根 / 通根月令 / 其他远根，再×藏干档
+// 自坐(坐支)最实，通根月令次之得令，其他柱按位置打折；远根明显弱于自坐。
+var ROOT_SELF = { 0: 1.0, 1: 0.8, 2: 0.6 };          // 自坐：本气/中气/余气
+var ROOT_MONTH = { 0: 0.9, 1: 0.65, 2: 0.45 };       // 他柱通根月令
+var ROOT_OTHER_POS = { 0: 0.4, 2: 0.55, 3: 0.35, 4: 0.45, 5: 0.4 }; // 其他远根所在柱(年/日/时/大运/流年)
+var ROOT_OTHER_RANK = [1.0, 0.7, 0.45];
+var ROOT_FLOOR = 0.35;
+function rootFactorOf(el, pillar, hidden) {
   var best = 0;
   for (var i = 0; i < hidden.length; i++) {
-    if (hidden[i].el === el) {
-      var s = (ROOT_POS_W[hidden[i].pillar] || 0.6) * (ROOT_RANK_W[hidden[i].rank] || 0.45);
-      if (s > best) best = s;
-    }
+    if (hidden[i].el !== el) continue;
+    var hp = hidden[i].pillar, rk = hidden[i].rank, s;
+    if (hp === pillar) s = (ROOT_SELF[rk] != null ? ROOT_SELF[rk] : 0.6);          // 自坐
+    else if (hp === 1) s = (ROOT_MONTH[rk] != null ? ROOT_MONTH[rk] : 0.45);       // 通根月令
+    else s = (ROOT_OTHER_POS[hp] || 0.4) * (ROOT_OTHER_RANK[rk] || 0.45);          // 其他远根
+    if (s > best) best = s;
   }
   return ROOT_FLOOR + (1 - ROOT_FLOOR) * best;
 }
@@ -166,7 +169,7 @@ function computeNatal(plist, dayGan, opts) {
   for (i = 0; i < stemSpecs.length; i++) {
     var sp = stemSpecs[i];
     var sel = ganWx(sp.char);
-    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
+    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, sp.pillar, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
   }
 
   // Step0a 刑冲合害：原局相邻 + 岁运对全盘地支无距离 + 岁运彼此
