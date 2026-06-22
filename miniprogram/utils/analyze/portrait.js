@@ -175,6 +175,31 @@ var CORE = {
   癸: { title: '癸水 · 雨露', text: '像细润的雨露，安静、聪慧、直觉准，温柔又有渗透力；心思深，外柔而内里有韧劲。' }
 };
 
+// 十神 → 流年专用文案（讲当年的状态/想法/行为，区别于贯穿一生的性格词）
+// pol 正/偏；lbl 顺端词(喜·左)、rbl 偏端词(忌·右)；desc 顺/偏都写出 + 宜做的事
+var LIUNIAN = {
+  比肩: { pol: '正', lbl: '自立合伙', rbl: '较劲破费',
+    desc: '顺时，自己拿主意、行动独立，朋友走动多、爱热闹，合伙搭伙做事得力；走偏时，爱较劲和人争高下，讲义气替人扛事，钱财容易被分、为朋友破费。宜：找搭档合伙立事、靠自己推进，账目算清、别替人担保。' },
+  劫财: { pol: '偏', lbl: '敢拼旺人脉', rbl: '冲动破财',
+    desc: '顺时，敢闯敢拼、行动快，朋友帮衬、人脉来财，气氛一来就上；走偏时，冲动消费、合伙吃亏，爱攀比，易被借钱、动赌念，钱来钱去留不住。宜：借人脉团队作战去开拓，管住冲动消费，远离赌与大额借出。' },
+  食神: { pol: '正', lbl: '松快有福', rbl: '贪玩懒散',
+    desc: '顺时，心态放松、日子有滋味，吃喝玩乐有福气，才艺、表达、口碑都顺；走偏时，贪图享受、爱吃爱喝爱玩，懒散拖延、动力不足，容易把正事放一边。宜：学才艺、做内容、慢工出细活，顺带调养身体，给自己定个小目标别全玩没了。' },
+  伤官: { pol: '偏', lbl: '才华出彩', rbl: '傲气口舌',
+    desc: '顺时，才华迸发、点子多，敢秀敢说敢闯，技艺长进、个人魅力足；走偏时，恃才傲物、爱抬杠顶撞上司，口无遮拦惹口舌，玩心重静不下来，锋芒太露得罪人。宜：把才华变成作品、技术、表达，考证学新技能，少争对错、对上级客气、管住嘴。' },
+  偏财: { pol: '偏', lbl: '财路人脉广', rbl: '投机散财',
+    desc: '顺时，财路广、生意活络，交际带来机会，出手大方、说做就做；走偏时，爱投机押得太大，应酬酒色多，钱进得快散也快，感情上易分心。宜：拓业务、做副业、结交资源灵活变现，别投机押大、控住应酬开销。' },
+  正财: { pol: '正', lbl: '稳进顾家', rbl: '计较操劳',
+    desc: '顺时，进财稳、勤快务实，懂攒钱、有责任心，把日子经营得有条理；走偏时，太抠太计较、为钱操劳，舍不得花也不敢闯，患得患失。宜：踏实积累、理财存钱、长期经营，该花的别太省，适度为机会投入。' },
+  七杀: { pol: '偏', lbl: '闯劲担当', rbl: '焦躁冒险',
+    desc: '顺时，闯劲足、扛得住事，敢决断、有魄力，常得权威或贵人推一把，是成长快的一年；走偏时，紧张焦虑、易冲动好斗，爱铤而走险、动赌性，惹是非或要防伤病。宜：去攻坚、扛项目、健身竞技，借压力成长、找平台权威背书，别赌别担保，注意安全与休息。' },
+  正官: { pol: '正', lbl: '名分上进', rbl: '拘谨压力',
+    desc: '顺时，名正言顺、易得提拔认可，做事有章法、守规矩，地位口碑往上走；走偏时，顾虑多、怕担责怕出错，被规矩束住放不开，留意官非口舌、压力上身。宜：求职晋升、考公考证、立规矩争名分，按流程办事别钻空子，照顾好情绪。' },
+  偏印: { pol: '偏', lbl: '钻研充电', rbl: '发懒空想',
+    desc: '顺时，灵感多、适合学习钻研，能想通很多事，独处充电、专精一门手艺；走偏时，发懒不爱动、多想少做，孤僻钻牛角尖，提不起劲、爱胡思乱想。宜：去钻研学习、做研究策划、独处充电，逼自己动起来，定期运动社交别空想。' },
+  正印: { pol: '正', lbl: '得助安稳', rbl: '发懒依赖',
+    desc: '顺时，常得长辈、贵人相助，适合进修考证，心里踏实、被托底照顾；走偏时，容易发懒、依赖心重，行动慢、准备过头，安于现状不想动弹。宜：进修考证、找贵人长辈帮、签长约稳中求进，克服懒散、主动迈出第一步。' }
+};
+
 function intensity(p) { return Math.round(Math.abs(p - 50) * 2); }
 
 // 某党羽在某 P 下偏优还是偏缺（中立方向）
@@ -228,16 +253,18 @@ function build(chart, opts) {
   function energyDots(ratio) { var n = Math.max(1, Math.min(5, Math.round(ratio * 5))); var d = []; for (var k = 1; k <= 5; k++) d.push({ i: k, on: k <= n }); return d; }
   var list = [];
   if (lnGan) {
+    // 流年：单条「流年天干」当年主旋律，用流年专用文案
     var lg = LunarUtil.SHI_SHEN[dayGan + lnGan];
     var lgEl = base.ganWx(lnGan);
-    var t0 = TEMP[lg] || { name: lg, pol: '', lbl: '', rbl: '', desc: '' };
+    var L0 = LIUNIAN[lg] || { pol: '', lbl: '', rbl: '', desc: '' };
     list.push({
-      god: lg, name: t0.name, pol: t0.pol, lbl: t0.lbl, rbl: t0.rbl, desc: t0.desc,
+      god: lg, name: lg, pol: L0.pol, lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
       cls: base.WX_CLS[lgEl],
       slider: sliderPos(xiji.dir[lgEl], (m.pool || {})[lgEl] || 0),
       energy: 1, dots: fullDots(), isMain: true
     });
   } else {
+    // 本命：只取能量最大的一条天干心性（性格措辞）
     var agg = {};
     stems.forEach(function (c) {
       if (!agg[c.god]) agg[c.god] = { god: c.god, el: c.el, cls: c.cls, energy: 0 };
@@ -254,10 +281,8 @@ function build(chart, opts) {
       });
     }
     list.sort(function (a, b) { return b.energy - a.energy; });
-    list.forEach(function (it, idx) {
-      it.dots = energyDots(maxE > 0 ? it.energy / maxE : 1);
-      it.isMain = idx === 0;
-    });
+    list = list.length ? [list[0]] : [];   // 只留主心性（能量最大）
+    list.forEach(function (it) { it.dots = fullDots(); it.isMain = true; });
   }
 
   // —— 内在心性（branchList）——

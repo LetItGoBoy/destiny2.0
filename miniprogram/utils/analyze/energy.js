@@ -35,6 +35,16 @@ var ROOT_CROSS_DF = 0.6;
 var DELING_X = 1.3;   // 得令加成（月令本气同党）
 var SAME_X = 1.0;     // 生扶结构性修正
 
+// 天干按根缩放 base：本气根×1.0 / 仅中余气弱根×0.55 / 无根×0.35
+var ROOT_MAIN = 1.0, ROOT_WEAK = 0.55, ROOT_NONE = 0.35;
+function rootFactorOf(el, hidden) {
+  var main = false, weak = false;
+  for (var i = 0; i < hidden.length; i++) {
+    if (hidden[i].el === el) { if (hidden[i].rank === 0) main = true; else weak = true; }
+  }
+  return main ? ROOT_MAIN : (weak ? ROOT_WEAK : ROOT_NONE);
+}
+
 // ── 刑冲合害（先合，再刑冲害；只作用于地支根气）──
 var LIU_HE = { 子: '丑', 丑: '子', 寅: '亥', 亥: '寅', 卯: '戌', 戌: '卯', 辰: '酉', 酉: '辰', 巳: '申', 申: '巳', 午: '未', 未: '午' };
 var LIU_CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', 申: '寅', 卯: '酉', 酉: '卯', 辰: '戌', 戌: '辰', 巳: '亥', 亥: '巳' };
@@ -113,11 +123,13 @@ function computeNatal(plist, dayGan, opts) {
   var i, j;
   var stems = [];
   var hidden = [];
+  var stemSpecs = [];     // 先收集天干规格，建完所有地支后再按根缩放 base
+  var luckBranches = [];
 
-  // —— 原局入池 ——
+  // —— 原局：天干规格 + 地支藏干入池 ——
   for (i = 0; i < plist.length; i++) {
     var P = plist[i];
-    stems.push({ char: P.gan, el: ganWx(P.gan), val: GAN_BASE[P.pos], pillar: P.pos, isDay: P.pos === 2, kind: 'natal' });
+    stemSpecs.push({ char: P.gan, val: GAN_BASE[P.pos], pillar: P.pos, isDay: P.pos === 2, kind: 'natal' });
   }
   for (i = 0; i < plist.length; i++) {
     var Q = plist[i];
@@ -130,18 +142,24 @@ function computeNatal(plist, dayGan, opts) {
 
   // —— 岁运入池（完整柱：干 + 支藏干）——
   var luck = opts.luck || [];
-  var luckBranches = [];
   for (i = 0; i < luck.length; i++) {
     var L = luck[i];
     if (!L.gz || L.gz.length < 2) continue;
     var gc = L.gz.charAt(0), zc = L.gz.charAt(1);
     var w = LUCK_W[L.kind], pos = LUCK_POS[L.kind];
-    stems.push({ char: gc, el: ganWx(gc), val: w.gan, pillar: pos, isDay: false, kind: L.kind });
+    stemSpecs.push({ char: gc, val: w.gan, pillar: pos, isDay: false, kind: L.kind });
     var lhg = LunarUtil.ZHI_HIDE_GAN[zc], lws = HIDE_W[lhg.length];
     for (j = 0; j < lhg.length; j++) {
       hidden.push({ char: lhg[j], el: ganWx(lhg[j]), val: w.zhi * lws[j], pillar: pos, rank: j, kind: L.kind });
     }
     luckBranches.push({ pos: pos, zhi: zc });
+  }
+
+  // —— 天干按根缩放 base（地支全部建完后，按全盘地支判根）——
+  for (i = 0; i < stemSpecs.length; i++) {
+    var sp = stemSpecs[i];
+    var sel = ganWx(sp.char);
+    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
   }
 
   // Step0a 刑冲合害：原局相邻 + 岁运对全盘地支无距离 + 岁运彼此
