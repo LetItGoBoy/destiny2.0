@@ -203,6 +203,19 @@
   line-height: 1.7;
   color: var(--ink-2);
 }
+/* 当前显示状态说明（本命 / 大运 / 流年） */
+.now-note {
+  margin: 14rpx 0 4rpx;
+  padding: 16rpx 20rpx;
+  background: var(--primary-soft, rgba(124, 92, 200, 0.10));
+  border-left: 6rpx solid var(--primary);
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--ink-1, #333);
+}
+.fs-l .now-note { font-size: 27rpx; }
+.fs-xl .now-note { font-size: 30rpx; }
 .comp-tip .tip-l { color: var(--primary); font-weight: 600; }
 .comp-tip .tip-r { color: var(--ink-3); font-weight: 600; }
 

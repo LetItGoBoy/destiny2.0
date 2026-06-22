@@ -19,6 +19,7 @@ Page({
     hasLuck: false,
     hasTime: true,
     curLabel: '本命 · 未叠加岁运',
+    traitNote: '',
     // 岁运选择
     daYunList: [],
     liuNianList: [],
@@ -179,6 +180,17 @@ Page({
     var barYearShow = this.data.curYear != null ? this.data.curYear
       : (this._yearMin != null ? Math.min(this._yearMax, Math.max(this._yearMin, new Date().getFullYear())) : '');
 
+    // 当前显示了什么的说明
+    var traitNote;
+    if (this.data.dyIndex < 0) {
+      traitNote = '现在看到的是你的「原局主心性」——贯穿一生的性格底色。点下方「岁运」选大运 / 流年，可查看某一年被引动的心性。';
+    } else if (this.data.lnIndex < 0) {
+      traitNote = '现在看到的是「' + this._dy[this.data.dyIndex].gz + ' 大运」十年里的心性倾向。再点一个流年，就能看到具体某年的当年主旋律。';
+    } else {
+      var lnItem = this.data.liuNianList[this.data.lnIndex];
+      traitNote = '现在看到的是「' + lnItem.year + ' 年 · ' + lnItem.gz + '」的流年心性——这一年最显于外的当年主旋律。';
+    }
+
     var p = portrait.build(this._chart, { daYunGZ: dyGZ, liuNianGZ: lnGZ });
     this.setData({
       core: p.core,
@@ -191,6 +203,7 @@ Page({
       hasLuck: p.hasLuck,
       hasTime: p.hasTime,
       curLabel: label,
+      traitNote: traitNote,
       barGz: barGz,
       barYearShow: barYearShow,
       barActive: barActive

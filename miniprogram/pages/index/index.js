@@ -67,6 +67,17 @@ Page({
     wx.navigateTo({ url: '/pages/astro/astro?now=1' });
   },
 
+  // 长辈模式：一键把全站字号切到「特大」，再点切回「大」
+  toggleElder: function () {
+    var next = this.data.fs === 'xl' ? 'l' : 'xl';
+    prefs.setFontSize(next);
+    this.setData({ fs: next });
+    wx.showToast({
+      title: next === 'xl' ? '已开启长辈模式 · 字更大' : '已退出长辈模式',
+      icon: 'none'
+    });
+  },
+
   onNameInput: function (e) {
     this.setData({ name: e.detail.value });
   },

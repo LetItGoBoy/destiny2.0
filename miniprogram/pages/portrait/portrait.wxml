@@ -71,6 +71,8 @@
         <text class="comp-sub">天干 · 别人眼中的你</text>
       </view>
 
+      <view class="now-note">{{traitNote}}</view>
+
       <view class="comp-tip">
         圆点越多，代表这股心性越突出；排在最前的是你的<text class="tip-l">主心性</text>。每条心性都有两面：滑标越靠<text class="tip-l">左</text>，越发挥得顺、显出好的一面；越靠<text class="tip-r">右</text>，则越容易走偏、需要留意。指针会随大运、流年左右移动。
       </view>

@@ -6,6 +6,10 @@
       <view class="hero-title serif">八字排盘</view>
       <view class="hero-sub">四柱八字 · 真太阳时 · 大运流年</view>
     </view>
+    <view class="elder-toggle {{fs === 'xl' ? 'on' : ''}}" bindtap="toggleElder">
+      <text class="elder-aa">A<text class="elder-aa-big">A</text></text>
+      <text class="elder-tx">长辈模式</text>
+    </view>
   </view>
 
   <!-- 此刻星象（程序亮点 · 默认展示） -->
