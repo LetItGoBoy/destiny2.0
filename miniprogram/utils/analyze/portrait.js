@@ -264,28 +264,23 @@ function build(chart, opts) {
       energy: 1, dots: fullDots(), isMain: true
     });
   } else {
-    // 本命：按五行能量排序取前两名心性（含天干+地支藏干，不限天干），各用其主导十神
-    var elAgg = {};
-    function addEl(god, el, cls, v) {
-      if (!elAgg[el]) elAgg[el] = { el: el, cls: cls, energy: 0, gods: {} };
-      elAgg[el].energy += v;
-      elAgg[el].gods[god] = (elAgg[el].gods[god] || 0) + v;
-    }
-    stems.forEach(function (c) { addEl(c.god, c.el, c.cls, c.val); });
-    (m.hiddenUnits || []).forEach(function (u) { addEl(u.god, u.el, base.WX_CLS[u.el], u.val); });
-    var els = [];
-    for (var e in elAgg) els.push(elAgg[e]);
-    els.sort(function (a, b) { return b.energy - a.energy; });
-    var maxEl = els.length ? els[0].energy : 1;
-    els.slice(0, 2).forEach(function (it, idx) {
-      var domGod = null, domE = -1;            // 该五行里能量最大的具体十神
-      for (var gg in it.gods) { if (it.gods[gg] > domE) { domE = it.gods[gg]; domGod = gg; } }
-      var t = TEMP[domGod] || { name: domGod, pol: '', lbl: '', rbl: '', desc: '' };
+    // 本命：透干的十神按能量排序取前两名（十神分开记，食神≠伤官、正财≠偏财）
+    var agg = {};
+    stems.forEach(function (c) {
+      if (!agg[c.god]) agg[c.god] = { god: c.god, el: c.el, cls: c.cls, energy: 0 };
+      agg[c.god].energy += c.val;
+    });
+    var arr = [];
+    for (var g in agg) arr.push(agg[g]);
+    arr.sort(function (a, b) { return b.energy - a.energy; });
+    var maxE = arr.length ? arr[0].energy : 1;
+    arr.slice(0, 2).forEach(function (it, idx) {
+      var t = TEMP[it.god] || { name: it.god, pol: '', lbl: '', rbl: '', desc: '' };
       list.push({
-        god: domGod, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, cls: it.cls,
+        god: it.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, cls: it.cls,
         slider: sliderPos(xiji.dir[it.el], (m.pool || {})[it.el] || 0),
         energy: it.energy,
-        dots: energyDots(maxEl > 0 ? it.energy / maxEl : 1),
+        dots: energyDots(maxE > 0 ? it.energy / maxE : 1),
         isMain: idx === 0
       });
     });
