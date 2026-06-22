@@ -35,15 +35,21 @@ var ROOT_CROSS_DF = 0.6;
 var DELING_X = 1.3;   // 得令加成（月令本气同党）
 var SAME_X = 1.0;     // 生扶结构性修正
 
-// 天干按根缩放 base（坐支优先）：坐支有同五行根×1.0 / 仅他柱远根×0.6 / 全盘无根×0.35
-// 坐支得地才算真根；远柱根、被合之根只算"虚透"，不给满档。
-var ROOT_OWN = 1.0, ROOT_OTHER = 0.6, ROOT_NONE = 0.35;
-function rootFactorOf(el, pillar, hidden) {
-  var own = false, other = false;
+// 天干按根缩放 base：根力 = max(位置权重 × 藏干档)，base系数 = 0.35 + 0.65×根力
+// 位置：月令最重，日支次之，年支再次，时支最轻（远根分档，非一刀切）
+// 藏干：本气最硬，中气次之，余气最虚
+var ROOT_POS_W = { 0: 0.7, 1: 1.0, 2: 0.85, 3: 0.55, 4: 0.7, 5: 0.6 };  // 年/月/日/时/大运/流年
+var ROOT_RANK_W = [1.0, 0.7, 0.45];                                       // 本气/中气/余气
+var ROOT_FLOOR = 0.35;                                                    // 全盘无根的虚浮底
+function rootFactorOf(el, hidden) {
+  var best = 0;
   for (var i = 0; i < hidden.length; i++) {
-    if (hidden[i].el === el) { if (hidden[i].pillar === pillar) own = true; else other = true; }
+    if (hidden[i].el === el) {
+      var s = (ROOT_POS_W[hidden[i].pillar] || 0.6) * (ROOT_RANK_W[hidden[i].rank] || 0.45);
+      if (s > best) best = s;
+    }
   }
-  return own ? ROOT_OWN : (other ? ROOT_OTHER : ROOT_NONE);
+  return ROOT_FLOOR + (1 - ROOT_FLOOR) * best;
 }
 
 // ── 刑冲合害（先合，再刑冲害；只作用于地支根气）──
@@ -160,7 +166,7 @@ function computeNatal(plist, dayGan, opts) {
   for (i = 0; i < stemSpecs.length; i++) {
     var sp = stemSpecs[i];
     var sel = ganWx(sp.char);
-    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, sp.pillar, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
+    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
   }
 
   // Step0a 刑冲合害：原局相邻 + 岁运对全盘地支无距离 + 岁运彼此
