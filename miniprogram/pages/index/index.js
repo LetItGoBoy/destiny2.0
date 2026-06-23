@@ -220,6 +220,11 @@ Page({
     this.castThenGo('/pages/portrait/portrait?input=' + encodeURIComponent(JSON.stringify(input)));
   },
 
+  // ---- 模块入口 ----
+  goMatch: function () {
+    wx.showToast({ title: '功能即将上线', icon: 'none' });
+  },
+
   goRecord: function (e) {
     var rec = this.data.recent[e.currentTarget.dataset.index];
     var input = {

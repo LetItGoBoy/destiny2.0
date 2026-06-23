@@ -10,7 +10,7 @@ App({
     if (config.cloudEnv && wx.cloud) {
       wx.cloud.init({
         env: config.cloudEnv,
-        traceUser: true
+        traceUser: false
       });
       this.globalData.cloudEnabled = true;
     }
