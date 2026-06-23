@@ -219,10 +219,8 @@ Page({
   },
 
   // ---- 模块入口 ----
-  goMatch: function (e) {
-    wx.navigateTo({
-      url: '/pages/match/match?type=' + e.currentTarget.dataset.type
-    });
+  goMatch: function () {
+    wx.showToast({ title: '功能即将上线', icon: 'none' });
   },
 
   goRecord: function (e) {
