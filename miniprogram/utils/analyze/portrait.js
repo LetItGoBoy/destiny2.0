@@ -264,12 +264,18 @@ function build(chart, opts) {
       energy: 1, dots: fullDots(), isMain: true
     });
   } else {
-    // 本命：透干的十神按能量排序取前两名（十神分开记，食神≠伤官、正财≠偏财）
+    // 本命：按具体十神能量排序取前两名（天干+地支，十神分开记）
+    // 心性排序计权：天干整体提升；地支按位置系数(年0.6/月1.0/日0.85/时0.55)且整体偏低，
+    // 使远在年/时支的藏支根不致虚高（如卯乙之于七杀），且天干能量大于地支。
+    var GAN_W = 1.3;
+    var ZHI_POS = { 0: 0.6, 1: 1.0, 2: 0.85, 3: 0.55, 4: 0.6, 5: 0.55 };
     var agg = {};
-    stems.forEach(function (c) {
-      if (!agg[c.god]) agg[c.god] = { god: c.god, el: c.el, cls: c.cls, energy: 0 };
-      agg[c.god].energy += c.val;
-    });
+    function addG(god, el, cls, v) {
+      if (!agg[god]) agg[god] = { god: god, el: el, cls: cls, energy: 0 };
+      agg[god].energy += v;
+    }
+    stems.forEach(function (c) { addG(c.god, c.el, c.cls, c.val * GAN_W); });
+    (m.hiddenUnits || []).forEach(function (u) { addG(u.god, u.el, base.WX_CLS[u.el], u.val * (ZHI_POS[u.pillar] != null ? ZHI_POS[u.pillar] : 0.6)); });
     var arr = [];
     for (var g in agg) arr.push(agg[g]);
     arr.sort(function (a, b) { return b.energy - a.energy; });

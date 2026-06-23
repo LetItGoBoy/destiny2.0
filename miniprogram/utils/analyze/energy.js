@@ -313,6 +313,8 @@ function build(chart, opts) {
     hiddenUnits.push({
       god: LunarUtil.SHI_SHEN[dayGan + hn.char],
       el: hn.el,
+      pillar: hn.pillar,
+      rank: hn.rank,
       base: round2(hbn.val),
       val: round2(hn.val),
       party: partyOf(natalNow.dm, hn.el)
