@@ -317,6 +317,27 @@
 .pc-on {
   color: var(--ink-2);
 }
+/* 优点 / 缺点：缺点另起一段 */
+.pc-con {
+  margin-top: 12rpx;
+}
+.pc-key {
+  display: inline-block;
+  margin-right: 10rpx;
+  padding: 1rpx 10rpx;
+  border-radius: 6rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  vertical-align: 1rpx;
+}
+.pc-key-pro {
+  color: var(--primary, #7c5cc8);
+  background: var(--primary-soft, rgba(124, 92, 200, 0.10));
+}
+.pc-key-con {
+  color: var(--ink-3, #8a8170);
+  background: var(--fill, rgba(0, 0, 0, 0.05));
+}
 .comp-empty {
   padding: 30rpx 0;
   text-align: center;

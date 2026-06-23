@@ -95,7 +95,8 @@
           <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
         </view>
         <view class="trait-pc">
-          <view class="pc pc-on">{{item.desc}}</view>
+          <view class="pc pc-on"><text class="pc-key pc-key-pro">优点</text>{{item.desc}}</view>
+          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">缺点</text>{{item.con}}</view>
         </view>
       </view>
 
