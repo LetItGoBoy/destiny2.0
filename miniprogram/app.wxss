@@ -63,15 +63,15 @@ page {
 /* 五行配色（适配白底的深色版）：木火土金水 */
 .wx-mu { color: #16A971; }
 .wx-huo { color: #E85540; }
-.wx-tu { color: #C0872C; }
-.wx-jin { color: #B0851C; }
+.wx-tu { color: #8C5E2A; }
+.wx-jin { color: #D4A017; }
 .wx-shui { color: #2E86E6; }
 
 /* 五行实底（彩色圆点，配深字） */
 .bg-mu { background: #34C88A; }
 .bg-huo { background: #FF7A63; }
-.bg-tu { background: #E0A85A; }
-.bg-jin { background: #ECC64E; }
+.bg-tu { background: #B07C34; }
+.bg-jin { background: #E6B81F; }
 .bg-shui { background: #5AA6F2; }
 
 /* 文字辅助 */
