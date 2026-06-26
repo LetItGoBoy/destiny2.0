@@ -8,13 +8,6 @@
     <view class="tab tab-energy serif {{tab === 'energy' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="energy">能量盘<text class="tab-free">免费</text></view>
   </view>
 
-  <!-- 盘面页：仅保留精简生日条 -->
-  <view class="card birth-strip" wx:if="{{tab === 'base' || tab === 'detail'}}">
-    <text class="info-tag {{meta.gender === 1 ? 'tag-m' : 'tag-f'}}">{{meta.gender === 1 ? '乾造' : '坤造'}}</text>
-    <text class="birth-main">{{meta.clockStr}}</text>
-    <text class="birth-lunar">{{meta.lunarShort}}</text>
-  </view>
-
   <!-- 出生星图入口（基础盘内，默认静止，进入后可时光流动）-->
   <view class="astro-entry" wx:if="{{tab === 'base'}}" hover-class="astro-entry-hover" bindtap="goAstro">
     <starfield class="astro-preview" ts="{{meta.timestamp}}" flow="{{false}}" spin="{{false}}" />
@@ -187,7 +180,6 @@
           <view class="sy-strip">
             <view class="sy-cell {{lyIndex === item.index ? 'sy-on' : ''}}"
               wx:for="{{liuYueBar}}" wx:key="index" bindtap="onLiuYueTap" data-index="{{item.index}}">
-              <view class="sy-hd">{{item.name}}</view>
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
               <view class="sy-rels">
@@ -204,7 +196,6 @@
           <view class="sy-strip">
             <view class="sy-cell {{lrIndex === item.index ? 'sy-on' : ''}}"
               wx:for="{{liuRiBar}}" wx:key="index" bindtap="onLiuRiTap" data-index="{{item.index}}">
-              <view class="sy-hd">{{item.label}}</view>
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
               <view class="sy-rels">

@@ -181,7 +181,7 @@
   padding: 2rpx 10rpx;
 }
 .big-char {
-  font-size: 54rpx;
+  font-size: 44rpx;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -220,6 +220,8 @@
 .hide-gan {
   display: flex;
   align-items: baseline;
+  justify-content: center;
+  white-space: nowrap;
   padding: 2rpx 0;
 }
 .hg-char {
@@ -599,11 +601,11 @@
   font-weight: 600;
 }
 
-/* 字号档位：大 */
-.fs-l .big-char { font-size: 60rpx; }
-.fs-l .plain, .fs-l .shishen { font-size: 28rpx; }
-.fs-l .rizhu { font-size: 25rpx; }
-.fs-l .hg-char { font-size: 30rpx; }
+/* 字号档位：大（普通详盘也用此档，八字适度收小） */
+.fs-l .big-char { font-size: 48rpx; }
+.fs-l .plain, .fs-l .shishen { font-size: 26rpx; }
+.fs-l .rizhu { font-size: 24rpx; }
+.fs-l .hg-char { font-size: 28rpx; }
 .fs-l .hg-ss { font-size: 23rpx; }
 .fs-l .ss-item, .fs-l .ss-none { font-size: 23rpx; }
 .fs-l .naying { font-size: 22rpx; }
@@ -809,21 +811,21 @@
   color: #7a7690; font-size: 22rpx; font-weight: 600;
   writing-mode: vertical-lr; letter-spacing: 3rpx;
 }
-.sy-scroll { flex: 1; white-space: nowrap; }
+.sy-scroll { flex: 1; min-width: 0; white-space: nowrap; }
 .sy-strip { display: inline-flex; gap: 8rpx; padding: 2rpx 0 4rpx; }
 .sy-cell {
-  flex: none; width: 70rpx; box-sizing: border-box;
+  flex: none; width: 70rpx; min-height: 118rpx; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   border-radius: 14rpx; padding: 8rpx 2rpx; text-align: center;
   background: #f7f7fb; border: 2rpx solid transparent;
 }
 .sy-on { background: #efeaff; border-color: #6D5DF6; }
-.sy-hd { font-size: 18rpx; color: #9a96b0; line-height: 1.2; margin-bottom: 2rpx; }
 .sy-line { display: flex; align-items: center; justify-content: center; gap: 3rpx; line-height: 1.3; }
 .sy-c { font-size: 30rpx; font-weight: 700; }
 .sy-g { font-size: 18rpx; color: #2a2640; }
-.sy-qian { font-size: 26rpx; color: #b5b1c8; padding: 16rpx 0; }
-.sy-rels { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rpx; margin-top: 5rpx; min-height: 26rpx; }
-.sy-rel { width: 26rpx; height: 26rpx; border-radius: 6rpx; color: #fff; font-size: 17rpx; line-height: 26rpx; text-align: center; }
+.sy-qian { font-size: 26rpx; color: #b5b1c8; margin: auto 0; }
+.sy-rels { display: flex; flex-wrap: nowrap; justify-content: center; gap: 2rpx; margin-top: auto; padding-top: 5rpx; height: 24rpx; overflow: hidden; }
+.sy-rel { flex: none; width: 20rpx; height: 20rpx; border-radius: 5rpx; color: #fff; font-size: 14rpx; line-height: 20rpx; text-align: center; }
 .sy-rel-he { background: #16A971; }
 .sy-rel-hui { background: #129AA8; }
 .sy-rel-chong { background: #E85540; }
@@ -833,10 +835,9 @@
 
 /* 长辈模式（特大字）：岁运放大，隐藏流月/流日，更清爽 */
 .fs-xl .sy-liuyue { display: none; }
-.fs-xl .sy-cell { width: 100rpx; padding: 12rpx 4rpx; }
-.fs-xl .sy-c { font-size: 44rpx; }
-.fs-xl .sy-g { font-size: 24rpx; }
-.fs-xl .sy-hd { font-size: 22rpx; }
-.fs-xl .sy-lab { font-size: 26rpx; }
-.fs-xl .sy-rels { min-height: 34rpx; }
-.fs-xl .sy-rel { width: 34rpx; height: 34rpx; font-size: 22rpx; line-height: 34rpx; }
+.fs-xl .sy-cell { width: 104rpx; min-height: 150rpx; padding: 12rpx 4rpx; }
+.fs-xl .sy-c { font-size: 46rpx; }
+.fs-xl .sy-g { font-size: 26rpx; }
+.fs-xl .sy-lab { font-size: 28rpx; }
+.fs-xl .sy-rels { height: 34rpx; }
+.fs-xl .sy-rel { width: 30rpx; height: 30rpx; font-size: 20rpx; line-height: 30rpx; }
