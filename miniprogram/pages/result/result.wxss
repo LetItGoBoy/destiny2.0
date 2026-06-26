@@ -795,3 +795,48 @@
   line-height: 1.6;
   padding: 30rpx 30rpx 16rpx;
 }
+
+/* ── 详盘 · 岁运密集表 ── */
+.sy-card { padding: 16rpx 12rpx 10rpx; }
+.sy-row {
+  display: flex; align-items: stretch;
+  margin-bottom: 14rpx; padding-bottom: 12rpx;
+  border-bottom: 1rpx solid #f1eff6;
+}
+.sy-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.sy-lab {
+  flex: none; width: 38rpx; display: flex; align-items: center; justify-content: center;
+  color: #7a7690; font-size: 22rpx; font-weight: 600;
+  writing-mode: vertical-lr; letter-spacing: 3rpx;
+}
+.sy-scroll { flex: 1; white-space: nowrap; }
+.sy-strip { display: inline-flex; gap: 8rpx; padding: 2rpx 0 4rpx; }
+.sy-cell {
+  flex: none; width: 70rpx; box-sizing: border-box;
+  border-radius: 14rpx; padding: 8rpx 2rpx; text-align: center;
+  background: #f7f7fb; border: 2rpx solid transparent;
+}
+.sy-on { background: #efeaff; border-color: #6D5DF6; }
+.sy-hd { font-size: 18rpx; color: #9a96b0; line-height: 1.2; margin-bottom: 2rpx; }
+.sy-line { display: flex; align-items: center; justify-content: center; gap: 3rpx; line-height: 1.3; }
+.sy-c { font-size: 30rpx; font-weight: 700; }
+.sy-g { font-size: 18rpx; color: #2a2640; }
+.sy-qian { font-size: 26rpx; color: #b5b1c8; padding: 16rpx 0; }
+.sy-rels { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rpx; margin-top: 5rpx; min-height: 26rpx; }
+.sy-rel { width: 26rpx; height: 26rpx; border-radius: 6rpx; color: #fff; font-size: 17rpx; line-height: 26rpx; text-align: center; }
+.sy-rel-he { background: #16A971; }
+.sy-rel-hui { background: #129AA8; }
+.sy-rel-chong { background: #E85540; }
+.sy-rel-xing { background: #E0822A; }
+.sy-rel-hai { background: #8E7BC4; }
+.sy-rel-po { background: #7E8896; }
+
+/* 长辈模式（特大字）：岁运放大，隐藏流月/流日，更清爽 */
+.fs-xl .sy-liuyue { display: none; }
+.fs-xl .sy-cell { width: 100rpx; padding: 12rpx 4rpx; }
+.fs-xl .sy-c { font-size: 44rpx; }
+.fs-xl .sy-g { font-size: 24rpx; }
+.fs-xl .sy-hd { font-size: 22rpx; }
+.fs-xl .sy-lab { font-size: 26rpx; }
+.fs-xl .sy-rels { min-height: 34rpx; }
+.fs-xl .sy-rel { width: 34rpx; height: 34rpx; font-size: 22rpx; line-height: 34rpx; }
