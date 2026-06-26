@@ -337,7 +337,10 @@ Page({
   // 基础盘 = 四柱；详盘 = 岁运柱 + 四柱
   // 列序（左→右）：流日 · 流月 · 流年 · 大运 · 年 · 月 · 日 · 时（默认只挂大运+流年）
   updateTable: function () {
-    var pillars = this._chart.pillars.slice(0);
+    // 浅拷贝原局四柱（便于打标记，不污染源数据）
+    var pillars = this._chart.pillars.map(function (p) {
+      var c = {}; for (var k in p) c[k] = p[k]; return c;
+    });
     if (this.data.tab === 'detail') {
       var extras = [];
       var dy = this._chart.daYun[this.data.dyIndex];
@@ -346,13 +349,13 @@ Page({
       if (this.data.lrIndex >= 0 && this.data.liuRiBar[this.data.lrIndex]) {
         var lr = this.data.liuRiBar[this.data.lrIndex];
         var lrCol = bazi.buildLuckPillar(this._ctx, lr.ganZhi);
-        if (lrCol) { lrCol.label = '流日'; lrCol.sub = lr.label; lrCol.extra = true; extras.push(lrCol); }
+        if (lrCol) { lrCol.label = '流日'; lrCol.extra = true; extras.push(lrCol); }
       }
       // 流月
       if (this.data.lyIndex >= 0 && this.data.liuYueBar[this.data.lyIndex]) {
         var ly = this.data.liuYueBar[this.data.lyIndex];
         var lyCol = bazi.buildLuckPillar(this._ctx, ly.ganZhi);
-        if (lyCol) { lyCol.label = '流月'; lyCol.sub = ly.name; lyCol.extra = true; extras.push(lyCol); }
+        if (lyCol) { lyCol.label = '流月'; lyCol.extra = true; extras.push(lyCol); }
       }
       // 流年
       if (dy) {
@@ -365,6 +368,8 @@ Page({
           extras.push(this.extraColumn(dy, '大运', ''));
         }
       }
+      // 年柱左侧画分界线（大运 | 年柱）
+      if (extras.length && pillars.length) pillars[0].divide = true;
       pillars = extras.concat(pillars);
     }
     this.setData({ tablePillars: pillars });

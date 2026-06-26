@@ -145,7 +145,11 @@
 }
 /* 大运/流年扩展柱：紫晕底色突出 */
 .cell-extra {
-  background: var(--tint);
+  background: transparent;
+}
+/* 大运 | 年柱 之间的灰色分界线 */
+.cell-divide {
+  border-left: 2rpx solid var(--ink-3);
 }
 .label-cell {
   flex: 0 0 76rpx;
@@ -230,11 +234,12 @@
 }
 .hg-ss {
   font-size: 20rpx;
-  color: var(--ink-3);
+  color: var(--ink);
   margin-left: 6rpx;
 }
 .plain {
   font-size: 24rpx;
+  color: var(--ink);
 }
 .naying {
   font-size: 20rpx;
@@ -248,7 +253,7 @@
 }
 .ss-item {
   font-size: 20rpx;
-  color: var(--ink-2);
+  color: var(--ink);
   padding: 2rpx 0;
   text-align: center;
 }
@@ -335,7 +340,7 @@
 }
 .yun-ss {
   font-size: 20rpx;
-  color: var(--ink-3);
+  color: var(--ink);
 }
 .yun-gz {
   font-size: 36rpx;
@@ -823,7 +828,7 @@
 .sy-line { display: flex; align-items: center; justify-content: center; gap: 3rpx; line-height: 1.3; }
 .sy-c { font-size: 30rpx; font-weight: 700; }
 .sy-g { font-size: 18rpx; color: #2a2640; }
-.sy-qian { font-size: 26rpx; color: #b5b1c8; margin: auto 0; }
+.sy-qian { font-size: 26rpx; color: #b5b1c8; margin: auto 0; writing-mode: vertical-rl; letter-spacing: 2rpx; }
 .sy-rels { display: flex; flex-wrap: nowrap; justify-content: center; gap: 2rpx; margin-top: auto; padding-top: 5rpx; height: 24rpx; overflow: hidden; }
 .sy-rel { flex: none; width: 20rpx; height: 20rpx; border-radius: 5rpx; color: #fff; font-size: 14rpx; line-height: 20rpx; text-align: center; }
 .sy-rel-he { background: #16A971; }

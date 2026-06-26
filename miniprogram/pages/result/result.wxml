@@ -41,15 +41,15 @@
   <view class="card chart" wx:if="{{tab === 'base' || tab === 'detail'}}">
     <view class="chart-row head-row">
       <view class="cell label-cell"></view>
-      <view class="cell head-cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell head-cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <view class="serif head-name">{{item.label}}</view>
-        <view class="head-sub" wx:if="{{item.sub}}">{{item.sub}}</view>
+        <view class="head-sub" wx:if="{{item.sub && !item.empty}}">{{item.sub}}</view>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">主星</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
         <text wx:elif="{{item.shiShenGan === '日主'}}" class="rizhu">日主</text>
         <text wx:else class="shishen" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
@@ -58,7 +58,7 @@
 
     <view class="chart-row">
       <view class="cell label-cell">天干</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
           <view class="wx-mark wx-{{item.gan.cls}}"><view class="el-ico el-{{item.gan.cls}}"></view><text>{{item.gan.wx}}</text></view>
@@ -69,7 +69,7 @@
 
     <view class="chart-row">
       <view class="cell label-cell">地支</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
           <view class="wx-mark wx-{{item.zhi.cls}}"><view class="el-ico el-{{item.zhi.cls}}"></view><text>{{item.zhi.wx}}</text></view>
@@ -80,7 +80,7 @@
 
     <view class="chart-row">
       <view class="cell label-cell">藏干</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text"
           bindtap="onTermTap" data-term="{{hg.shiShen}}">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
@@ -97,35 +97,39 @@
     <block wx:if="{{showSubRows}}">
     <view class="chart-row">
       <view class="cell label-cell">星运</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.empty ? '*' :item.xingYun}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.xingYun}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">自坐</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.empty ? '*' :item.ziZuo}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.ziZuo}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">空亡</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain dim">{{item.empty ? '*' :item.xunKong}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain">{{item.xunKong}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">纳音</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain dim naying" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.empty ? '*' :item.naYin}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain naying" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.naYin}}</text>
       </view>
     </view>
 
     <view class="chart-row no-line shensha-row">
       <view class="cell label-cell">神煞</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text class="ss-item" wx:if="{{!item.empty && item.shenSha.length}}"
           bindtap="onTermTap" data-term="{{item.shenSha[0]}}">{{item.shenSha[0]}}</text>
         <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">*</text>
