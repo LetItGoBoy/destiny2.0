@@ -131,10 +131,6 @@
   align-items: stretch;
   padding: 14rpx 0;
 }
-/* 仅保留天干、地支之间的一条分割虚线 */
-.chart-row.gz-line {
-  border-bottom: 1rpx dashed var(--ink-3);
-}
 .cell {
   flex: 1;
   display: flex;
@@ -147,9 +143,9 @@
 .cell-extra {
   background: transparent;
 }
-/* 大运 | 年柱 之间的灰色分界线 */
-.cell-divide {
-  border-left: 2rpx solid var(--ink-3);
+/* 大运 | 年柱 分界：竖虚线仅出现在天干、地支两行 */
+.gan-zhi-row .cell-divide {
+  border-left: 2rpx dashed var(--ink-3);
 }
 .label-cell {
   flex: 0 0 76rpx;

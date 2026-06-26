@@ -56,7 +56,7 @@
       </view>
     </view>
 
-    <view class="chart-row gz-line">
+    <view class="chart-row gan-zhi-row">
       <view class="cell label-cell">天干</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
@@ -67,7 +67,7 @@
       </view>
     </view>
 
-    <view class="chart-row">
+    <view class="chart-row gan-zhi-row">
       <view class="cell label-cell">地支</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
