@@ -129,11 +129,11 @@
 .chart-row {
   display: flex;
   align-items: stretch;
-  border-bottom: 1rpx solid var(--line);
   padding: 14rpx 0;
 }
-.chart-row.no-line {
-  border-bottom: none;
+/* 仅保留天干、地支之间的一条分割虚线 */
+.chart-row.gz-line {
+  border-bottom: 1rpx dashed var(--ink-3);
 }
 .cell {
   flex: 1;
