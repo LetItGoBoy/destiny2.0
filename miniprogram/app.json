@@ -13,12 +13,12 @@
     "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTitleText": "同乐八字",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#F5F6FB",
+    "backgroundColor": "#F4EEE6",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
     "color": "#9A9CB5",
-    "selectedColor": "#6D5DF6",
+    "selectedColor": "#8A2B27",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [

@@ -210,7 +210,7 @@
   border: 1rpx solid var(--line);
 }
 .fp-done {
-  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
   color: #fff;
 }
 
@@ -413,8 +413,8 @@
   border-radius: 12rpx;
 }
 .lt-on {
-  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 4rpx 14rpx rgba(109, 93, 246, 0.3);
+  box-shadow: 0 4rpx 14rpx rgba(138, 43, 39, 0.3);
 }

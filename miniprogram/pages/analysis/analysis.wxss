@@ -117,7 +117,7 @@
   font-size: 22rpx;
   margin-bottom: 18rpx;
 }
-.ws-lg-same { color: #6D5DF6; }
+.ws-lg-same { color: #8A2B27; }
 .ws-lg-diff { color: #EC5C8D; }
 
 /* 喜忌 / 用神 chips */
@@ -303,7 +303,7 @@
   flex-shrink: 0;
   color: var(--ink-3);
 }
-.bd-same { color: #6D5DF6; }
+.bd-same { color: #8A2B27; }
 .bd-diff { color: #EC5C8D; }
 .bd-day  { color: var(--ink-3); }
 /* 汇总区 */

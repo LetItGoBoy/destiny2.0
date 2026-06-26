@@ -20,7 +20,7 @@
 .quote-card {
   padding: 28rpx 30rpx;
   margin-bottom: 22rpx;
-  background: linear-gradient(135deg, rgba(157, 120, 248, 0.10), rgba(91, 141, 239, 0.08));
+  background: linear-gradient(135deg, rgba(138, 43, 39, 0.10), rgba(138, 43, 39, 0.08));
   border-left: 6rpx solid var(--primary);
 }
 .quote-label {
@@ -280,8 +280,8 @@
   width: 220rpx;
   height: 220rpx;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #CDB8FF, #7C5CE0 62%, #483390);
-  box-shadow: 0 0 80rpx rgba(157, 120, 248, 0.7), 0 0 200rpx rgba(124, 92, 224, 0.35);
+  background: radial-gradient(circle at 35% 30%, #CDB8FF, #A3382F 62%, #483390);
+  box-shadow: 0 0 80rpx rgba(138, 43, 39, 0.7), 0 0 200rpx rgba(138, 43, 39, 0.35);
 }
 .breath-phase {
   margin-top: 48rpx;
@@ -482,8 +482,8 @@
 .sutra-inked {
   color: #F4F2FF;
   border-style: solid;
-  border-color: rgba(157, 120, 248, 0.7);
-  background: rgba(157, 120, 248, 0.18);
+  border-color: rgba(138, 43, 39, 0.7);
+  background: rgba(138, 43, 39, 0.18);
 }
 .sutra-punct {
   border: none;
