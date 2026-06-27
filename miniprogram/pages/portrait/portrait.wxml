@@ -44,8 +44,8 @@
 
     <!-- 框架说明 -->
     <view class="intro">
-      大部分人身上都有不止一种心性，只是<text class="em">配比</text>不同。下面是你<text class="em">天干（外在表现）</text>所呈现的心性构成，它会随大运、流年此消彼长。
-      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月干，外显更集中）</text>
+      每个人身上都同时住着好几种心性，只是<text class="em">配比</text>不同。我们综合你的<text class="em">天干与地支</text>，理出最<text class="em">贯穿一生</text>的两股主心性。每一股都有舒展的一面，也有需要留意的一面——<text class="em">一体两面</text>，会随大运、流年此消彼长。
+      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月柱，结果更集中）</text>
     </view>
 
     <!-- 两种底色倾向：守正 ←→ 求变 -->
@@ -67,14 +67,14 @@
     <!-- 外显心性（天干） -->
     <view class="card comp" id="sec-tiangan">
       <view class="comp-head">
-        <text class="comp-t serif">外显心性</text>
-        <text class="comp-sub">天干 · 别人眼中的你</text>
+        <text class="comp-t serif">主心性</text>
+        <text class="comp-sub">天干地支 · 贯穿一生</text>
       </view>
 
       <view class="now-note">{{traitNote}}</view>
 
       <view class="comp-tip">
-        这是你最突出的两股<text class="tip-l">主心性</text>（按能量排序）。每股心性都有两面：滑标越靠<text class="tip-l">左</text>，越发挥得顺、显出好的一面；越靠<text class="tip-r">右</text>，越容易走偏、需要留意。指针会随大运、流年移动。
+        这是你最贯穿一生的两股<text class="tip-l">主心性</text>。每一股都有<text class="tip-l">发挥得顺</text>的一面，也有<text class="tip-r">容易走偏</text>的一面——没有绝对的好坏，只是同一种特质在不同状态下的两种样子，会随大运、流年慢慢挪动。
       </view>
 
       <view class="trait" wx:for="{{list}}" wx:key="god">
@@ -100,7 +100,7 @@
         </view>
       </view>
 
-      <view class="comp-empty" wx:if="{{list.length === 0}}">天干能量过弱，暂无明显外显心性。</view>
+      <view class="comp-empty" wx:if="{{list.length === 0}}">心性能量较平均，暂无特别突出的主心性。</view>
     </view>
 
     <!-- 心结与张力（地支刑冲合害） -->
@@ -173,7 +173,7 @@
 
   </block>
 
-  <view class="foot">性格画像基于天干十神的能量与旺衰，仅供传统文化娱乐参考</view>
+  <view class="foot">性格画像基于天干地支十神的能量配比，仅供传统文化娱乐参考</view>
 
   <!-- 底部时光条占位（避免内容被吸底栏遮挡） -->
   <view class="bar-holder" wx:if="{{tab === 'trait'}}"></view>
