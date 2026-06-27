@@ -7,8 +7,28 @@
 var energy = require('./energy.js');
 var base = require('./base.js');
 var relations = require('./relations.js');
+var traitWords = require('./traitWords.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
+
+// 主心性 → 气泡星团数据（优/中/缺 关键词 + 日主五行附加）
+function buildTraitBubbles(list, dmEl) {
+  var out = [];
+  (list || []).slice(0, 2).forEach(function (t, idx) {
+    var kw = traitWords[t.god];
+    if (!kw) return;
+    var bw = idx === 0 ? 0.95 : 0.78;
+    (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', w: bw - i * 0.1 }); });
+    (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', w: 0.55 }); });
+    (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', w: bw - 0.05 - i * 0.1 }); });
+    var wx = kw.wx && kw.wx[dmEl];
+    if (wx) {
+      (wx.pro || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'pro', w: 0.6 }); });
+      (wx.con || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'con', w: 0.58 }); });
+    }
+  });
+  return out;
+}
 
 // ── 占比决策树：全池五行占比 → 每个五行 喜(+,左)/忌(-,右) ──
 var WX = ['木', '火', '土', '金', '水'];
@@ -400,6 +420,7 @@ function build(chart, opts) {
     },
     paimian: paimian,
     list: list,
+    traitBubbles: buildTraitBubbles(list, dmEl),
     branchList: branchList,
     relations: rels,
     stages: stages,

@@ -74,29 +74,22 @@
       <view class="now-note">{{traitNote}}</view>
 
       <view class="comp-tip">
-        这是你最贯穿一生的两股<text class="tip-l">主心性</text>。每一股都有<text class="tip-l">发挥得顺</text>的一面，也有<text class="tip-r">容易走偏</text>的一面——没有绝对的好坏，只是同一种特质在不同状态下的两种样子，会随大运、流年慢慢挪动。
+        把你这两股主心性拆成一颗颗关键词：<text class="tip-l">蓝色在上</text>是发挥得顺的一面，<text class="tip-r">红色在下</text>是需要留意的一面——它们一体两面，越突出的越大。可以按住拖一拖。
       </view>
 
+      <!-- 气泡星团 -->
+      <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" />
+
+      <!-- 两股主心性 · 优缺细读 -->
       <view class="trait" wx:for="{{list}}" wx:key="god">
         <view class="trait-line">
           <text class="trait-name serif">{{item.name}}</text>
           <text class="trait-main" wx:if="{{item.isMain}}">主心性</text>
           <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-          <view class="trait-energy">
-            <text class="te-dot {{d.on ? 'on' : ''}}" wx:for="{{item.dots}}" wx:for-item="d" wx:key="i"></text>
-          </view>
-        </view>
-        <!-- 滑标轴：左端词(顺) ←指针→ 右端词(偏) -->
-        <view class="slider-row">
-          <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
-          <view class="sl-track">
-            <view class="sl-thumb" style="left:{{item.slider}}%"></view>
-          </view>
-          <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
         </view>
         <view class="trait-pc">
           <view class="pc pc-on"><text class="pc-key pc-key-pro">优点</text>{{item.desc}}</view>
-          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">缺点</text>{{item.con}}</view>
+          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">留意</text>{{item.con}}</view>
         </view>
       </view>
 
