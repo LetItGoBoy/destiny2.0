@@ -690,3 +690,21 @@
 /* 字号档位 */
 .fs-l .core-text, .fs-l .pc, .fs-l .intro { font-size: 26rpx; }
 .fs-xl .core-text, .fs-xl .pc, .fs-xl .intro { font-size: 29rpx; }
+
+/* 气泡星团 · 顺偏滑标 */
+.lean-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin: 8rpx 6rpx 4rpx;
+}
+.lean-slider { flex: 1; }
+.lean-end {
+  font-size: 24rpx;
+  font-weight: 700;
+  flex: none;
+  width: 86rpx;
+  text-align: center;
+}
+.lean-end.l { color: #2C6BB0; }
+.lean-end.r { color: #B23A2E; }

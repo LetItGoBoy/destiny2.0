@@ -78,7 +78,14 @@
       </view>
 
       <!-- 气泡星团 -->
-      <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" />
+      <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" lean="{{lean}}" />
+      <view class="lean-row" wx:if="{{traitBubbles.length}}">
+        <text class="lean-end l">顺 · 优</text>
+        <slider class="lean-slider" min="0" max="100" value="{{leanVal}}"
+          activeColor="#8A2B27" backgroundColor="#E2DCD2" block-color="#8A2B27" block-size="20"
+          bindchanging="onLean" bindchange="onLean" />
+        <text class="lean-end r">偏 · 缺</text>
+      </view>
 
       <!-- 两股主心性 · 优缺细读 -->
       <view class="trait" wx:for="{{list}}" wx:key="god">
