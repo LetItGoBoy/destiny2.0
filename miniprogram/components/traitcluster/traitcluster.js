@@ -4,8 +4,7 @@ var CON = { fill: '#F7DCD9', line: '#E6A89F', text: '#B23A2E' }; // 缺（淡红
 
 Component({
   properties: {
-    bubbles: { type: Array, value: [] },
-    lean: { type: Number, value: 0.4 }   // 0=顺(优大) … 1=偏(缺大)
+    bubbles: { type: Array, value: [] }   // 每个泡泡自带 lean(由算法算出的滑标位置)
   },
 
   lifetimes: {
@@ -54,9 +53,10 @@ Component({
           label: it.label,
           kind: it.kind,
           w: it.w || 0.6,
+          lean: it.lean == null ? 0.5 : it.lean,
           con: con,
           pal: con ? CON : PRO,
-          r: that.targetR(it.kind, it.w || 0.6),
+          r: that.targetR(it.kind, it.w || 0.6, it.lean == null ? 0.5 : it.lean),
           x: W / 2 + Math.cos(a) * 40,
           y: cy + Math.sin(a) * 30,
           vx: 0, vy: 0
@@ -64,9 +64,8 @@ Component({
       });
     },
 
-    // 半径随滑标涨缩：顺→优大缺小，偏→缺大优小；中性不变
+    // 半径随该心性算出的滑标位置涨缩：顺→优大缺小，偏→缺大优小；中性不变
     targetR: function (kind, w, lean) {
-      if (lean == null) lean = this.data.lean;
       var base = 13 + (w || 0.6) * 15;
       if (kind === 'neu') return base;
       if (kind === 'con') return base * (0.5 + 0.95 * lean);
@@ -84,10 +83,9 @@ Component({
     physics: function () {
       var W = this._w, H = this._h, ns = this._nodes || [];
       var cx = W / 2, topY = H * 0.30, botY = H * 0.72;
-      var lean = this.data.lean;
       for (var i = 0; i < ns.length; i++) {
         var n = ns[i];
-        var tr = this.targetR(n.kind, n.w, lean);
+        var tr = this.targetR(n.kind, n.w, n.lean);
         n.r += (tr - n.r) * 0.12;        // 平滑涨缩
         if (n.fix) continue;
         var gy = n.con ? botY : topY;

@@ -77,15 +77,8 @@
         把你这两股主心性拆成一颗颗关键词：<text class="tip-l">蓝色在上</text>是发挥得顺的一面，<text class="tip-r">红色在下</text>是需要留意的一面——它们一体两面，越突出的越大。可以按住拖一拖。
       </view>
 
-      <!-- 气泡星团 -->
-      <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" lean="{{lean}}" />
-      <view class="lean-row" wx:if="{{traitBubbles.length}}">
-        <text class="lean-end l">顺 · 优</text>
-        <slider class="lean-slider" min="0" max="100" value="{{leanVal}}"
-          activeColor="#8A2B27" backgroundColor="#E2DCD2" block-color="#8A2B27" block-size="20"
-          bindchanging="onLean" bindchange="onLean" />
-        <text class="lean-end r">偏 · 缺</text>
-      </view>
+      <!-- 气泡星团（大小由各心性算出的喜忌位置驱动，随大运流年变化） -->
+      <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" />
 
       <!-- 两股主心性 · 优缺细读 -->
       <view class="trait" wx:for="{{list}}" wx:key="god">

@@ -13,8 +13,6 @@ Page({
     paimian: [],
     list: [],
     traitBubbles: [],
-    leanVal: 40,        // 滑标位置 0-100
-    lean: 0.4,          // 0=顺(优大) … 1=偏(缺大)
     branchList: [],
     relations: [],
     stages: [],
@@ -212,12 +210,6 @@ Page({
       barYearShow: barYearShow,
       barActive: barActive
     });
-  },
-
-  // 顺/偏滑标：控制气泡星团优缺涨缩
-  onLean: function (e) {
-    var v = e.detail.value;
-    this.setData({ leanVal: v, lean: v / 100 });
   },
 
   noop: function () {}

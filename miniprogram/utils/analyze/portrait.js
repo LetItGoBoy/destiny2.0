@@ -17,14 +17,16 @@ function buildTraitBubbles(list, dmEl) {
   (list || []).slice(0, 2).forEach(function (t, idx) {
     var kw = traitWords[t.god];
     if (!kw) return;
+    // 该心性算出的滑标位置(25-75) → lean(0顺…1偏)，驱动这组泡泡优缺涨缩
+    var lean = (t.slider != null ? t.slider : 50) / 100;
     var bw = idx === 0 ? 0.95 : 0.78;
-    (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', w: bw - i * 0.1 }); });
-    (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', w: 0.55 }); });
-    (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', w: bw - 0.05 - i * 0.1 }); });
+    (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', w: bw - i * 0.1, lean: lean }); });
+    (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', w: 0.55, lean: lean }); });
+    (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', w: bw - 0.05 - i * 0.1, lean: lean }); });
     var wx = kw.wx && kw.wx[dmEl];
     if (wx) {
-      (wx.pro || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'pro', w: 0.6 }); });
-      (wx.con || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'con', w: 0.58 }); });
+      (wx.pro || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'pro', w: 0.6, lean: lean }); });
+      (wx.con || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'con', w: 0.58, lean: lean }); });
     }
   });
   return out;
