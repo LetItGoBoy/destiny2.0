@@ -74,7 +74,7 @@
       <view class="now-note">{{traitNote}}</view>
 
       <view class="comp-tip">
-        把你这两股主心性拆成一颗颗关键词：<text class="tip-l">红色在上</text>是发挥得顺的一面，<text class="tip-r">蓝色在下</text>是需要留意的一面——它们一体两面，越突出的越大。可以按住拖一拖。
+        把你这两股主心性拆成一颗颗关键词：<text class="tip-l">红色在上</text>是发挥得顺的一面，<text class="tip-r">蓝色在下</text>是需要留意的一面——一体两面，越突出的越大。挂上岁运后，<text class="tip-luck">金色</text>气泡是那一年叠加进来的心性。可以按住拖一拖。
       </view>
 
       <!-- 气泡星团（大小由各心性算出的喜忌位置驱动，随大运流年变化） -->

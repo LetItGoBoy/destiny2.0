@@ -1,6 +1,7 @@
 // 心性气泡星团：优点(含中性)聚上团、缺点聚下团；淡底实心圆，贴合不重叠，可拖动。
-var PRO = { fill: '#F7DCD9', line: '#E6A89F', text: '#B23A2E' }; // 优 / 中（淡红）
-var CON = { fill: '#DCE8F7', line: '#9CBEE6', text: '#2C6BB0' }; // 缺（淡蓝）
+var PRO = { fill: '#F7DCD9', line: '#E6A89F', text: '#B23A2E' };  // 原局优/中（淡红）
+var CON = { fill: '#DCE8F7', line: '#9CBEE6', text: '#2C6BB0' };  // 原局缺（淡蓝）
+var LUCK = { fill: '#F3E2BC', line: '#D9B45A', text: '#9A6B12' }; // 岁运叠加（金）
 
 Component({
   properties: {
@@ -55,7 +56,7 @@ Component({
           w: it.w || 0.6,
           lean: it.lean == null ? 0.5 : it.lean,
           con: con,
-          pal: con ? CON : PRO,
+          pal: it.src === 'luck' ? LUCK : (con ? CON : PRO),
           r: that.targetR(it.kind, it.w || 0.6, it.lean == null ? 0.5 : it.lean),
           x: W / 2 + Math.cos(a) * 40,
           y: cy + Math.sin(a) * 30,

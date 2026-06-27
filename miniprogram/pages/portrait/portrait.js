@@ -184,12 +184,12 @@ Page({
     // 当前显示了什么的说明
     var traitNote;
     if (this.data.dyIndex < 0) {
-      traitNote = '现在看到的是你的「原局主心性」——贯穿一生的性格底色。点下方「岁运」选大运 / 流年，可查看某一年被引动的心性。';
+      traitNote = '红蓝气泡是你「原局主心性」——贯穿一生的底色。点下方「岁运」挂上大运 / 流年，会多出一组金色气泡，叠加那一年被引动的心性，原局主心性始终都在。';
     } else if (this.data.lnIndex < 0) {
-      traitNote = '现在看到的是「' + this._dy[this.data.dyIndex].gz + ' 大运」十年里的心性倾向。再点一个流年，就能看到具体某年的当年主旋律。';
+      traitNote = '金色气泡是「' + this._dy[this.data.dyIndex].gz + ' 大运」叠加在你主心性上的色彩；红蓝原局主心性仍在，大小随这十年的喜忌此消彼长。再点一个流年看具体某年。';
     } else {
       var lnItem = this.data.liuNianList[this.data.lnIndex];
-      traitNote = '现在看到的是「' + lnItem.year + ' 年 · ' + lnItem.gz + '」的流年心性——这一年最显于外的当年主旋律。';
+      traitNote = '金色气泡是「' + lnItem.year + ' 年 · ' + lnItem.gz + '」叠加进来的当年心性；红蓝原局主心性始终都在，只是各面大小随今年喜忌变化——所以不会有性格割裂感。';
     }
 
     var p = portrait.build(this._chart, { daYunGZ: dyGZ, liuNianGZ: lnGZ });

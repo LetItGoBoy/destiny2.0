@@ -11,8 +11,8 @@ var traitWords = require('./traitWords.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
 
-// 主心性 → 气泡星团数据（优/中/缺 关键词 + 日主五行附加）
-function buildTraitBubbles(list, dmEl) {
+// 主心性 → 气泡星团数据（原局两股 src=natal 红蓝 + 岁运叠加 src=luck 金）
+function buildTraitBubbles(list, luck, dmEl) {
   var out = [];
   (list || []).slice(0, 2).forEach(function (t, idx) {
     var kw = traitWords[t.god];
@@ -20,15 +20,24 @@ function buildTraitBubbles(list, dmEl) {
     // 该心性算出的滑标位置(25-75) → lean(0顺…1偏)，驱动这组泡泡优缺涨缩
     var lean = (t.slider != null ? t.slider : 50) / 100;
     var bw = idx === 0 ? 0.95 : 0.78;
-    (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', w: bw - i * 0.1, lean: lean }); });
-    (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', w: 0.55, lean: lean }); });
-    (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', w: bw - 0.05 - i * 0.1, lean: lean }); });
+    (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw - i * 0.1, lean: lean }); });
+    (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: lean }); });
+    (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'natal', w: bw - 0.05 - i * 0.1, lean: lean }); });
     var wx = kw.wx && kw.wx[dmEl];
     if (wx) {
-      (wx.pro || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'pro', w: 0.6, lean: lean }); });
-      (wx.con || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'con', w: 0.58, lean: lean }); });
+      (wx.pro || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: 0.6, lean: lean }); });
+      (wx.con || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: 0.58, lean: lean }); });
     }
   });
+  // 岁运叠加（金色）：取一组优缺关键词，叠在主心性之上，不顶替
+  if (luck && luck.god) {
+    var lkw = traitWords[luck.god];
+    if (lkw) {
+      var ll = (luck.slider != null ? luck.slider : 50) / 100;
+      (lkw.pro || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'luck', w: 0.85 - i * 0.1, lean: ll }); });
+      (lkw.con || []).slice(0, 2).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'luck', w: 0.8 - i * 0.1, lean: ll }); });
+    }
+  }
   return out;
 }
 
@@ -283,45 +292,43 @@ function build(chart, opts) {
   // 本命/未选流年：保留原局天干多条，方向同样改用决策树。
   function fullDots() { var d = []; for (var k = 1; k <= 5; k++) d.push({ i: k, on: true }); return d; }
   function energyDots(ratio) { var n = Math.max(1, Math.min(5, Math.round(ratio * 5))); var d = []; for (var k = 1; k <= 5; k++) d.push({ i: k, on: k <= n }); return d; }
+  // —— 主心性：始终取原局最强的两股（天干+地支），贯穿一生，不被岁运顶替 ——
+  // 大小(顺偏)用含岁运的合并能量喜忌，所以底色不变、但各面随岁运此消彼长。
   var list = [];
-  if (lnGan) {
-    // 流年：单条「流年天干」当年主旋律，用流年专用文案
-    var lg = LunarUtil.SHI_SHEN[dayGan + lnGan];
-    var lgEl = base.ganWx(lnGan);
-    var L0 = LIUNIAN[lg] || { pol: '', lbl: '', rbl: '', desc: '' };
+  var GAN_W = 1.3;
+  var ZHI_POS = { 0: 0.6, 1: 1.0, 2: 0.85, 3: 0.55, 4: 0.6, 5: 0.55 };
+  var agg = {};
+  function addG(god, el, cls, v) {
+    if (!agg[god]) agg[god] = { god: god, el: el, cls: cls, energy: 0 };
+    agg[god].energy += v;
+  }
+  stems.forEach(function (c) { addG(c.god, c.el, c.cls, c.val * GAN_W); });
+  (m.hiddenUnits || []).forEach(function (u) { addG(u.god, u.el, base.WX_CLS[u.el], u.val * (ZHI_POS[u.pillar] != null ? ZHI_POS[u.pillar] : 0.6)); });
+  var arr = [];
+  for (var g in agg) arr.push(agg[g]);
+  arr.sort(function (a, b) { return b.energy - a.energy; });
+  var maxE = arr.length ? arr[0].energy : 1;
+  arr.slice(0, 2).forEach(function (it, idx) {
+    var t = TEMP[it.god] || { name: it.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
     list.push({
-      god: lg, name: lg, pol: L0.pol, lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
-      cls: base.WX_CLS[lgEl],
-      slider: sliderPos(xiji.dir[lgEl], (m.pool || {})[lgEl] || 0),
-      energy: 1, dots: fullDots(), isMain: true
+      god: it.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, con: t.con, cls: it.cls,
+      slider: sliderPos(xiji.dir[it.el], (m.pool || {})[it.el] || 0),
+      energy: it.energy,
+      dots: energyDots(maxE > 0 ? it.energy / maxE : 1),
+      isMain: idx === 0
     });
-  } else {
-    // 本命：按具体十神能量排序取前两名（天干+地支，十神分开记）
-    // 心性排序计权：天干整体提升；地支按位置系数(年0.6/月1.0/日0.85/时0.55)且整体偏低，
-    // 使远在年/时支的藏支根不致虚高（如卯乙之于七杀），且天干能量大于地支。
-    var GAN_W = 1.3;
-    var ZHI_POS = { 0: 0.6, 1: 1.0, 2: 0.85, 3: 0.55, 4: 0.6, 5: 0.55 };
-    var agg = {};
-    function addG(god, el, cls, v) {
-      if (!agg[god]) agg[god] = { god: god, el: el, cls: cls, energy: 0 };
-      agg[god].energy += v;
-    }
-    stems.forEach(function (c) { addG(c.god, c.el, c.cls, c.val * GAN_W); });
-    (m.hiddenUnits || []).forEach(function (u) { addG(u.god, u.el, base.WX_CLS[u.el], u.val * (ZHI_POS[u.pillar] != null ? ZHI_POS[u.pillar] : 0.6)); });
-    var arr = [];
-    for (var g in agg) arr.push(agg[g]);
-    arr.sort(function (a, b) { return b.energy - a.energy; });
-    var maxE = arr.length ? arr[0].energy : 1;
-    arr.slice(0, 2).forEach(function (it, idx) {
-      var t = TEMP[it.god] || { name: it.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
-      list.push({
-        god: it.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, con: t.con, cls: it.cls,
-        slider: sliderPos(xiji.dir[it.el], (m.pool || {})[it.el] || 0),
-        energy: it.energy,
-        dots: energyDots(maxE > 0 ? it.energy / maxE : 1),
-        isMain: idx === 0
-      });
-    });
+  });
+
+  // —— 岁运叠加心性：取岁运天干十神（流年优先，否则大运），作为另一组气泡叠加 ——
+  var luckGan = lnGan || ((opts.daYunGZ && opts.daYunGZ.length >= 2) ? opts.daYunGZ.charAt(0) : null);
+  var luckTrait = null;
+  if (luckGan) {
+    var lkGod = LunarUtil.SHI_SHEN[dayGan + luckGan];
+    var lkEl = base.ganWx(luckGan);
+    luckTrait = {
+      god: lkGod, name: lkGod, cls: base.WX_CLS[lkEl],
+      slider: sliderPos(xiji.dir[lkEl], (m.pool || {})[lkEl] || 0)
+    };
   }
 
   // —— 内在心性（branchList）——
@@ -422,7 +429,8 @@ function build(chart, opts) {
     },
     paimian: paimian,
     list: list,
-    traitBubbles: buildTraitBubbles(list, dmEl),
+    traitBubbles: buildTraitBubbles(list, luckTrait, dmEl),
+    luckTrait: luckTrait,
     branchList: branchList,
     relations: rels,
     stages: stages,

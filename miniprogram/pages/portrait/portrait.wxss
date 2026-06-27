@@ -218,6 +218,7 @@
 .fs-xl .now-note { font-size: 30rpx; }
 .comp-tip .tip-l { color: var(--primary); font-weight: 600; }
 .comp-tip .tip-r { color: #2C6BB0; font-weight: 600; }
+.comp-tip .tip-luck { color: #9A6B12; font-weight: 600; }
 
 .trait {
   padding: 22rpx 0;
