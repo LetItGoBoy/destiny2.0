@@ -217,7 +217,7 @@
 .fs-l .now-note { font-size: 27rpx; }
 .fs-xl .now-note { font-size: 30rpx; }
 .comp-tip .tip-l { color: var(--primary); font-weight: 600; }
-.comp-tip .tip-r { color: var(--ink-3); font-weight: 600; }
+.comp-tip .tip-r { color: #2C6BB0; font-weight: 600; }
 
 .trait {
   padding: 22rpx 0;
@@ -285,7 +285,7 @@
   max-width: 160rpx;
 }
 .sl-lbl-l { color: var(--primary); text-align: right; }
-.sl-lbl-r { color: var(--ink-3); text-align: left; }
+.sl-lbl-r { color: #2C6BB0; text-align: left; }
 .sl-track {
   flex: 1;
   height: 10rpx;
@@ -335,8 +335,8 @@
   background: var(--primary-soft, rgba(138, 43, 39, 0.10));
 }
 .pc-key-con {
-  color: var(--ink-3, #8a8170);
-  background: var(--fill, rgba(0, 0, 0, 0.05));
+  color: #2C6BB0;
+  background: rgba(44, 107, 176, 0.10);
 }
 .comp-empty {
   padding: 30rpx 0;

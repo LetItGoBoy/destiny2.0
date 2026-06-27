@@ -1,6 +1,6 @@
 // 心性气泡星团：优点(含中性)聚上团、缺点聚下团；淡底实心圆，贴合不重叠，可拖动。
-var PRO = { fill: '#DCE8F7', line: '#9CBEE6', text: '#2C6BB0' }; // 优 / 中（淡蓝）
-var CON = { fill: '#F7DCD9', line: '#E6A89F', text: '#B23A2E' }; // 缺（淡红）
+var PRO = { fill: '#F7DCD9', line: '#E6A89F', text: '#B23A2E' }; // 优 / 中（淡红）
+var CON = { fill: '#DCE8F7', line: '#9CBEE6', text: '#2C6BB0' }; // 缺（淡蓝）
 
 Component({
   properties: {

@@ -74,7 +74,7 @@
       <view class="now-note">{{traitNote}}</view>
 
       <view class="comp-tip">
-        把你这两股主心性拆成一颗颗关键词：<text class="tip-l">蓝色在上</text>是发挥得顺的一面，<text class="tip-r">红色在下</text>是需要留意的一面——它们一体两面，越突出的越大。可以按住拖一拖。
+        把你这两股主心性拆成一颗颗关键词：<text class="tip-l">红色在上</text>是发挥得顺的一面，<text class="tip-r">蓝色在下</text>是需要留意的一面——它们一体两面，越突出的越大。可以按住拖一拖。
       </view>
 
       <!-- 气泡星团（大小由各心性算出的喜忌位置驱动，随大运流年变化） -->
@@ -86,6 +86,14 @@
           <text class="trait-name serif">{{item.name}}</text>
           <text class="trait-main" wx:if="{{item.isMain}}">主心性</text>
           <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+        </view>
+        <!-- 算法算出的顺/偏位置（只读展示） -->
+        <view class="slider-row">
+          <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
+          <view class="sl-track">
+            <view class="sl-thumb" style="left:{{item.slider}}%"></view>
+          </view>
+          <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
         </view>
         <view class="trait-pc">
           <view class="pc pc-on"><text class="pc-key pc-key-pro">优点</text>{{item.desc}}</view>
