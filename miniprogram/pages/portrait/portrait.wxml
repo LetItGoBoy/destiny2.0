@@ -64,7 +64,18 @@
       </view>
     </view>
 
-    <!-- 外显心性（天干） -->
+    <!-- 今年心性（流年/大运叠加的当年倾向） -->
+    <view class="card luck-card" wx:if="{{luckTrait}}">
+      <view class="luck-head">
+        <text class="luck-badge">今年心性</text>
+        <text class="luck-name serif">{{luckTrait.name}}</text>
+        <text class="luck-lbls" wx:if="{{luckTrait.lbl}}">{{luckTrait.lbl}} · {{luckTrait.rbl}}</text>
+      </view>
+      <view class="luck-lead">{{luckTrait.lead}}</view>
+      <view class="luck-desc">{{luckTrait.desc}}</view>
+    </view>
+
+    <!-- 主心性（天干地支 · 贯穿一生） -->
     <view class="card comp" id="sec-tiangan">
       <view class="comp-head">
         <text class="comp-t serif">主心性</text>

@@ -11,6 +11,20 @@ var traitWords = require('./traitWords.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
 
+// 十神 → 「今年心性」过渡引子（流年新加入的当年倾向，口语化）
+var LIUNIAN_LEAD = {
+  比肩: '今年想靠自己、找人搭伙',
+  劫财: '今年想拼想闯、人脉走动多',
+  食神: '今年想松快享受，也容易发懒',
+  伤官: '今年想表现、想秀才华',
+  偏财: '今年想搞钱，机会多、应酬多',
+  正财: '今年想踏实攒钱、过日子',
+  七杀: '今年想拼一把、扛事，压力也大',
+  正官: '今年想求名分、上进守规矩',
+  偏印: '今年想钻研充电，也容易发懒',
+  正印: '今年想求安稳、靠贵人长辈'
+};
+
 // 主心性 → 气泡星团数据（原局两股 src=natal 红蓝 + 岁运叠加 src=luck 金）
 function buildTraitBubbles(list, luck, dmEl) {
   var out = [];
@@ -30,7 +44,8 @@ function buildTraitBubbles(list, luck, dmEl) {
     }
   });
   // 岁运叠加（金色）：取一组优缺关键词，叠在主心性之上，不顶替
-  if (luck && luck.god) {
+  // 若岁运十神与原局主心性相同，能量本就一样，不再加多余的圆
+  if (luck && luck.god && !luck.dup) {
     var lkw = traitWords[luck.god];
     if (lkw) {
       var ll = (luck.slider != null ? luck.slider : 50) / 100;
@@ -325,9 +340,14 @@ function build(chart, opts) {
   if (luckGan) {
     var lkGod = LunarUtil.SHI_SHEN[dayGan + luckGan];
     var lkEl = base.ganWx(luckGan);
+    var L0 = LIUNIAN[lkGod] || { lbl: '', rbl: '', desc: '' };
+    var dup = list.some(function (t) { return t.god === lkGod; });
     luckTrait = {
       god: lkGod, name: lkGod, cls: base.WX_CLS[lkEl],
-      slider: sliderPos(xiji.dir[lkEl], (m.pool || {})[lkEl] || 0)
+      slider: sliderPos(xiji.dir[lkEl], (m.pool || {})[lkEl] || 0),
+      lead: LIUNIAN_LEAD[lkGod] || '',
+      lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
+      dup: dup
     };
   }
 

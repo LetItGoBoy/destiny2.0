@@ -709,3 +709,47 @@
 }
 .lean-end.l { color: #2C6BB0; }
 .lean-end.r { color: #B23A2E; }
+
+/* 今年心性（流年/大运叠加）· 金色调 */
+.luck-card {
+  border-left: 6rpx solid #D9B45A;
+  background: linear-gradient(180deg, rgba(217,180,90,0.08), #FFFFFF 60%);
+}
+.luck-head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-bottom: 10rpx;
+}
+.luck-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #fff;
+  background: #C9A227;
+  border-radius: 8rpx;
+  padding: 3rpx 14rpx;
+}
+.luck-name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #9A6B12;
+  letter-spacing: 2rpx;
+}
+.luck-lbls {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: #B08A2E;
+}
+.luck-lead {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #8A5E12;
+  margin-bottom: 10rpx;
+}
+.luck-desc {
+  font-size: 25rpx;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.fs-l .luck-desc { font-size: 27rpx; }
+.fs-xl .luck-desc { font-size: 30rpx; }
