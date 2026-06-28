@@ -710,10 +710,10 @@
 .lean-end.l { color: #2C6BB0; }
 .lean-end.r { color: #B23A2E; }
 
-/* 今年心性（流年/大运叠加）· 金色调 */
-.luck-card {
-  border-left: 6rpx solid #D9B45A;
-  background: linear-gradient(180deg, rgba(217,180,90,0.08), #FFFFFF 60%);
+/* 今年心性（流年/大运叠加）· 气泡与主心性细读之间，无特殊卡框 */
+.luck-block {
+  padding: 18rpx 0 6rpx;
+  border-bottom: 1rpx solid var(--line);
 }
 .luck-head {
   display: flex;

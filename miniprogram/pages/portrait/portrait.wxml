@@ -64,17 +64,6 @@
       </view>
     </view>
 
-    <!-- 今年心性（流年/大运叠加的当年倾向） -->
-    <view class="card luck-card" wx:if="{{luckTrait}}">
-      <view class="luck-head">
-        <text class="luck-badge">今年心性</text>
-        <text class="luck-name serif">{{luckTrait.name}}</text>
-        <text class="luck-lbls" wx:if="{{luckTrait.lbl}}">{{luckTrait.lbl}} · {{luckTrait.rbl}}</text>
-      </view>
-      <view class="luck-lead">{{luckTrait.lead}}</view>
-      <view class="luck-desc">{{luckTrait.desc}}</view>
-    </view>
-
     <!-- 主心性（天干地支 · 贯穿一生） -->
     <view class="card comp" id="sec-tiangan">
       <view class="comp-head">
@@ -90,6 +79,17 @@
 
       <!-- 气泡星团（大小由各心性算出的喜忌位置驱动，随大运流年变化） -->
       <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" />
+
+      <!-- 今年心性（流年/大运叠加，气泡与主心性细读之间） -->
+      <view class="luck-block" wx:if="{{luckTrait}}">
+        <view class="luck-head">
+          <text class="luck-badge">今年心性</text>
+          <text class="luck-name serif">{{luckTrait.name}}</text>
+          <text class="luck-lbls" wx:if="{{luckTrait.lbl}}">{{luckTrait.lbl}} · {{luckTrait.rbl}}</text>
+        </view>
+        <view class="luck-lead">{{luckTrait.lead}}</view>
+        <view class="luck-desc">{{luckTrait.desc}}</view>
+      </view>
 
       <!-- 两股主心性 · 优缺细读 -->
       <view class="trait" wx:for="{{list}}" wx:key="god">
