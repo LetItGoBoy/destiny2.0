@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "性格画像",
+  "usingComponents": {
+    "traitcluster": "/components/traitcluster/traitcluster"
+  }
+}

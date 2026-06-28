@@ -117,7 +117,7 @@
   font-size: 22rpx;
   margin-bottom: 18rpx;
 }
-.ws-lg-same { color: #6D5DF6; }
+.ws-lg-same { color: #8A2B27; }
 .ws-lg-diff { color: #EC5C8D; }
 
 /* 喜忌 / 用神 chips */
@@ -231,6 +231,120 @@
   font-size: 24rpx;
   line-height: 1.65;
   color: var(--ink-3);
+}
+
+/* ── 计算过程展开面板 ── */
+.calc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24rpx;
+  padding: 14rpx 0 2rpx;
+  border-top: 1rpx solid var(--line);
+  gap: 6rpx;
+}
+.calc-toggle-text {
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.calc-arrow {
+  font-size: 20rpx;
+  color: var(--ink-3);
+  display: inline-block;
+  transition: transform 0.2s;
+}
+.calc-arrow-up {
+  transform: rotate(180deg);
+}
+.calc-breakdown {
+  margin-top: 14rpx;
+}
+/* 每条字的明细行 */
+.bd-row {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 0;
+  gap: 8rpx;
+}
+.bd-sep {
+  border-top: 1rpx dashed var(--line);
+  margin-top: 8rpx;
+  padding-top: 14rpx;
+}
+.bd-pos {
+  font-size: 19rpx;
+  color: var(--ink-3);
+  width: 148rpx;
+  flex-shrink: 0;
+}
+.bd-char {
+  font-size: 28rpx;
+  font-weight: 700;
+  width: 30rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+.bd-godwx {
+  flex: 1;
+  font-size: 20rpx;
+  color: var(--ink-2);
+  min-width: 0;
+}
+.bd-math {
+  font-size: 20rpx;
+  width: 172rpx;
+  text-align: right;
+  flex-shrink: 0;
+}
+.bd-ptag {
+  font-size: 18rpx;
+  width: 68rpx;
+  text-align: right;
+  flex-shrink: 0;
+  color: var(--ink-3);
+}
+.bd-same { color: #8A2B27; }
+.bd-diff { color: #EC5C8D; }
+.bd-day  { color: var(--ink-3); }
+/* 汇总区 */
+.bd-footer {
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 2rpx solid var(--line);
+}
+.bd-foot-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  padding: 6rpx 0;
+  font-size: 23rpx;
+}
+.bd-foot-lbl {
+  font-size: 21rpx;
+  color: var(--ink-3);
+}
+.bd-foot-val {
+  font-weight: 700;
+}
+.bd-foot-sep {
+  color: var(--ink-3);
+}
+.bd-foot-note {
+  font-size: 19rpx;
+  color: var(--ink-3);
+}
+.bd-foot-result {
+  font-size: 22rpx;
+  color: var(--ink-2);
+}
+.bd-foot-total {
+  font-size: 25rpx;
+  font-weight: 700;
+  color: var(--ink);
+  border-top: 1rpx dashed var(--line);
+  margin-top: 8rpx;
+  padding-top: 14rpx;
 }
 
 .footer {

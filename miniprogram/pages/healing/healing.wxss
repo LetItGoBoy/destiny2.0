@@ -16,16 +16,147 @@
   color: var(--ink-3);
 }
 
-/* 模块网格 */
+/* 今日心语 */
+.quote-card {
+  padding: 28rpx 30rpx;
+  margin-bottom: 22rpx;
+  background: linear-gradient(135deg, rgba(138, 43, 39, 0.10), rgba(138, 43, 39, 0.08));
+  border-left: 6rpx solid var(--primary);
+}
+.quote-label {
+  font-size: 22rpx;
+  color: var(--primary);
+  letter-spacing: 2rpx;
+  margin-bottom: 12rpx;
+}
+.quote-text {
+  font-size: 36rpx;
+  line-height: 1.6;
+  color: var(--ink);
+  letter-spacing: 2rpx;
+}
+
+/* 我的修行：打卡 + 成就 */
+.practice {
+  padding: 30rpx 30rpx 24rpx;
+  margin-bottom: 26rpx;
+}
+.practice-top {
+  display: flex;
+  align-items: center;
+}
+.pt-streak {
+  flex-shrink: 0;
+  padding-right: 28rpx;
+  margin-right: 24rpx;
+  border-right: 1rpx solid var(--line);
+}
+.pt-num {
+  font-size: 76rpx;
+  font-weight: 700;
+  color: var(--ink-3);
+  line-height: 1;
+}
+.pt-num.pt-on {
+  color: var(--primary);
+}
+.pt-unit {
+  font-size: 26rpx;
+  color: var(--ink-3);
+  margin-left: 6rpx;
+}
+.pt-cap {
+  margin-top: 10rpx;
+  font-size: 21rpx;
+  color: var(--ink-3);
+}
+.pt-stats {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+}
+.pt-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pt-sv {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pt-sl {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+.ach-row-t {
+  margin-top: 26rpx;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.ach-prog {
+  font-size: 22rpx;
+  font-weight: 400;
+  color: var(--ink-3);
+  margin-left: 10rpx;
+}
+.ach-scroll {
+  margin-top: 16rpx;
+  white-space: nowrap;
+}
+.ach-list {
+  display: inline-flex;
+  gap: 14rpx;
+  padding-bottom: 4rpx;
+}
+.ach {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 132rpx;
+  padding: 18rpx 10rpx 16rpx;
+  border-radius: 18rpx;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  opacity: 0.55;
+}
+.ach-on {
+  opacity: 1;
+  background: var(--tint);
+  border-color: var(--primary);
+}
+.ach-ico {
+  font-size: 44rpx;
+  line-height: 1;
+}
+.ach-name {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ach-desc {
+  margin-top: 4rpx;
+  font-size: 19rpx;
+  color: var(--ink-3);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* 模块网格：固定两列，窄屏也不塌成单列 */
 .grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 24rpx;
+  justify-content: space-between;
 }
 .mod {
-  width: calc(50% - 12rpx);
+  width: 48.5%;
   box-sizing: border-box;
   padding: 30rpx 28rpx;
+  margin-bottom: 24rpx;
 }
 .mod-hover {
   opacity: 0.85;
@@ -46,6 +177,7 @@
 .mod-muyu .mod-ico { background: linear-gradient(135deg, #C9A059, #A1763B); }
 .mod-burn .mod-ico { background: linear-gradient(135deg, #F28A6B, #C9543D); }
 .mod-rain .mod-ico { background: linear-gradient(135deg, #6FB6FF, #3D6F9E); }
+.mod-sutra .mod-ico { background: linear-gradient(135deg, #5BB58C, #2E7D58); }
 
 /* 矢量小图标（SVG data URI，免外部资源） */
 .mod-ico-img {
@@ -67,9 +199,22 @@
 .ico-rain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FBF9FF' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M6.2 13.5a3.8 3.8 0 0 1 .4-7.6A5.2 5.2 0 0 1 16.8 7a3.6 3.6 0 0 1-.4 6.5H6.2z'/%3E%3Cpath d='M8.2 16.5l-1 3.2'/%3E%3Cpath d='M12.4 16.5l-1 3.2' opacity='0.75'/%3E%3Cpath d='M16.6 16.5l-1 3.2'/%3E%3C/svg%3E");
 }
+.ico-sutra {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FBF9FF' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3.5h11l3 3v14H5z'/%3E%3Cpath d='M16 3.5v3h3' opacity='0.7'/%3E%3Cpath d='M8 10h8'/%3E%3Cpath d='M8 13.5h8'/%3E%3Cpath d='M8 17h5'/%3E%3C/svg%3E");
+}
 .mod-title {
   font-size: 32rpx;
   font-weight: 700;
+}
+.mod-flag {
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #2E7D58;
+  background: rgba(91, 181, 140, 0.16);
+  border-radius: 6rpx;
+  padding: 2rpx 8rpx;
+  margin-left: 8rpx;
+  vertical-align: middle;
 }
 .mod-sub {
   margin-top: 6rpx;
@@ -135,8 +280,8 @@
   width: 220rpx;
   height: 220rpx;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #CDB8FF, #7C5CE0 62%, #483390);
-  box-shadow: 0 0 80rpx rgba(157, 120, 248, 0.7), 0 0 200rpx rgba(124, 92, 224, 0.35);
+  background: radial-gradient(circle at 35% 30%, #CDB8FF, #A3382F 62%, #483390);
+  box-shadow: 0 0 80rpx rgba(138, 43, 39, 0.7), 0 0 200rpx rgba(138, 43, 39, 0.35);
 }
 .breath-phase {
   margin-top: 48rpx;
@@ -302,6 +447,84 @@
   font-weight: 600;
 }
 
+/* 每日抄经 */
+.sutra-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  margin-bottom: 14rpx;
+}
+.sutra-prog {
+  font-size: 24rpx;
+  color: var(--ink-3);
+  margin-bottom: 40rpx;
+}
+.sutra-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18rpx;
+  max-width: 600rpx;
+}
+.sutra-ch {
+  width: 96rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  text-align: center;
+  font-size: 52rpx;
+  font-weight: 700;
+  border-radius: 14rpx;
+  border: 1rpx dashed rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+  transition: color 0.3s, background 0.3s, border-color 0.3s;
+}
+.sutra-inked {
+  color: #F4F2FF;
+  border-style: solid;
+  border-color: rgba(138, 43, 39, 0.7);
+  background: rgba(138, 43, 39, 0.18);
+}
+.sutra-punct {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  width: 48rpx;
+}
+.sutra-tip {
+  margin-top: 40rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
+.sutra-done-text {
+  margin-top: 44rpx;
+  font-size: 32rpx;
+  color: var(--ink);
+  letter-spacing: 2rpx;
+}
+.sutra-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+.sutra-again, .sutra-back {
+  min-width: 200rpx;
+  text-align: center;
+  padding: 20rpx 0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.sutra-again {
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  color: var(--ink-2);
+}
+.sutra-back {
+  background: linear-gradient(135deg, #5BB58C, #2E7D58);
+  color: #fff;
+}
+
 /* 深色全屏覆盖层：局部回到亮色文字（页面整体为浅色主题） */
 .overlay {
   color: #F4F2FF;
@@ -312,4 +535,14 @@
   --line: rgba(255, 255, 255, 0.14);
   --fill: rgba(255, 255, 255, 0.08);
   --gold: #E3C27E;
+}
+
+/* 页脚免责声明 */
+.page-footer {
+  text-align: center;
+  font-size: 21rpx;
+  color: var(--ink-3);
+  letter-spacing: 1rpx;
+  line-height: 1.6;
+  padding: 30rpx 30rpx 16rpx;
 }

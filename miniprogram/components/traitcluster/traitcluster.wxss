@@ -1,0 +1,5 @@
+.tc-canvas {
+  width: 100%;
+  height: 640rpx;
+  display: block;
+}

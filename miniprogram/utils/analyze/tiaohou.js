@@ -102,17 +102,33 @@ function analyze(ctx, t) {
     过燥: '生于' + SEASON[monthZhi] + '而火炎土燥，全局燥气偏重，最需水来润局。'
   }[climate];
 
+  // 喜用：盘中所缺（不见）的调候天干即为喜用
+  var xiYong = [];
+  var seen = {};
+  for (var c = 0; c < yong.length; c++) {
+    if (yong[c].status === '不见' && !seen[yong[c].gan]) {
+      seen[yong[c].gan] = true;
+      xiYong.push({ gan: yong[c].gan, wx: yong[c].wx, cls: yong[c].cls });
+    }
+  }
+
   var lines = [];
   lines.push('生于' + monthZhi + '月（' + SEASON[monthZhi] + '令），' + climateDesc);
   if (yong.length) {
     lines.push('《穷通宝鉴》以 ' + yong.map(function (it) { return it.gan + '（' + it.role + '）'; }).join('、') + ' 为调候用神。');
     lines.push('本局主用神' + (firstStatus === '不见' ? '未现' : firstStatus) + '，' + deLi + '。');
   }
+  if (xiYong.length) {
+    lines.push('调候所缺 ' + xiYong.map(function (it) { return it.gan; }).join('、') + ' 即为喜用，原局未见、行运逢之最为得力。');
+  } else if (yong.length) {
+    lines.push('调候用神原局已全数现身，气候得调，无明显短板。');
+  }
 
   return {
     climate: climate,
     season: SEASON[monthZhi],
     yong: yong,
+    xiYong: xiYong,
     deLi: deLi,
     lines: lines,
     healthNotes: CLIMATE_HEALTH[climate] || []
