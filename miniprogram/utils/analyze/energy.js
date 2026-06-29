@@ -16,7 +16,7 @@ var ganWx = base.ganWx;
 
 // ── 原局参数 ──
 var GAN_BASE = [1.0, 1.0, 1.0, 1.0];        // 年/月/日/时 天干基础分
-var ZHI_W = [1.0, 2.0, 1.4, 1.0];           // 地支权重（月令当权、日支贴身）
+var ZHI_W = [1.0, 2.5, 1.4, 1.0];           // 地支权重（月令当权、日支贴身）
 var HIDE_W = { 1: [1], 2: [0.7, 0.3], 3: [0.6, 0.3, 0.1] };
 var PLBL = ['年', '月', '日', '时'];
 
@@ -31,28 +31,36 @@ var C_XIE = 0.15;     // 泄气 −
 var C_KE = 0.25;      // 受克 −
 var C_COST = 0.05;    // 克耗 −
 var C_ROOT = 0.30;    // 通根帮扶 +
-var ROOT_CROSS_DF = 0.6;
+var SAME_PILLAR_RANK_W = { 0: 1, 1: 0.5, 2: 0.3 };
 var DELING_X = 1.3;   // 得令加成（月令本气同党）
 var SAME_X = 1.0;     // 生扶结构性修正
 
-// 天干按根缩放 base：区分自坐根 / 通根月令 / 其他远根，再×藏干档
+// 天干按根加成 base：区分自坐根 / 通根月令 / 其他远根，再×藏干档
 // 自坐(坐支)最实，通根月令次之得令，其他柱按位置打折；远根明显弱于自坐。
-var ROOT_SELF = { 0: 1.0, 1: 0.8, 2: 0.6 };          // 自坐：本气/中气/余气
-var ROOT_MONTH = { 0: 0.9, 1: 0.65, 2: 0.45 };       // 他柱通根月令
-var ROOT_OTHER_POS = { 0: 0.4, 2: 0.55, 3: 0.35, 4: 0.45, 5: 0.4 }; // 其他远根所在柱(年/日/时/大运/流年)
-var ROOT_OTHER_RANK = [1.0, 0.7, 0.45];
-var ROOT_FLOOR = 0.35;
-function rootFactorOf(el, pillar, hidden) {
-  var best = 0;
+// 根必须与天干同十神，不能只按同五行借根，例如伤官乙不能借食神甲。
+var ROOT_SELF_FACTOR = 1.2;                          // 自坐根试算倍率
+var MONTH_STEM_MIN_FACTOR = 1.3;                     // 月干高权重：无根最低倍率
+var ROOT_RANK_FACTOR = { 0: 1.5, 1: 1.3, 2: 1.15 }; // 本气/中气/余气根对应的天干初始倍率
+var ROOT_DISTANCE_FACTOR = { 1: 0.6, 2: 0.3, 3: 0.1, 4: 0.08, 5: 0.06 }; // 异柱根按远近折损
+function rootDistanceFactor(a, b) {
+  var d = Math.abs(a - b);
+  if (d === 0) return 1;
+  return ROOT_DISTANCE_FACTOR[d] || 0.05;
+}
+function rootFactorOf(stemChar, dayGan, pillar, hidden) {
+  var stemGod = LunarUtil.SHI_SHEN[dayGan + stemChar];
+  var best = 1;
   for (var i = 0; i < hidden.length; i++) {
-    if (hidden[i].el !== el) continue;
-    var hp = hidden[i].pillar, rk = hidden[i].rank, s;
-    if (hp === pillar) s = (ROOT_SELF[rk] != null ? ROOT_SELF[rk] : 0.6);          // 自坐
-    else if (hp === 1) s = (ROOT_MONTH[rk] != null ? ROOT_MONTH[rk] : 0.45);       // 通根月令
-    else s = (ROOT_OTHER_POS[hp] || 0.4) * (ROOT_OTHER_RANK[rk] || 0.45);          // 其他远根
-    if (s > best) best = s;
+    if (LunarUtil.SHI_SHEN[dayGan + hidden[i].char] !== stemGod) continue;
+    var rootRank = hidden[i].pillar === 1 ? 0 : hidden[i].rank; // 月令所有根都按本气根看
+    var rankFactor = ROOT_RANK_FACTOR[rootRank] || 1;
+    var f = hidden[i].pillar === pillar
+      ? ROOT_SELF_FACTOR
+      : 1 + (rankFactor - 1) * rootDistanceFactor(pillar, hidden[i].pillar);
+    if (f > best) best = f;
   }
-  return ROOT_FLOOR + (1 - ROOT_FLOOR) * best;
+  if (pillar === 1 && best < MONTH_STEM_MIN_FACTOR) best = MONTH_STEM_MIN_FACTOR;
+  return best;
 }
 
 // ── 刑冲合害（先合，再刑冲害；只作用于地支根气）──
@@ -61,7 +69,7 @@ var LIU_CHONG = { 子: '午', 午: '子', 丑: '未', 未: '丑', 寅: '申', �
 var LIU_HAI = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '寅', 卯: '辰', 辰: '卯', 申: '亥', 亥: '申', 酉: '戌', 戌: '酉' };
 var ZI_XING = { 辰: 1, 午: 1, 酉: 1, 亥: 1 };
 var XING_PAIR = { 子卯: 1, 卯子: 1, 寅巳: 1, 巳寅: 1, 丑戌: 1, 戌丑: 1, 戌未: 1, 未戌: 1 };
-var REL_D = { 刑: 0.30, 冲: 0.25, 合: 0.15, 害: 0.12 };
+var REL_D = { 刑: 0.50, 冲: 0.25, 合: 0.15, 害: 0.12 };
 var REL_FLOOR = 0.3, REL_CEIL = 1.8;   // 累计倍率封顶
 
 // 一对地支的关系归类（先合 → 刑 → 冲 → 害）
@@ -103,6 +111,7 @@ function applyRelations(hidden, pairs) {
     var er = elemRel(elA, elB);
     if (er === 'same') {                          // 同五行：库冲/同气刑 → 本气增、库余气散
       mul(iaM, 1 + d); mul(ibM, 1 + d);
+      if (t === '刑') { mulSubs(pr.aPos, 1 + 0.5 * d); mulSubs(pr.bPos, 1 + 0.5 * d); }
       if (t === '冲') { mulSubs(pr.aPos, 1 - 0.5 * d); mulSubs(pr.bPos, 1 - 0.5 * d); }
     } else if (er === 'AkB') {                     // a 克 b
       mul(iaM, 1 - 0.4 * d); mul(ibM, 1 - d);
@@ -115,13 +124,22 @@ function applyRelations(hidden, pairs) {
     }
   });
   for (var k = 0; k < hidden.length; k++) {
-    hidden[k].val *= Math.max(REL_FLOOR, Math.min(REL_CEIL, fac[k]));
+    var relFactor = Math.max(REL_FLOOR, Math.min(REL_CEIL, fac[k]));
+    hidden[k].relFactor = relFactor;
+    hidden[k].activated = Math.abs(relFactor - 1) > 0.000001;
+    hidden[k].val *= relFactor;
   }
 }
 
 function partyOf(dm, el) {
   var r = base.relation(dm, el);
   return (r === '同我' || r === '生我') ? 'same' : 'diff';
+}
+
+function samePillarWeight(hd) {
+  if (hd.rank === 0) return 1;
+  if (!hd.activated) return 0;
+  return SAME_PILLAR_RANK_W[hd.rank] || 0;
 }
 
 // 占比/能量主算
@@ -165,11 +183,11 @@ function computeNatal(plist, dayGan, opts) {
     luckBranches.push({ pos: pos, zhi: zc });
   }
 
-  // —— 天干按根缩放 base（地支全部建完后，按全盘地支判根）——
+  // —— 天干按根加成 base（地支全部建完后，按全盘地支判根）——
   for (i = 0; i < stemSpecs.length; i++) {
     var sp = stemSpecs[i];
     var sel = ganWx(sp.char);
-    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sel, sp.pillar, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
+    stems.push({ char: sp.char, el: sel, val: sp.val * rootFactorOf(sp.char, dayGan, sp.pillar, hidden), pillar: sp.pillar, isDay: sp.isDay, kind: sp.kind });
   }
 
   // Step0a 刑冲合害：原局相邻 + 岁运对全盘地支无距离 + 岁运彼此
@@ -201,12 +219,15 @@ function computeNatal(plist, dayGan, opts) {
       var hdv = hd.val;
       if (hd.char === st.char) {                                                                  // 同柱通根（同字，全rank）
         dSt += C_ROOT * hdv;
-      } else if (hd.rank === 0) {                                                                  // 仅本气参与生克
+      } else {
+        var rw = samePillarWeight(hd);                                                             // 本气全算；被刑冲合害激活的中余气折算
+        if (!rw) continue;
+        var eff = hdv * rw;
         if (hd.el === st.el) { /* 同五行异字：无互动 */ }
-        else if (SHENG[hd.el] === st.el) { dSt += C_SHENG * hdv; hd.val = hdv * (1 - C_XIE); }    // 支生干
-        else if (KE[hd.el] === st.el) { dSt -= C_KE * hdv; hd.val = hdv * (1 - C_COST); }         // 截脚：支克干
-        else if (SHENG[st.el] === hd.el) { hd.val = hdv + C_SHENG * stv0; multSt *= (1 - C_XIE); } // 干生支
-        else if (KE[st.el] === hd.el) { hd.val = hdv - C_KE * stv0; multSt *= (1 - C_COST); }      // 盖头：干克支
+        else if (SHENG[hd.el] === st.el) { dSt += C_SHENG * eff; hd.val = hdv * (1 - C_XIE * rw); }    // 支生干
+        else if (KE[hd.el] === st.el) { dSt -= C_KE * eff; hd.val = hdv * (1 - C_COST * rw); }         // 截脚：支克干
+        else if (SHENG[st.el] === hd.el) { hd.val = hdv + C_SHENG * stv0 * rw; multSt *= (1 - C_XIE * rw); } // 干生支
+        else if (KE[st.el] === hd.el) { hd.val = hdv - C_KE * stv0 * rw; multSt *= (1 - C_COST * rw); }      // 盖头：干克支
       }
     }
     st.val = stv0 * multSt + dSt;
@@ -216,9 +237,11 @@ function computeNatal(plist, dayGan, opts) {
   for (var s3 = 0; s3 < stems.length; s3++) {
     var stm = stems[s3], sum = 0;
     for (var hh = 0; hh < hidden.length; hh++) {
-      if (hidden[hh].pillar !== stm.pillar && hidden[hh].char === stm.char) sum += hidden[hh].val;
+      if (hidden[hh].pillar !== stm.pillar && hidden[hh].char === stm.char) {
+        sum += hidden[hh].val * rootDistanceFactor(stm.pillar, hidden[hh].pillar);
+      }
     }
-    if (sum > 0) stm.val += C_ROOT * sum * ROOT_CROSS_DF;
+    if (sum > 0) stm.val += C_ROOT * sum;
   }
 
   for (var f1 = 0; f1 < stems.length; f1++) stems[f1].val = Math.max(0.02, stems[f1].val);
@@ -320,14 +343,29 @@ function build(chart, opts) {
       party: partyOf(natalNow.dm, hn.el)
     });
   }
+  var luckGanUnits = [];
+  for (var ls = plist.length; ls < natalNow.stems.length; ls++) {
+    var lst = natalNow.stems[ls];
+    luckGanUnits.push({
+      kind: lst.kind,
+      char: lst.char,
+      el: lst.el,
+      god: LunarUtil.SHI_SHEN[dayGan + lst.char],
+      val: round2(lst.val),
+      party: partyOf(natalNow.dm, lst.el)
+    });
+  }
 
   // 旺衰：本命 / 岁运后（全池）
   var aggBase = aggregate(natalBase);
   var aggNow = hasLuck ? aggregate(natalNow) : aggBase;
 
-  // 全池五行占比（原局 + 岁运，含日元）—— 决策树输入
+  // 全池五行占比（原局 + 岁运，含日元）—— 展示用
   var poolNow = poolPct(natalNow);
   var poolBase = poolPct(natalBase);
+  // 喜忌决策用池：不把日主天干本身算作病重来源，但保留其他天干与地支根气。
+  var poolXiji = poolPct(natalNow, true);
+  var poolXijiBase = poolPct(natalBase, true);
 
   // 归一化参考值（含上浮空间，便于看到增长）
   var maxRef = 0;
@@ -338,20 +376,26 @@ function build(chart, opts) {
     ganCells: ganCells,
     zhiCells: zhiCells,
     hiddenUnits: hiddenUnits,
+    luckGanUnits: luckGanUnits,
     maxRef: maxRef,
     hasLuck: hasLuck,
     pBase: Math.round(aggBase.p * 100),
     pNow: Math.round(aggNow.p * 100),
     pool: poolNow,
-    poolBase: poolBase
+    poolBase: poolBase,
+    poolXiji: poolXiji,
+    poolXijiBase: poolXijiBase
   };
 }
 
 // 全池五行占比（百分数 map）
-function poolPct(model) {
+function poolPct(model, excludeDayStem) {
   var WX = ['木', '火', '土', '金', '水'], sum = {}, tot = 0;
   WX.forEach(function (e) { sum[e] = 0; });
-  model.stems.forEach(function (s) { sum[s.el] += s.val; tot += s.val; });
+  model.stems.forEach(function (s) {
+    if (excludeDayStem && s.isDay) return;
+    sum[s.el] += s.val; tot += s.val;
+  });
   model.hidden.forEach(function (h) { sum[h.el] += h.val; tot += h.val; });
   var p = {};
   WX.forEach(function (e) { p[e] = tot > 0 ? sum[e] / tot * 100 : 0; });

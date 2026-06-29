@@ -11,25 +11,46 @@ var traitWords = require('./traitWords.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
 
-// 十神 → 「今年心性」过渡引子（流年新加入的当年倾向，口语化）
-var LIUNIAN_LEAD = {
-  比肩: '今年想靠自己、找人搭伙',
-  劫财: '今年想拼想闯、人脉走动多',
-  食神: '今年想松快享受，也容易发懒',
-  伤官: '今年想表现、想秀才华',
-  偏财: '今年想搞钱，机会多、应酬多',
-  正财: '今年想踏实攒钱、过日子',
-  七杀: '今年想拼一把、扛事，压力也大',
-  正官: '今年想求名分、上进守规矩',
-  偏印: '今年想钻研充电，也容易发懒',
-  正印: '今年想求安稳、靠贵人长辈'
+// 临时叠加心性气泡：只用于时间阶段/年份，不作为稳定性格文案。
+var YEAR_TRAIT_WORDS = {
+  比肩: { pro: ['自主', '硬气', '稳住', '自己来'], con: ['较劲', '固执', '不服软', '单扛'] },
+  劫财: { pro: ['敢冲', '有人气', '讲义气', '会争取'], con: ['上头', '攀比', '冲动花钱', '替人扛'] },
+  食神: { pro: ['松弛', '好相处', '有口福', '会享受'], con: ['拖延', '贪舒服', '不想卷', '放松过头'] },
+  伤官: { pro: ['敢说', '有灵感', '表现力', '出作品'], con: ['嘴快', '不服管', '太锋利', '自律差'] },
+  正财: { pro: ['务实', '会规划', '能执行', '重承诺'], con: ['压力大', '太现实', '瞎忙', '怕变动'] },
+  偏财: { pro: ['机会感', '会变通', '出手快', '人脉活'], con: ['分心', '花钱快', '投机', '边界松'] },
+  正官: { pro: ['自律', '负责', '守分寸', '要名分'], con: ['顾虑多', '放不开', '怕出错', '太拘谨'] },
+  七杀: { pro: ['果断', '敢拼', '扛压力', '有目标'], con: ['紧绷', '急躁', '压迫感', '赌一把'] },
+  正印: { pro: ['安稳', '好学', '有贵人', '被托底'], con: ['依赖', '懒动', '想太多', '怕变化'] },
+  偏印: { pro: ['专注', '洞察', '灵感', '深挖'], con: ['孤僻', '挑剔', '空想', '不落地'] }
 };
 
-// 主心性 → 气泡星团数据（原局两股 src=natal 红蓝 + 岁运叠加 src=luck 金）
-function buildTraitBubbles(list, luck, dmEl) {
+function wordCopy(god, kind) {
+  if (kind === 'luck') return YEAR_TRAIT_WORDS[god] || {};
+  var kw = traitWords[god];
+  if (!kw) return {};
+  return kw[kind] || kw.outer || kw;
+}
+
+function wordText(god, kind, side) {
+  var kw = wordCopy(god, kind);
+  return ((kw && kw[side]) || []).join('、');
+}
+
+function narrativeText(god, kind, side) {
+  var t = TEMP[god] || { desc: '', con: '' };
+  if (kind === 'inner') {
+    if (side === 'desc') return INNER[god] || t.desc;
+    return '';
+  }
+  return side === 'desc' ? t.desc : t.con;
+}
+
+// 心性 → 气泡星团数据（原局 src=natal 红蓝 + 岁运叠加 src=luck 金）
+function buildTraitBubbles(list, luck, kind) {
   var out = [];
   (list || []).slice(0, 2).forEach(function (t, idx) {
-    var kw = traitWords[t.god];
+    var kw = wordCopy(t.god, kind || 'outer');
     if (!kw) return;
     // 该心性算出的滑标位置(25-75) → lean(0顺…1偏)，驱动这组泡泡优缺涨缩
     var lean = (t.slider != null ? t.slider : 50) / 100;
@@ -37,20 +58,16 @@ function buildTraitBubbles(list, luck, dmEl) {
     (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw - i * 0.1, lean: lean }); });
     (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: lean }); });
     (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'natal', w: bw - 0.05 - i * 0.1, lean: lean }); });
-    var wx = kw.wx && kw.wx[dmEl];
-    if (wx) {
-      (wx.pro || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: 0.6, lean: lean }); });
-      (wx.con || []).slice(0, 1).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: 0.58, lean: lean }); });
-    }
   });
   // 岁运叠加（金色）：取一组优缺关键词，叠在主心性之上，不顶替
   // 若岁运十神与原局主心性相同，能量本就一样，不再加多余的圆
-  if (luck && luck.god && !luck.dup) {
-    var lkw = traitWords[luck.god];
+  if (luck && luck.god) {
+    var lkw = wordCopy(luck.god, 'luck');
     if (lkw) {
       var ll = (luck.slider != null ? luck.slider : 50) / 100;
-      (lkw.pro || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'luck', w: 0.85 - i * 0.1, lean: ll }); });
-      (lkw.con || []).slice(0, 2).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'luck', w: 0.8 - i * 0.1, lean: ll }); });
+      var lw = luck.bubbleWeight || 0.7;
+      (lkw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'luck', w: Math.max(0.35, lw - i * 0.08), lean: ll }); });
+      (lkw.con || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'luck', w: Math.max(0.35, lw - 0.04 - i * 0.08), lean: ll }); });
     }
   }
   return out;
@@ -79,8 +96,17 @@ function decideXiji(p, dmEl, rootEls) {
   var top = WX[0];
   WX.forEach(function (e) { if (p[e] > p[top]) top = e; });
   var dir = {}, mode, disease = null;
+  var ti = 0, shiShang = 0, biJie = 0;
+  WX.forEach(function (e) {
+    var g = partyGod(dmEl, e);
+    if (g === '食伤') { ti += p[e]; shiShang += p[e]; }
+    if (g === '比劫') { ti += p[e]; biJie += p[e]; }
+  });
 
-  if (p[top] >= 40) {
+  if (ti >= 40 && shiShang > biJie) {
+    mode = '食伤偏旺'; // 输出太过：比劫转为喜用，食伤仍为忌，财官印沿用体旺取法。
+    WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '食伤') ? '-' : '+'; });
+  } else if (p[top] >= 40) {
     // 病重型：围绕病 D 的生克五位
     mode = '病重';
     disease = top;
@@ -102,11 +128,13 @@ function decideXiji(p, dmEl, rootEls) {
     });
   } else {
     // 均衡型：看体 = 食伤 + 比劫
-    var ti = 0;
-    WX.forEach(function (e) { var g = partyGod(dmEl, e); if (g === '食伤' || g === '比劫') ti += p[e]; });
     if (ti >= 40) {
       mode = '体旺';   // 喜财官印，忌食伤比劫
-      WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '财' || g === '官杀' || g === '印') ? '+' : '-'; });
+      WX.forEach(function (e) {
+        var g = partyGod(dmEl, e);
+        if (g === '印' && biJie > shiShang) dir[e] = '-';
+        else dir[e] = (g === '财' || g === '官杀' || g === '印') ? '+' : '-';
+      });
     } else {
       mode = '体弱';   // 喜比劫印，忌财官食伤
       WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '比劫' || g === '印') ? '+' : '-'; });
@@ -115,12 +143,70 @@ function decideXiji(p, dmEl, rootEls) {
   return { dir: dir, mode: mode, disease: disease };
 }
 
-// 滑标位置：喜(+)→左、忌(-)→右；强度 = |占比−20| 限幅 [0,25] → 钳到 [25%,75%]
+// 五行滑标位置：喜(+)→左、忌(-)→右；强度 = |五行占比−20| 限幅 [0,25] → 钳到 [25%,75%]
 function sliderPos(d, pct) {
   var mag = Math.min(25, Math.round(Math.abs(pct - 20) * 1.2));
   if (d === '+') return 50 - mag;
   if (d === '-') return 50 + mag;
   return 50;
+}
+
+// 心性滑标位置：方向仍取喜忌；强度改用该十神在心性聚合池里的能量占比。
+// 十神均分基准为 10%，只取超过基准的部分做偏移，避免弱十神被五行总量推到极端。
+function traitSliderPos(d, godPct) {
+  var mag = Math.min(25, Math.round(Math.max(0, godPct - 10)));
+  if (d === '+') return 50 - mag;
+  if (d === '-') return 50 + mag;
+  return 50;
+}
+
+function luckSliderPos(d, godPct) {
+  var mag = Math.min(25, Math.max(8, Math.round(Math.max(0, godPct) * 2)));
+  if (d === '+') return 50 - mag;
+  if (d === '-') return 50 + mag;
+  return 50;
+}
+
+// 十神结构识别：用于覆盖滑标方向。强度仍用十神能量占比。
+function detectTraitPattern(arr, godPct, stems) {
+  function pct(g) { return godPct[g] || 0; }
+  function ratio(a, b) {
+    var hi = Math.max(a, b), lo = Math.min(a, b);
+    return hi > 0 ? lo / hi : 0;
+  }
+  function stemSum(names) {
+    var n = 0;
+    (stems || []).forEach(function (c) {
+      if (names.indexOf(c.god) >= 0) n += c.val || 0;
+    });
+    return n;
+  }
+
+  var shi = pct('食神'), sha = pct('七杀');
+  if (shi >= 18 && sha >= 18 && ratio(shi, sha) >= 0.75) {
+    return {
+      name: '食神制杀',
+      dirByGod: { 食神: '+', 七杀: '+' }
+    };
+  }
+
+  var stemBody = stemSum(['比肩', '劫财']);
+  var stemSha = stemSum(['七杀']);
+  var stemJie = stemSum(['劫财']);
+  if (stemBody > 0 && stemSha > 0 && ratio(stemBody, stemSha) >= 0.70) {
+    if (stemJie > 0) {
+      return {
+        name: '羊刃驾杀',
+        dirByGod: { 劫财: '0', 比肩: '0', 七杀: '0' }
+      };
+    }
+    return {
+      name: '身杀两停',
+      dirByGod: { 比肩: '+', 劫财: '+', 正财: '+', 偏财: '+', 七杀: '+', 正官: '+' }
+    };
+  }
+
+  return null;
 }
 
 // 全盘地支（原局+岁运）有本气根的五行集合
@@ -281,7 +367,7 @@ function build(chart, opts) {
 
   // —— 占比决策树：全池五行占比 → 各五行喜忌 ——
   var rootEls = rootElsOf(chart, opts);
-  var xiji = decideXiji(m.pool || {}, dmEl, rootEls);
+  var xiji = decideXiji(m.poolXiji || m.pool || {}, dmEl, rootEls);
 
   // 流年干支（显示层只看流年引动）
   var lnGan = (opts.liuNianGZ && opts.liuNianGZ.length >= 2) ? opts.liuNianGZ.charAt(0) : null;
@@ -310,8 +396,8 @@ function build(chart, opts) {
   // —— 主心性：始终取原局最强的两股（天干+地支），贯穿一生，不被岁运顶替 ——
   // 大小(顺偏)用含岁运的合并能量喜忌，所以底色不变、但各面随岁运此消彼长。
   var list = [];
-  var GAN_W = 1.3;
-  var ZHI_POS = { 0: 0.6, 1: 1.0, 2: 0.85, 3: 0.55, 4: 0.6, 5: 0.55 };
+  var GAN_W = 1;
+  var ZHI_POS = { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };
   var agg = {};
   function addG(god, el, cls, v) {
     if (!agg[god]) agg[god] = { god: god, el: el, cls: cls, energy: 0 };
@@ -323,16 +409,72 @@ function build(chart, opts) {
   for (var g in agg) arr.push(agg[g]);
   arr.sort(function (a, b) { return b.energy - a.energy; });
   var maxE = arr.length ? arr[0].energy : 1;
-  arr.slice(0, 2).forEach(function (it, idx) {
-    var t = TEMP[it.god] || { name: it.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
-    list.push({
-      god: it.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl, desc: t.desc, con: t.con, cls: it.cls,
-      slider: sliderPos(xiji.dir[it.el], (m.pool || {})[it.el] || 0),
-      energy: it.energy,
-      dots: energyDots(maxE > 0 ? it.energy / maxE : 1),
-      isMain: idx === 0
-    });
+  var totalE = 0, godPct = {};
+  arr.forEach(function (it) { totalE += it.energy; });
+  arr.forEach(function (it) { godPct[it.god] = totalE > 0 ? it.energy / totalE * 100 : 0; });
+  var traitPattern = detectTraitPattern(arr, godPct, stems);
+  function traitDir(god, el) {
+    if (traitPattern && traitPattern.dirByGod && traitPattern.dirByGod[god]) return traitPattern.dirByGod[god];
+    return xiji.dir[el];
+  }
+
+  function makeTraitItem(src, idx, max, copyKind) {
+    var t = TEMP[src.god] || { name: src.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
+    var dir = traitDir(src.god, src.el);
+    return {
+      god: src.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
+      desc: narrativeText(src.god, copyKind, 'desc'),
+      con: narrativeText(src.god, copyKind, 'con'),
+      descLabel: copyKind === 'inner' ? '解读' : '优点',
+      conLabel: '留意',
+      cls: src.cls,
+      slider: traitSliderPos(dir, godPct[src.god] || 0),
+      energy: src.energy,
+      godPct: Math.round(godPct[src.god] || 0),
+      traitDir: dir,
+      traitPattern: traitPattern ? traitPattern.name : '',
+      dots: energyDots(max > 0 ? src.energy / max : 1),
+      isMain: idx === 0,
+      source: src.source,
+      sourceChar: src.sourceChar
+    };
+  }
+
+  var outerSources = [];
+  stems.forEach(function (c) {
+    if (c.pos === '年' || c.pos === '月') {
+      outerSources.push({
+        god: c.god, el: c.el, cls: c.cls, energy: c.val,
+        source: outerSources.length === 0 ? '外显一' : '外显二',
+        sourceChar: c.char
+      });
+    }
   });
+  var maxOuter = 0;
+  outerSources.forEach(function (it) { if (it.energy > maxOuter) maxOuter = it.energy; });
+  var outerList = outerSources.map(function (it, idx) { return makeTraitItem(it, idx, maxOuter, 'outer'); });
+
+  var innerSources = [];
+  function addInnerByPillar(pillar, source) {
+    for (var i = 0; i < (m.hiddenUnits || []).length; i++) {
+      var u = m.hiddenUnits[i];
+      if (u.pillar === pillar && u.rank === 0) {
+        var pp = chart.pillars[pillar];
+        innerSources.push({
+          god: u.god, el: u.el, cls: base.WX_CLS[u.el], energy: u.val,
+          source: source, sourceChar: pp && pp.zhi ? pp.zhi.text : ''
+        });
+        break;
+      }
+    }
+  }
+  addInnerByPillar(1, '内显一');
+  addInnerByPillar(2, '内显二');
+  var maxInner = 0;
+  innerSources.forEach(function (it) { if (it.energy > maxInner) maxInner = it.energy; });
+  var innerList = innerSources.map(function (it, idx) { return makeTraitItem(it, idx, maxInner, 'inner'); });
+
+  var list = outerList;
 
   // —— 岁运叠加心性：取岁运天干十神（流年优先，否则大运），作为另一组气泡叠加 ——
   var luckGan = lnGan || ((opts.daYunGZ && opts.daYunGZ.length >= 2) ? opts.daYunGZ.charAt(0) : null);
@@ -342,11 +484,23 @@ function build(chart, opts) {
     var lkEl = base.ganWx(luckGan);
     var L0 = LIUNIAN[lkGod] || { lbl: '', rbl: '', desc: '' };
     var dup = list.some(function (t) { return t.god === lkGod; });
+    var luckKind = lnGan ? 'ln' : 'dy';
+    var luckUnit = null;
+    (m.luckGanUnits || []).forEach(function (u) {
+      if (u.kind === luckKind && u.char === luckGan) luckUnit = u;
+    });
+    var luckEnergy = luckUnit ? luckUnit.val : 0.35;
+    var luckPct = totalE > 0 ? luckEnergy / (totalE + luckEnergy) * 100 : 10;
+    var luckDir = traitDir(lkGod, lkEl);
     luckTrait = {
       god: lkGod, name: lkGod, cls: base.WX_CLS[lkEl],
-      slider: sliderPos(xiji.dir[lkEl], (m.pool || {})[lkEl] || 0),
-      lead: LIUNIAN_LEAD[lkGod] || '',
+      slider: luckSliderPos(luckDir, luckPct),
+      energy: luckEnergy,
+      godPct: Math.round(luckPct),
+      bubbleWeight: Math.max(0.45, Math.min(1.05, 0.45 + luckPct / 22)),
+      lead: '',
       lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
+      traitDir: luckDir,
       dup: dup
     };
   }
@@ -449,7 +603,12 @@ function build(chart, opts) {
     },
     paimian: paimian,
     list: list,
-    traitBubbles: buildTraitBubbles(list, luckTrait, dmEl),
+    outerList: outerList,
+    innerList: innerList,
+    traitPattern: traitPattern,
+    traitBubbles: buildTraitBubbles(outerList, luckTrait, 'outer'),
+    outerBubbles: buildTraitBubbles(outerList, luckTrait, 'outer'),
+    innerBubbles: buildTraitBubbles(innerList, null, 'inner'),
     luckTrait: luckTrait,
     branchList: branchList,
     relations: rels,

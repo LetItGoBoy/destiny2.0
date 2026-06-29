@@ -13,6 +13,10 @@ Page({
     paimian: [],
     list: [],
     traitBubbles: [],
+    outerList: [],
+    innerList: [],
+    outerBubbles: [],
+    innerBubbles: [],
     luckTrait: null,
     branchList: [],
     relations: [],
@@ -20,7 +24,7 @@ Page({
     zhengNow: 50, pianNow: 50,
     hasLuck: false,
     hasTime: true,
-    curLabel: '本命 · 未叠加岁运',
+    curLabel: '原局 · 未叠加时间阶段',
     traitNote: '',
     // 岁运选择
     daYunList: [],
@@ -168,14 +172,14 @@ Page({
   },
 
   recompute: function () {
-    var dyGZ = null, lnGZ = null, label = '本命 · 未叠加岁运';
+    var dyGZ = null, lnGZ = null, label = '原局 · 未叠加时间阶段';
     var barGz = '', barActive = false;
     if (this.data.dyIndex >= 0) {
       var d = this._dy[this.data.dyIndex];
-      dyGZ = d.gz; label = '大运 ' + d.gz; barGz = d.gz;
+      dyGZ = d.gz; label = '十年阶段'; barGz = d.gz;
       if (this.data.lnIndex >= 0) {
         var ln = this.data.liuNianList[this.data.lnIndex];
-        lnGZ = ln.gz; label += ' · 流年 ' + ln.gz + '（' + ln.year + '）';
+        lnGZ = ln.gz; label += ' · ' + ln.year + ' 年';
         barGz = d.gz + ' · ' + ln.gz; barActive = true;
       }
     }
@@ -185,12 +189,12 @@ Page({
     // 当前显示了什么的说明
     var traitNote;
     if (this.data.dyIndex < 0) {
-      traitNote = '红蓝气泡是你「原局主心性」——贯穿一生的底色。点下方「岁运」挂上大运 / 流年，会多出一组金色气泡，叠加那一年被引动的心性，原局主心性始终都在。';
+      traitNote = '红蓝气泡是你的原局心性。外显看别人容易看见的样子；内显看更底层的反应惯性。点下方「阶段」挂上时间变化，外显区会多出一组金色气泡，提示当下被引动的心性。';
     } else if (this.data.lnIndex < 0) {
-      traitNote = '金色气泡是「' + this._dy[this.data.dyIndex].gz + ' 大运」叠加在你主心性上的色彩；红蓝原局主心性仍在，大小随这十年的喜忌此消彼长。再点一个流年看具体某年。';
+      traitNote = '金色气泡是当前十年阶段叠加出来的外显心性；红蓝原局心性仍在，滑标会随这段时间的状态此消彼长。再点一个年份看具体某年。';
     } else {
       var lnItem = this.data.liuNianList[this.data.lnIndex];
-      traitNote = '金色气泡是「' + lnItem.year + ' 年 · ' + lnItem.gz + '」叠加进来的当年心性；红蓝原局主心性始终都在，只是各面大小随今年喜忌变化——所以不会有性格割裂感。';
+      traitNote = '金色气泡是「' + lnItem.year + ' 年」叠加进来的当年外显心性；红蓝原局心性始终都在，只是各面大小会随当下状态变化。';
     }
 
     var p = portrait.build(this._chart, { daYunGZ: dyGZ, liuNianGZ: lnGZ });
@@ -199,6 +203,10 @@ Page({
       paimian: p.paimian,
       list: p.list,
       traitBubbles: p.traitBubbles,
+      outerList: p.outerList,
+      innerList: p.innerList,
+      outerBubbles: p.outerBubbles,
+      innerBubbles: p.innerBubbles,
       luckTrait: p.luckTrait,
       branchList: p.branchList,
       relations: p.relations,

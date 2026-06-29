@@ -21,8 +21,8 @@
   <!-- 模块切换 -->
   <view class="seg">
     <view class="seg-item {{tab === 'trait' ? 'on' : ''}}" bindtap="switchTab" data-tab="trait">
-      <text class="seg-t serif">主心性</text>
-      <text class="seg-sub">贯穿一生</text>
+      <text class="seg-t serif">心性画像</text>
+      <text class="seg-sub">内外两层</text>
     </view>
     <view class="seg-item {{tab === 'season' ? 'on' : ''}}" bindtap="switchTab" data-tab="season">
       <text class="seg-t serif">性格四季</text>
@@ -30,7 +30,7 @@
     </view>
   </view>
 
-  <!-- ══════════ 模块一：主心性 · 贯穿一生 ══════════ -->
+  <!-- ══════════ 模块一：心性画像 · 内外两层 ══════════ -->
   <block wx:if="{{tab === 'trait'}}">
 
     <!-- 外在底色（日主） -->
@@ -44,15 +44,15 @@
 
     <!-- 框架说明 -->
     <view class="intro">
-      每个人身上都同时住着好几种心性，只是<text class="em">配比</text>不同。我们综合你的<text class="em">天干与地支</text>，理出最<text class="em">贯穿一生</text>的两股主心性。每一股都有舒展的一面，也有需要留意的一面——<text class="em">一体两面</text>，会随大运、流年此消彼长。
-      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，仅取年、月柱，结果更集中）</text>
+      每个人身上都有外在表现和内在反应两层心性。<text class="em">外显</text>是别人容易看见的表达、做事方式和第一反应；<text class="em">内显</text>是更底层的安全感、关系模式和选择惯性。每一股都有舒展的一面，也有需要留意的一面——<text class="em">一体两面</text>，会随时间阶段此消彼长。
+      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，结果会更集中在早期和外在层面）</text>
     </view>
 
     <!-- 两种底色倾向：守正 ←→ 求变 -->
     <view class="card pol">
       <view class="pol-head">
         <text class="pol-t serif">两种底色</text>
-        <text class="pol-sub">守正与求变的配比 · 含天干地支全部十神</text>
+        <text class="pol-sub">守正与求变的配比</text>
       </view>
       <view class="pol-bar">
         <view class="pol-zheng" style="width:{{zhengNow}}%"></view>
@@ -64,41 +64,37 @@
       </view>
     </view>
 
-    <!-- 主心性（天干地支 · 贯穿一生） -->
+    <!-- 外显心性（年干 + 月干） -->
     <view class="card comp" id="sec-tiangan">
       <view class="comp-head">
-        <text class="comp-t serif">主心性</text>
-        <text class="comp-sub">天干地支 · 贯穿一生</text>
+        <text class="comp-t serif">外显心性</text>
+        <text class="comp-sub">别人最容易看见的样子</text>
       </view>
 
       <view class="now-note">{{traitNote}}</view>
 
       <view class="comp-tip">
-        把你这两股主心性拆成一颗颗关键词：<text class="tip-l">红色在上</text>是发挥得顺的一面，<text class="tip-r">蓝色在下</text>是需要留意的一面——一体两面，越突出的越大。挂上岁运后，<text class="tip-luck">金色</text>气泡是那一年叠加进来的心性。可以按住拖一拖。
+        这一块看你更容易被别人感受到的状态：怎么表达、怎么行动、怎么回应外界。<text class="tip-l">红色在上</text>是顺的一面，<text class="tip-r">蓝色在下</text>是偏的一面；选择时间阶段后，<text class="tip-luck">金色</text>气泡是当下叠加出来的外显倾向。
       </view>
 
-      <!-- 气泡星团（大小由各心性算出的喜忌位置驱动，随大运流年变化） -->
-      <traitcluster wx:if="{{traitBubbles.length}}" bubbles="{{traitBubbles}}" />
+      <traitcluster wx:if="{{outerBubbles.length}}" bubbles="{{outerBubbles}}" />
 
-      <!-- 今年心性（流年/大运叠加，气泡与主心性细读之间） -->
       <view class="luck-block" wx:if="{{luckTrait}}">
         <view class="luck-head">
           <text class="luck-badge">今年心性</text>
           <text class="luck-name serif">{{luckTrait.name}}</text>
           <text class="luck-lbls" wx:if="{{luckTrait.lbl}}">{{luckTrait.lbl}} · {{luckTrait.rbl}}</text>
         </view>
-        <view class="luck-lead">{{luckTrait.lead}}</view>
+        <view class="luck-lead" wx:if="{{luckTrait.lead}}">{{luckTrait.lead}}</view>
         <view class="luck-desc">{{luckTrait.desc}}</view>
       </view>
 
-      <!-- 两股主心性 · 优缺细读 -->
-      <view class="trait" wx:for="{{list}}" wx:key="god">
+      <view class="trait" wx:for="{{outerList}}" wx:key="source">
         <view class="trait-line">
           <text class="trait-name serif">{{item.name}}</text>
-          <text class="trait-main" wx:if="{{item.isMain}}">主心性</text>
+          <text class="trait-main">{{item.source}}</text>
           <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
         </view>
-        <!-- 算法算出的顺/偏位置（只读展示） -->
         <view class="slider-row">
           <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
           <view class="sl-track">
@@ -107,30 +103,65 @@
           <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
         </view>
         <view class="trait-pc">
-          <view class="pc pc-on"><text class="pc-key pc-key-pro">优点</text>{{item.desc}}</view>
-          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">留意</text>{{item.con}}</view>
+          <view class="pc pc-on"><text class="pc-key pc-key-pro">{{item.descLabel}}</text>{{item.desc}}</view>
+          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">{{item.conLabel}}</text>{{item.con}}</view>
         </view>
       </view>
 
-      <view class="comp-empty" wx:if="{{list.length === 0}}">心性能量较平均，暂无特别突出的主心性。</view>
+      <view class="comp-empty" wx:if="{{outerList.length === 0}}">外显心性暂不可见。</view>
+    </view>
+
+    <!-- 内显心性（月支本气 + 日支本气） -->
+    <view class="card comp">
+      <view class="comp-head">
+        <text class="comp-t serif">内显心性</text>
+        <text class="comp-sub">真正驱动你的底层反应</text>
+      </view>
+
+      <view class="comp-tip">
+        这一块看更贴近内心的惯性：你在关系里在意什么、遇到压力会先保护什么、真正让你有安全感的是什么。气泡是关键词，下面的文字是更完整的解释。
+      </view>
+
+      <traitcluster wx:if="{{innerBubbles.length}}" bubbles="{{innerBubbles}}" />
+
+      <view class="trait" wx:for="{{innerList}}" wx:key="source">
+        <view class="trait-line">
+          <text class="trait-name serif">{{item.name}}</text>
+          <text class="trait-main">{{item.source}}</text>
+          <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
+        </view>
+        <view class="slider-row">
+          <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
+          <view class="sl-track">
+            <view class="sl-thumb" style="left:{{item.slider}}%"></view>
+          </view>
+          <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
+        </view>
+        <view class="trait-pc">
+          <view class="pc pc-on"><text class="pc-key pc-key-pro">{{item.descLabel}}</text>{{item.desc}}</view>
+          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">{{item.conLabel}}</text>{{item.con}}</view>
+        </view>
+      </view>
+
+      <view class="comp-empty" wx:if="{{innerList.length === 0}}">内显心性暂不可见。</view>
     </view>
 
     <!-- 心结与张力（地支刑冲合害） -->
     <view class="card comp" wx:if="{{relations.length}}">
       <view class="comp-head">
         <text class="comp-t serif">心结与张力</text>
-        <text class="comp-sub">地支刑冲合害 · 内在的牵动</text>
+        <text class="comp-sub">关系组合 · 内在的牵动</text>
       </view>
 
       <view class="comp-tip">
-        地支之间的<text class="tip-l">合</text>、<text class="tip-r">冲</text>、<text class="tip-r">刑</text>、<text class="tip-r">害</text>，是内心潜藏的动力与情结。叠加大运、流年后，新形成的关系会被引动，对应的心结也会浮现。
+        有些组合会让内心更容易被牵动：可能是放不下的牵挂，也可能是冲突、拉扯或压力。选择不同时间阶段后，新形成的牵动会一起显示出来。
       </view>
 
       <view class="rel" wx:for="{{relations}}" wx:key="type">
         <view class="rel-head-line">
           <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
           <text class="rel-tag">{{item.tag}}</text>
-          <text class="rel-luck" wx:if="{{item.anyLuck}}">岁运引动</text>
+          <text class="rel-luck" wx:if="{{item.anyLuck}}">阶段引动</text>
         </view>
         <view class="rel-zhis-row">
           <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
@@ -146,15 +177,15 @@
 
     <!-- 模块说明 -->
     <view class="intro">
-      人生分四程：<text class="em">少年、青年、中年、晚年</text>，分别由年、月、日、时四柱主导。下面是每一程的主旋律与内心底色——这是<text class="em">阶段性</text>的着力点，与「主心性」里贯穿一生的底色互为表里。
-      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，晚年一程暂不可见）</text>
+      人生分四程：<text class="em">少年、青年、中年、晚年</text>，分别由年、月、日、时四柱主导。下面是每一程的主旋律与内心底色——这是<text class="em">阶段性</text>的着力点，与「心性画像」里的内外两层互为表里。
+      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，最后一段暂不可见）</text>
     </view>
 
     <!-- 人生四季：四柱分限速览 -->
     <view class="card comp">
       <view class="comp-head">
         <text class="comp-t serif">人生四季</text>
-        <text class="comp-sub">四柱分限 · 各阶段的着力点</text>
+        <text class="comp-sub">人生阶段 · 各阶段的着力点</text>
       </view>
 
       <view class="stage" wx:for="{{stages}}" wx:key="label">
@@ -185,7 +216,7 @@
 
   </block>
 
-  <view class="foot">性格画像基于天干地支十神的能量配比，仅供传统文化娱乐参考</view>
+  <view class="foot">性格画像基于出生信息的结构化分析，仅供娱乐参考</view>
 
   <!-- 底部时光条占位（避免内容被吸底栏遮挡） -->
   <view class="bar-holder" wx:if="{{tab === 'trait'}}"></view>
@@ -202,12 +233,12 @@
     <view class="tb-mid">
       <text class="tb-year {{barActive ? 'on' : ''}}">{{barYearShow}}</text>
       <text class="tb-gz" wx:if="{{barGz}}">{{barGz}}</text>
-      <text class="tb-gz tb-hint" wx:else>本命 · 点箭头看流年</text>
+      <text class="tb-gz tb-hint" wx:else>原局 · 点箭头看年份</text>
     </view>
     <text class="tb-arrow" bindtap="stepYear" data-d="1">›</text>
   </view>
   <view class="tb-expand" bindtap="openPanel">
-    <text>岁运</text>
+    <text>阶段</text>
     <text class="tb-expand-ic">▴</text>
   </view>
 </view>
@@ -220,7 +251,7 @@
     <text class="panel-close" bindtap="closePanel">收起</text>
   </view>
 
-  <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
+  <view class="section-title serif">十年阶段 <text class="section-note">点选叠加，重复点取消</text></view>
   <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
     <view class="yun-strip">
       <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
@@ -233,7 +264,7 @@
   </scroll-view>
 
   <block wx:if="{{liuNianList.length}}">
-    <view class="section-title serif">流年 <text class="section-note">{{daYunList[dyIndex].gz}} 运内</text></view>
+    <view class="section-title serif">具体年份 <text class="section-note">当前阶段内</text></view>
     <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="yun-strip">
         <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
