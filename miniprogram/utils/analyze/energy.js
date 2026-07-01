@@ -355,6 +355,19 @@ function build(chart, opts) {
       party: partyOf(natalNow.dm, lst.el)
     });
   }
+  var luckZhiUnits = [];
+  for (var lz = natalHidLen; lz < natalNow.hidden.length; lz++) {
+    var lhd = natalNow.hidden[lz];
+    luckZhiUnits.push({
+      kind: lhd.kind,
+      char: lhd.char,
+      el: lhd.el,
+      god: LunarUtil.SHI_SHEN[dayGan + lhd.char],
+      rank: lhd.rank,
+      val: round2(lhd.val),
+      party: partyOf(natalNow.dm, lhd.el)
+    });
+  }
 
   // 旺衰：本命 / 岁运后（全池）
   var aggBase = aggregate(natalBase);
@@ -377,6 +390,7 @@ function build(chart, opts) {
     zhiCells: zhiCells,
     hiddenUnits: hiddenUnits,
     luckGanUnits: luckGanUnits,
+    luckZhiUnits: luckZhiUnits,
     maxRef: maxRef,
     hasLuck: hasLuck,
     pBase: Math.round(aggBase.p * 100),

@@ -24,6 +24,30 @@ page {
   --tint: rgba(138, 43, 39, 0.10);
 }
 
+.page {
+  position: relative;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page-bg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.72;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page > view:not(.ss-mask):not(.cast-mask):not(.panel-mask):not(.panel):not(.savebar):not(.timebar),
+.page > scroll-view,
+.page > button {
+  position: relative;
+  z-index: 1;
+}
+
 /* 现代标题字（去衬线、去宋体，偏未来感） */
 .serif {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;

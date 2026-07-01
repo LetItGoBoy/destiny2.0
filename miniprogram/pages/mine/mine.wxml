@@ -1,4 +1,6 @@
 <view class="page fs-{{fs}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
+
   <!-- 用户卡片 -->
   <view class="card profile">
     <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">

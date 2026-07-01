@@ -1,4 +1,5 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
   <view class="head">
     <view class="head-title serif">{{isNow ? '此刻星象' : (meta.name || '未署名') + ' 的出生星图'}}</view>

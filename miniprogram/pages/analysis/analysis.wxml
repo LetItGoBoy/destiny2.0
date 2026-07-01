@@ -1,4 +1,5 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
   <!-- 命主信息 + 八字 -->
   <view class="card head-card">

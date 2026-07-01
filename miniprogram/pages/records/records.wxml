@@ -24,6 +24,8 @@
 </template>
 
 <view class="page fs-{{fs}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
+
   <view class="head">
     <view class="head-title serif">八字记录</view>
     <view class="head-sub" wx:if="{{listTab === 'celeb'}}">国外名人命盘 · 共{{total}}位 · 点击查看（生时多不可考，按正午起盘）</view>

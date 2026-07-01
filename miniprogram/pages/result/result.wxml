@@ -1,4 +1,5 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
   <!-- 选项卡 -->
   <view class="tabs">
@@ -311,7 +312,8 @@
     <button class="btn-save {{saved ? 'btn-saved' : ''}}" bindtap="onSave">
       {{saved ? '已保存' : '保存'}}
     </button>
-    <button class="btn-xiangpi" bindtap="onXiangPi">性格画像</button>
+    <button class="btn-record" bindtap="goRecords">记录</button>
+    <button class="btn-xiangpi" bindtap="onXiangPi">获取画像</button>
   </view>
 
   <!-- 词条解读卡（十神/长生/神煞/纳音） -->

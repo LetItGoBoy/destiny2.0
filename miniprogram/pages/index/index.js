@@ -202,10 +202,10 @@ Page({
       wx.navigateTo({
         url: url,
         complete: function () {
-          setTimeout(function () { that.setData({ casting: false }); }, 400);
+          setTimeout(function () { that.setData({ casting: false }); }, 160);
         }
       });
-    }, 1300);
+    }, 720);
   },
 
   // ---- 排盘（进结果页）----

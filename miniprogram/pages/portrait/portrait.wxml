@@ -1,11 +1,11 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
-  <!-- 盘面（两模块共用的命盘参照） -->
   <view class="card pan">
     <view class="pan-col {{item.isDay ? 'pan-day' : ''}}" wx:for="{{paimian}}" wx:key="label">
       <view class="pan-label">{{item.label}}</view>
       <block wx:if="{{item.empty}}">
-        <view class="pan-god dim">—</view>
+        <view class="pan-god dim">-</view>
         <view class="pan-gz serif dim">未知</view>
       </block>
       <block wx:else>
@@ -18,262 +18,304 @@
     </view>
   </view>
 
-  <!-- 模块切换 -->
-  <view class="seg">
-    <view class="seg-item {{tab === 'trait' ? 'on' : ''}}" bindtap="switchTab" data-tab="trait">
-      <text class="seg-t serif">心性画像</text>
-      <text class="seg-sub">内外两层</text>
-    </view>
-    <view class="seg-item {{tab === 'season' ? 'on' : ''}}" bindtap="switchTab" data-tab="season">
-      <text class="seg-t serif">性格四季</text>
-      <text class="seg-sub">不同阶段</text>
+  <view class="card core">
+    <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
+    <view class="core-body">
+      <view class="core-title serif">{{core.title}}</view>
+      <view class="core-text">{{core.text}}</view>
     </view>
   </view>
 
-  <!-- ══════════ 模块一：心性画像 · 内外两层 ══════════ -->
-  <block wx:if="{{tab === 'trait'}}">
+  <view class="intro">
+    心性画像按人生阶段展开。点开一个阶段，就能看到这一阶段的外显状态和内心反应；再点同一项会收起，点另一个阶段会切换展开。红色泡泡是顺的一面，蓝色泡泡是偏的一面，金色泡泡只出现在「岁运」里。
+    <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，晚年阶段的固定底色暂不可见）</text>
+  </view>
 
-    <!-- 外在底色（日主） -->
-    <view class="card core">
-      <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
-      <view class="core-body">
-        <view class="core-title serif">{{core.title}}</view>
-        <view class="core-text">{{core.text}}</view>
+  <view class="card pol">
+    <view class="pol-head">
+      <text class="pol-t serif">两种底色</text>
+      <text class="pol-sub">守正与求变的配比</text>
+    </view>
+    <view class="pol-bar">
+      <view class="pol-zheng" style="width:{{zhengNow}}%"></view>
+      <view class="pol-pian" style="width:{{pianNow}}%"></view>
+    </view>
+    <view class="pol-explain">
+      <view class="pol-explain-item pol-explain-zheng">
+        <text class="pol-explain-k">守正</text>
+        <text class="pol-explain-t">更看重稳定、规则、责任和长期积累，顺的时候可靠踏实。</text>
+      </view>
+      <view class="pol-explain-item pol-explain-pian">
+        <text class="pol-explain-k">求变</text>
+        <text class="pol-explain-t">更看重自由、突破、表达和机会变化，顺的时候灵活有冲劲。</text>
       </view>
     </view>
-
-    <!-- 框架说明 -->
-    <view class="intro">
-      每个人身上都有外在表现和内在反应两层心性。<text class="em">外显</text>是别人容易看见的表达、做事方式和第一反应；<text class="em">内显</text>是更底层的安全感、关系模式和选择惯性。每一股都有舒展的一面，也有需要留意的一面——<text class="em">一体两面</text>，会随时间阶段此消彼长。
-      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，结果会更集中在早期和外在层面）</text>
+    <view class="pol-legend">
+      <text class="lg-zheng">守正 · 稳健循环</text>
+      <text class="lg-pian">求变 · 突破不拘</text>
     </view>
+  </view>
 
-    <!-- 两种底色倾向：守正 ←→ 求变 -->
-    <view class="card pol">
-      <view class="pol-head">
-        <text class="pol-t serif">两种底色</text>
-        <text class="pol-sub">守正与求变的配比</text>
-      </view>
-      <view class="pol-bar">
-        <view class="pol-zheng" style="width:{{zhengNow}}%"></view>
-        <view class="pol-pian" style="width:{{pianNow}}%"></view>
-      </view>
-      <view class="pol-legend">
-        <text class="lg-zheng">守正 · 稳健循常</text>
-        <text class="lg-pian">求变 · 突破不拘</text>
-      </view>
-    </view>
-
-    <!-- 外显心性（年干 + 月干） -->
-    <view class="card comp" id="sec-tiangan">
-      <view class="comp-head">
-        <text class="comp-t serif">外显心性</text>
-        <text class="comp-sub">别人最容易看见的样子</text>
-      </view>
-
-      <view class="now-note">{{traitNote}}</view>
-
-      <view class="comp-tip">
-        这一块看你更容易被别人感受到的状态：怎么表达、怎么行动、怎么回应外界。<text class="tip-l">红色在上</text>是顺的一面，<text class="tip-r">蓝色在下</text>是偏的一面；选择时间阶段后，<text class="tip-luck">金色</text>气泡是当下叠加出来的外显倾向。
-      </view>
-
-      <traitcluster wx:if="{{outerBubbles.length}}" bubbles="{{outerBubbles}}" />
-
-      <view class="luck-block" wx:if="{{luckTrait}}">
-        <view class="luck-head">
-          <text class="luck-badge">今年心性</text>
-          <text class="luck-name serif">{{luckTrait.name}}</text>
-          <text class="luck-lbls" wx:if="{{luckTrait.lbl}}">{{luckTrait.lbl}} · {{luckTrait.rbl}}</text>
-        </view>
-        <view class="luck-lead" wx:if="{{luckTrait.lead}}">{{luckTrait.lead}}</view>
-        <view class="luck-desc">{{luckTrait.desc}}</view>
-      </view>
-
-      <view class="trait" wx:for="{{outerList}}" wx:key="source">
-        <view class="trait-line">
-          <text class="trait-name serif">{{item.name}}</text>
-          <text class="trait-main">{{item.source}}</text>
-          <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-        </view>
-        <view class="slider-row">
-          <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
-          <view class="sl-track">
-            <view class="sl-thumb" style="left:{{item.slider}}%"></view>
+  <view class="stage-acc">
+    <view class="acc-card {{openStageKey === stage.key ? 'open' : ''}}" wx:for="{{stagePortraits}}" wx:for-item="stage" wx:key="key">
+      <view class="acc-head" bindtap="toggleStage" data-key="{{stage.key}}">
+        <view class="acc-index">{{stage.index}}</view>
+        <view class="acc-copy">
+          <view class="acc-title">
+            <text class="acc-name serif">{{stage.label}}</text>
+            <text class="acc-age">{{stage.age}}</text>
+            <text class="acc-sub">{{stage.sub}}</text>
           </view>
-          <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
-        </view>
-        <view class="trait-pc">
-          <view class="pc pc-on"><text class="pc-key pc-key-pro">{{item.descLabel}}</text>{{item.desc}}</view>
-          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">{{item.conLabel}}</text>{{item.con}}</view>
-        </view>
-      </view>
-
-      <view class="comp-empty" wx:if="{{outerList.length === 0}}">外显心性暂不可见。</view>
-    </view>
-
-    <!-- 内显心性（月支本气 + 日支本气） -->
-    <view class="card comp">
-      <view class="comp-head">
-        <text class="comp-t serif">内显心性</text>
-        <text class="comp-sub">真正驱动你的底层反应</text>
-      </view>
-
-      <view class="comp-tip">
-        这一块看更贴近内心的惯性：你在关系里在意什么、遇到压力会先保护什么、真正让你有安全感的是什么。气泡是关键词，下面的文字是更完整的解释。
-      </view>
-
-      <traitcluster wx:if="{{innerBubbles.length}}" bubbles="{{innerBubbles}}" />
-
-      <view class="trait" wx:for="{{innerList}}" wx:key="source">
-        <view class="trait-line">
-          <text class="trait-name serif">{{item.name}}</text>
-          <text class="trait-main">{{item.source}}</text>
-          <text class="trait-tag tag-{{item.pol === '正' ? 'z' : 'p'}}">{{item.pol === '正' ? '守正' : '求变'}}</text>
-        </view>
-        <view class="slider-row">
-          <text class="sl-lbl sl-lbl-l">{{item.lbl}}</text>
-          <view class="sl-track">
-            <view class="sl-thumb" style="left:{{item.slider}}%"></view>
+          <view class="acc-stage-meta">
+            <text class="acc-phase">{{stage.phase}}</text>
+            <text class="acc-theme">{{stage.theme}}</text>
           </view>
-          <text class="sl-lbl sl-lbl-r">{{item.rbl}}</text>
         </view>
-        <view class="trait-pc">
-          <view class="pc pc-on"><text class="pc-key pc-key-pro">{{item.descLabel}}</text>{{item.desc}}</view>
-          <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">{{item.conLabel}}</text>{{item.con}}</view>
+        <view class="acc-action">
+          <text class="acc-action-text">{{openStageKey === stage.key ? '收起' : '点开查看'}}</text>
+          <view class="acc-arrow">⌄</view>
         </view>
       </view>
 
-      <view class="comp-empty" wx:if="{{innerList.length === 0}}">内显心性暂不可见。</view>
-    </view>
-
-    <!-- 心结与张力（地支刑冲合害） -->
-    <view class="card comp" wx:if="{{relations.length}}">
-      <view class="comp-head">
-        <text class="comp-t serif">心结与张力</text>
-        <text class="comp-sub">关系组合 · 内在的牵动</text>
-      </view>
-
-      <view class="comp-tip">
-        有些组合会让内心更容易被牵动：可能是放不下的牵挂，也可能是冲突、拉扯或压力。选择不同时间阶段后，新形成的牵动会一起显示出来。
-      </view>
-
-      <view class="rel" wx:for="{{relations}}" wx:key="type">
-        <view class="rel-head-line">
-          <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
-          <text class="rel-tag">{{item.tag}}</text>
-          <text class="rel-luck" wx:if="{{item.anyLuck}}">阶段引动</text>
-        </view>
-        <view class="rel-zhis-row">
-          <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
-        </view>
-        <view class="pc pc-on">{{item.text}}</view>
-      </view>
-    </view>
-
-  </block>
-
-  <!-- ══════════ 模块二：性格四季 ══════════ -->
-  <block wx:else>
-
-    <!-- 模块说明 -->
-    <view class="intro">
-      人生分四程：<text class="em">少年、青年、中年、晚年</text>，分别由年、月、日、时四柱主导。下面是每一程的主旋律与内心底色——这是<text class="em">阶段性</text>的着力点，与「心性画像」里的内外两层互为表里。
-      <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，最后一段暂不可见）</text>
-    </view>
-
-    <!-- 人生四季：四柱分限速览 -->
-    <view class="card comp">
-      <view class="comp-head">
-        <text class="comp-t serif">人生四季</text>
-        <text class="comp-sub">人生阶段 · 各阶段的着力点</text>
-      </view>
-
-      <view class="stage" wx:for="{{stages}}" wx:key="label">
-        <view class="stage-head">
-          <text class="stage-badge">{{item.label}}</text>
-          <text class="stage-sub">{{item.sub}}</text>
-          <view class="stage-gz serif" wx:if="{{!item.empty}}">
-            <text class="wx-{{item.ganCls}}">{{item.gan}}</text><text class="wx-{{item.zhiCls}}">{{item.zhi}}</text>
+      <view class="acc-body" wx:if="{{openStageKey === stage.key}}">
+        <view class="stage-note">{{stage.note}}</view>
+        <block wx:if="{{stage.empty}}">
+          <view class="comp-empty">这一阶段需要出生时辰，当前暂不可见。</view>
+        </block>
+        <block wx:else>
+          <view class="layer-card" wx:if="{{stage.outer}}">
+            <view class="layer-head" bindtap="toggleLayer" data-stage="{{stage.key}}" data-layer="outer">
+              <view>
+                <view class="layer-k layer-k-outer">{{stage.outer.title}}</view>
+                <view class="layer-help layer-help-outer">别人更容易看见的表达方式、做事姿态和面对外界时的第一反应。</view>
+                <view class="trait-line">
+                  <text class="trait-name serif">{{stage.outer.name}}</text>
+                  <text class="trait-main" wx:if="{{stage.outer.luckName}}">{{stage.outer.luckName}}</text>
+                </view>
+              </view>
+              <text class="trait-tag tag-{{stage.outer.pol === '正' ? 'z' : 'p'}}" wx:if="{{stage.outer.pol}}">{{stage.outer.pol === '正' ? '守正' : '求变'}}</text>
+              <text class="layer-arrow">{{stage.outer.open ? '⌃' : '⌄'}}</text>
+            </view>
+            <view class="layer-body" wx:if="{{stage.outer.open}}">
+              <view class="slider-row {{stage.outer.isFlowOnly ? 'flow-slider' : ''}}">
+                <text class="sl-lbl sl-lbl-l">{{stage.outer.lbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb" style="left:{{stage.outer.slider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{stage.outer.rbl}}</text>
+              </view>
+              <view class="slider-row flow-slider" wx:if="{{stage.outer.luckName}}">
+                <text class="sl-lbl sl-lbl-l">{{stage.outer.luckLbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb luck-thumb" style="left:{{stage.outer.luckSlider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{stage.outer.luckRbl}}</text>
+              </view>
+              <traitcluster wx:if="{{stage.outer.bubbles.length}}" bubbles="{{stage.outer.bubbles}}" />
+              <view class="trait-pc">
+                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{stage.outer.descLabel}}</text>{{stage.outer.desc}}</view>
+                <view class="pc pc-on pc-con" wx:if="{{stage.outer.con}}"><text class="pc-key pc-key-con">{{stage.outer.conLabel}}</text>{{stage.outer.con}}</view>
+              </view>
+            </view>
           </view>
-          <text class="stage-gz dim" wx:else>未知</text>
-        </view>
-        <block wx:if="{{!item.empty}}">
-          <view class="stage-theme">
-            <text class="stage-key">主旋律</text>
-            <text class="stage-theme-name serif">{{item.theme}}</text>
-            <text class="stage-god">{{item.themeGod}}</text>
-          </view>
-          <view class="pc pc-on">{{item.desc}}</view>
-          <view class="stage-inner" wx:if="{{item.inner}}">
-            <text class="stage-key stage-key-in">内心</text>
-            <text class="stage-inner-name">{{item.innerName}}</text>
-            <text class="stage-inner-txt">{{item.inner}}</text>
+
+          <view class="layer-card" wx:if="{{stage.inner}}">
+            <view class="layer-head" bindtap="toggleLayer" data-stage="{{stage.key}}" data-layer="inner">
+              <view>
+                <view class="layer-k layer-k-inner">{{stage.inner.title}}</view>
+                <view class="layer-help layer-help-inner">更靠里的情绪底色、安全感来源和关系里的真实反应，不一定立刻表现出来。</view>
+                <view class="trait-line">
+                  <text class="trait-name serif">{{stage.inner.name}}</text>
+                  <text class="trait-main" wx:if="{{stage.inner.luckName}}">{{stage.inner.luckName}}</text>
+                </view>
+              </view>
+              <text class="trait-tag tag-{{stage.inner.pol === '正' ? 'z' : 'p'}}" wx:if="{{stage.inner.pol}}">{{stage.inner.pol === '正' ? '守正' : '求变'}}</text>
+              <text class="layer-arrow">{{stage.inner.open ? '⌃' : '⌄'}}</text>
+            </view>
+            <view class="layer-body" wx:if="{{stage.inner.open}}">
+              <view class="slider-row">
+                <text class="sl-lbl sl-lbl-l">{{stage.inner.lbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb" style="left:{{stage.inner.slider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{stage.inner.rbl}}</text>
+              </view>
+              <view class="slider-row flow-slider" wx:if="{{stage.inner.luckName}}">
+                <text class="sl-lbl sl-lbl-l">{{stage.inner.luckLbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb luck-thumb" style="left:{{stage.inner.luckSlider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{stage.inner.luckRbl}}</text>
+              </view>
+              <traitcluster wx:if="{{stage.inner.bubbles.length}}" bubbles="{{stage.inner.bubbles}}" />
+              <view class="trait-pc">
+                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{stage.inner.descLabel}}</text>{{stage.inner.desc}}</view>
+                <view class="pc pc-on pc-con" wx:if="{{stage.inner.con}}"><text class="pc-key pc-key-con">{{stage.inner.conLabel}}</text>{{stage.inner.con}}</view>
+              </view>
+            </view>
           </view>
         </block>
-        <view class="pc" wx:else>未填出生时辰，晚年一程暂不可见。</view>
       </view>
     </view>
 
-  </block>
-
-  <view class="foot">性格画像基于出生信息的结构化分析，仅供娱乐参考</view>
-
-  <!-- 底部时光条占位（避免内容被吸底栏遮挡） -->
-  <view class="bar-holder" wx:if="{{tab === 'trait'}}"></view>
-</view>
-
-<!-- 底部常驻时光条（仅「主心性」模块，随大运流年此消彼长） -->
-<view class="timebar" wx:if="{{loaded && tab === 'trait'}}">
-  <view class="tb-natal {{hasLuck ? '' : 'tb-dim'}}" bindtap="backToNatal">
-    <text class="tb-natal-ic">↺</text>
-    <text>本命</text>
-  </view>
-  <view class="tb-step">
-    <text class="tb-arrow" bindtap="stepYear" data-d="-1">‹</text>
-    <view class="tb-mid">
-      <text class="tb-year {{barActive ? 'on' : ''}}">{{barYearShow}}</text>
-      <text class="tb-gz" wx:if="{{barGz}}">{{barGz}}</text>
-      <text class="tb-gz tb-hint" wx:else>原局 · 点箭头看年份</text>
-    </view>
-    <text class="tb-arrow" bindtap="stepYear" data-d="1">›</text>
-  </view>
-  <view class="tb-expand" bindtap="openPanel">
-    <text>阶段</text>
-    <text class="tb-expand-ic">▴</text>
-  </view>
-</view>
-
-<!-- 滑出选择面板 -->
-<view class="panel-mask {{panelOpen ? 'show' : ''}}" bindtap="closePanel"></view>
-<view class="panel {{panelOpen ? 'show' : ''}}" wx:if="{{loaded}}">
-  <view class="panel-head">
-    <text class="panel-cur">{{curLabel}}</text>
-    <text class="panel-close" bindtap="closePanel">收起</text>
-  </view>
-
-  <view class="section-title serif">十年阶段 <text class="section-note">点选叠加，重复点取消</text></view>
-  <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-    <view class="yun-strip">
-      <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
-        wx:for="{{daYunList}}" wx:key="index" bindtap="onDaYun" data-index="{{item.index}}">
-        <view class="yun-ss">{{item.god}}</view>
-        <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
-        <view class="yun-age">{{item.age}}岁</view>
-      </view>
-    </view>
-  </scroll-view>
-
-  <block wx:if="{{liuNianList.length}}">
-    <view class="section-title serif">具体年份 <text class="section-note">当前阶段内</text></view>
-    <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-      <view class="yun-strip">
-        <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
-          wx:for="{{liuNianList}}" wx:key="index" bindtap="onLiuNian" data-index="{{item.index}}">
-          <view class="yun-ss">{{item.god}}</view>
-          <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
-          <view class="yun-year">{{item.year}}</view>
+    <view class="acc-card luck-card {{openStageKey === 'luck' ? 'open' : ''}}">
+      <view class="acc-head" bindtap="toggleStage" data-key="luck">
+        <view class="acc-index luck-index">流</view>
+        <view class="acc-copy">
+          <view class="acc-title">
+            <text class="acc-name serif">岁运</text>
+            <text class="acc-sub">流动心性</text>
+          </view>
+          <view class="acc-pills">
+            <text class="acc-pill luck-pill">选择阶段</text>
+            <text class="acc-pill luck-pill">选择年份</text>
+            <text class="acc-pill luck-pill">金色泡泡混入</text>
+          </view>
+        </view>
+        <view class="acc-action">
+          <text class="acc-action-text">{{openStageKey === 'luck' ? '收起' : '点开查看'}}</text>
+          <view class="acc-arrow">⌄</view>
         </view>
       </view>
-    </scroll-view>
-  </block>
+
+      <view class="acc-body" wx:if="{{openStageKey === 'luck'}}">
+        <view class="stage-note">先选择要叠加到哪个人生阶段，再选择该阶段对应的年份。金色泡泡会直接混进这一阶段的外显和内心星团里。</view>
+
+        <view class="luck-controls">
+          <view class="luck-control-title">选择阶段</view>
+          <view class="luck-stage-row">
+            <view class="luck-stage {{luckStageIndex === idx ? 'on' : ''}}" wx:for="{{stagePortraits}}" wx:for-item="st" wx:for-index="idx" wx:key="key" bindtap="selectLuckStage" data-index="{{idx}}">
+              <text>{{st.label}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="luck-controls">
+          <view class="luck-control-title">选择年份</view>
+          <block wx:if="{{luckYearList.length}}">
+            <view class="luck-step">
+              <view class="luck-step-btn" bindtap="stepLuckYear" data-d="-1">‹</view>
+              <view class="luck-year-main">{{luckYear}}</view>
+              <view class="luck-step-btn" bindtap="stepLuckYear" data-d="1">›</view>
+            </view>
+            <scroll-view class="luck-year-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+              <view class="luck-year-strip">
+                <view class="luck-year {{item.active ? 'on' : ''}}" wx:for="{{luckYearList}}" wx:key="year" bindtap="selectLuckYear" data-year="{{item.year}}">
+                  <text class="luck-y">{{item.year}}</text>
+                  <text class="luck-a">{{item.age}}岁</text>
+                </view>
+              </view>
+            </scroll-view>
+          </block>
+          <view class="comp-empty" wx:else>这个阶段暂无可选年份。</view>
+        </view>
+
+        <view class="luck-block" wx:if="{{luckFlow}}">
+          <view class="luck-head">
+            <text class="luck-badge">{{luckYear}}心性</text>
+            <text class="luck-name serif">{{luckFlow.name}}</text>
+            <text class="luck-lbls" wx:if="{{luckFlow.lbl}}">{{luckFlow.lbl}} · {{luckFlow.rbl}}</text>
+          </view>
+          <view class="luck-lead" wx:if="{{luckFlow.lead}}">{{luckFlow.lead}}</view>
+          <view class="luck-desc">{{luckFlow.desc}}</view>
+        </view>
+
+        <block wx:if="{{luckPortrait && !luckPortrait.empty}}">
+          <view class="layer-card" wx:if="{{luckPortrait.outer}}">
+            <view class="layer-head" bindtap="toggleLayer" data-stage="luck" data-layer="outer">
+              <view>
+                <view class="layer-k layer-k-outer">{{luckPortrait.outer.title}}</view>
+                <view class="layer-help layer-help-outer">别人更容易看见的表达方式、做事姿态和面对外界时的第一反应。</view>
+                <view class="trait-line">
+                  <text class="trait-name serif">{{luckPortrait.outer.name}}</text>
+                  <text class="trait-main">{{luckPortrait.outer.luckName}}</text>
+                </view>
+              </view>
+              <text class="trait-tag tag-{{luckPortrait.outer.pol === '正' ? 'z' : 'p'}}" wx:if="{{luckPortrait.outer.pol}}">{{luckPortrait.outer.pol === '正' ? '守正' : '求变'}}</text>
+              <text class="layer-arrow">{{luckPortrait.outer.open ? '⌃' : '⌄'}}</text>
+            </view>
+            <view class="layer-body" wx:if="{{luckPortrait.outer.open}}">
+              <view class="slider-row {{luckPortrait.outer.isFlowOnly ? 'flow-slider' : ''}}">
+                <text class="sl-lbl sl-lbl-l">{{luckPortrait.outer.lbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb" style="left:{{luckPortrait.outer.slider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{luckPortrait.outer.rbl}}</text>
+              </view>
+              <view class="slider-row flow-slider" wx:if="{{luckPortrait.outer.luckName}}">
+                <text class="sl-lbl sl-lbl-l">{{luckPortrait.outer.luckLbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb luck-thumb" style="left:{{luckPortrait.outer.luckSlider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{luckPortrait.outer.luckRbl}}</text>
+              </view>
+              <traitcluster wx:if="{{luckPortrait.outer.bubbles.length}}" bubbles="{{luckPortrait.outer.bubbles}}" />
+              <view class="trait-pc">
+                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{luckPortrait.outer.descLabel}}</text>{{luckPortrait.outer.desc}}</view>
+                <view class="pc pc-on pc-con" wx:if="{{luckPortrait.outer.con}}"><text class="pc-key pc-key-con">{{luckPortrait.outer.conLabel}}</text>{{luckPortrait.outer.con}}</view>
+              </view>
+            </view>
+          </view>
+
+          <view class="layer-card" wx:if="{{luckPortrait.inner}}">
+            <view class="layer-head" bindtap="toggleLayer" data-stage="luck" data-layer="inner">
+              <view>
+                <view class="layer-k layer-k-inner">{{luckPortrait.inner.title}}</view>
+                <view class="layer-help layer-help-inner">更靠里的情绪底色、安全感来源和关系里的真实反应，不一定立刻表现出来。</view>
+                <view class="trait-line">
+                  <text class="trait-name serif">{{luckPortrait.inner.name}}</text>
+                  <text class="trait-main">{{luckPortrait.inner.luckName}}</text>
+                </view>
+              </view>
+              <text class="trait-tag tag-{{luckPortrait.inner.pol === '正' ? 'z' : 'p'}}" wx:if="{{luckPortrait.inner.pol}}">{{luckPortrait.inner.pol === '正' ? '守正' : '求变'}}</text>
+              <text class="layer-arrow">{{luckPortrait.inner.open ? '⌃' : '⌄'}}</text>
+            </view>
+            <view class="layer-body" wx:if="{{luckPortrait.inner.open}}">
+              <view class="slider-row">
+                <text class="sl-lbl sl-lbl-l">{{luckPortrait.inner.lbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb" style="left:{{luckPortrait.inner.slider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{luckPortrait.inner.rbl}}</text>
+              </view>
+              <view class="slider-row flow-slider" wx:if="{{luckPortrait.inner.luckName}}">
+                <text class="sl-lbl sl-lbl-l">{{luckPortrait.inner.luckLbl}}</text>
+                <view class="sl-track">
+                  <view class="sl-thumb luck-thumb" style="left:{{luckPortrait.inner.luckSlider}}%"></view>
+                </view>
+                <text class="sl-lbl sl-lbl-r">{{luckPortrait.inner.luckRbl}}</text>
+              </view>
+              <traitcluster wx:if="{{luckPortrait.inner.bubbles.length}}" bubbles="{{luckPortrait.inner.bubbles}}" />
+              <view class="trait-pc">
+                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{luckPortrait.inner.descLabel}}</text>{{luckPortrait.inner.desc}}</view>
+                <view class="pc pc-on pc-con" wx:if="{{luckPortrait.inner.con}}"><text class="pc-key pc-key-con">{{luckPortrait.inner.conLabel}}</text>{{luckPortrait.inner.con}}</view>
+              </view>
+            </view>
+          </view>
+        </block>
+        <view class="comp-empty" wx:if="{{luckPortrait && luckPortrait.empty}}">这一阶段需要出生时辰，当前暂不可见。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card comp" wx:if="{{relations.length}}">
+    <view class="comp-head">
+      <text class="comp-t serif">心结与张力</text>
+      <text class="comp-sub">内在的牵动</text>
+    </view>
+    <view class="comp-tip">有些组合会让内心更容易被牵动：可能是放不下的牵挂，也可能是冲突、拉扯或压力。</view>
+    <view class="rel" wx:for="{{relations}}" wx:key="type">
+      <view class="rel-head-line">
+        <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
+        <text class="rel-tag">{{item.tag}}</text>
+        <text class="rel-luck" wx:if="{{item.anyLuck}}">阶段引动</text>
+      </view>
+      <view class="rel-zhis-row">
+        <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
+      </view>
+      <view class="pc pc-on">{{item.text}}</view>
+    </view>
+  </view>
+
+  <view class="foot">性格画像基于出生信息的结构化分析，仅供娱乐参考</view>
 </view>

@@ -10,6 +10,7 @@ var relations = require('./relations.js');
 var traitWords = require('./traitWords.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
+var KE = base.KE;
 
 // 临时叠加心性气泡：只用于时间阶段/年份，不作为稳定性格文案。
 var YEAR_TRAIT_WORDS = {
@@ -50,14 +51,14 @@ function narrativeText(god, kind, side) {
 function buildTraitBubbles(list, luck, kind) {
   var out = [];
   (list || []).slice(0, 2).forEach(function (t, idx) {
-    var kw = wordCopy(t.god, kind || 'outer');
+    var kw = wordCopy(t.god, t.copyKind || kind || 'outer');
     if (!kw) return;
     // 该心性算出的滑标位置(25-75) → lean(0顺…1偏)，驱动这组泡泡优缺涨缩
     var lean = (t.slider != null ? t.slider : 50) / 100;
     var bw = idx === 0 ? 0.95 : 0.78;
-    (kw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw - i * 0.1, lean: lean }); });
-    (kw.neu || []).slice(0, 2).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: lean }); });
-    (kw.con || []).slice(0, 3).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'natal', w: bw - 0.05 - i * 0.1, lean: lean }); });
+    (kw.pro || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw, lean: lean }); });
+    (kw.neu || []).slice(0, 3).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: lean }); });
+    (kw.con || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: lean }); });
   });
   // 岁运叠加（金色）：取一组优缺关键词，叠在主心性之上，不顶替
   // 若岁运十神与原局主心性相同，能量本就一样，不再加多余的圆
@@ -66,8 +67,8 @@ function buildTraitBubbles(list, luck, kind) {
     if (lkw) {
       var ll = (luck.slider != null ? luck.slider : 50) / 100;
       var lw = luck.bubbleWeight || 0.7;
-      (lkw.pro || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'pro', src: 'luck', w: Math.max(0.35, lw - i * 0.08), lean: ll }); });
-      (lkw.con || []).slice(0, 4).forEach(function (w, i) { out.push({ label: w, kind: 'con', src: 'luck', w: Math.max(0.35, lw - 0.04 - i * 0.08), lean: ll }); });
+      (lkw.pro || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'luck', w: lw, lean: ll }); });
+      (lkw.con || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'luck', w: lw, lean: ll }); });
     }
   }
   return out;
@@ -145,25 +146,31 @@ function decideXiji(p, dmEl, rootEls) {
 
 // 五行滑标位置：喜(+)→左、忌(-)→右；强度 = |五行占比−20| 限幅 [0,25] → 钳到 [25%,75%]
 function sliderPos(d, pct) {
-  var mag = Math.min(25, Math.round(Math.abs(pct - 20) * 1.2));
+  var mag = Math.min(25, Math.max(10, Math.round(Math.abs(pct - 20) * 1.2)));
   if (d === '+') return 50 - mag;
   if (d === '-') return 50 + mag;
   return 50;
 }
 
 // 心性滑标位置：方向仍取喜忌；强度改用该十神在心性聚合池里的能量占比。
-// 十神均分基准为 10%，只取超过基准的部分做偏移，避免弱十神被五行总量推到极端。
-function traitSliderPos(d, godPct) {
-  var mag = Math.min(25, Math.round(Math.max(0, godPct - 10)));
+// 十神均分基准为 10%，只取超过基准的部分做偏移；凡明确喜/忌，至少偏离中线 10。
+var RIGHT_SOFT_CAP_GODS = { 正财: true, 比肩: true, 偏财: true, 食神: true, 正印: true };
+
+function capTraitRight(god, pos) {
+  return RIGHT_SOFT_CAP_GODS[god] ? Math.min(pos, 65) : pos;
+}
+
+function traitSliderPos(d, godPct, god) {
+  var mag = Math.min(25, Math.max(10, Math.round(Math.max(0, godPct - 10))));
   if (d === '+') return 50 - mag;
-  if (d === '-') return 50 + mag;
+  if (d === '-') return capTraitRight(god, 50 + mag);
   return 50;
 }
 
-function luckSliderPos(d, godPct) {
-  var mag = Math.min(25, Math.max(8, Math.round(Math.max(0, godPct) * 2)));
+function luckSliderPos(d, godPct, god) {
+  var mag = Math.min(25, Math.max(10, Math.round(Math.max(0, godPct) * 2)));
   if (d === '+') return 50 - mag;
-  if (d === '-') return 50 + mag;
+  if (d === '-') return capTraitRight(god, 50 + mag);
   return 50;
 }
 
@@ -317,29 +324,29 @@ var CORE = {
   癸: { title: '癸水 · 雨露', text: '像细润的雨露，安静、聪慧、直觉准，温柔又有渗透力；心思深，外柔而内里有韧劲。' }
 };
 
-// 十神 → 流年专用文案（讲当年的状态/想法/行为，区别于贯穿一生的性格词）
-// pol 正/偏；lbl 顺端词(喜·左)、rbl 偏端词(忌·右)；desc 顺/偏都写出 + 宜做的事
+// 十神 → 流年专用文案（讲这一年适合做什么、容易打算做什么，区别于稳定性格）
+// pol 正/偏；lbl 顺端词(喜·左)、rbl 偏端词(忌·右)；desc 用行动建议口吻，不写成固定性格。
 var LIUNIAN = {
   比肩: { pol: '正', lbl: '自立合伙', rbl: '较劲破费',
-    desc: '顺时，自己拿主意、行动独立，朋友走动多、爱热闹，合伙搭伙做事得力；走偏时，爱较劲和人争高下，讲义气替人扛事，钱财容易被分、为朋友破费。宜：找搭档合伙立事、靠自己推进，账目算清、别替人担保。' },
+    desc: '今年适合把主动权拿回来，自己定计划、自己推进，也适合找同频的人搭伙做事。你可能会想独立完成一件事，或重新整理朋友圈、合作关系。注意账目分清，别因为讲义气替人扛太多。' },
   劫财: { pol: '偏', lbl: '敢拼旺人脉', rbl: '冲动破财',
-    desc: '顺时，敢闯敢拼、行动快，朋友帮衬、人脉来财，气氛一来就上；走偏时，冲动消费、合伙吃亏，爱攀比，易被借钱、动赌念，钱来钱去留不住。宜：借人脉团队作战去开拓，管住冲动消费，远离赌与大额借出。' },
+    desc: '今年适合借人脉、团队、圈子去开拓，适合竞争、抢机会、把行动速度提起来。你可能会想换圈子、拉团队、做更有冲劲的事。注意别冲动消费、别攀比投入，借钱担保要谨慎。' },
   食神: { pol: '正', lbl: '松快有福', rbl: '贪玩懒散',
-    desc: '顺时，心态放松、日子有滋味，吃喝玩乐有福气，才艺、表达、口碑都顺；走偏时，贪图享受、爱吃爱喝爱玩，懒散拖延、动力不足，容易把正事放一边。宜：学才艺、做内容、慢工出细活，顺带调养身体，给自己定个小目标别全玩没了。' },
+    desc: '今年适合做内容、作品、表达、服务，也适合调养身体、学习一门让自己舒服的技能。你可能会想放慢节奏，把日子过得更有滋味。注意别只顾享受和拖延，最好给自己定一个能完成的小目标。' },
   伤官: { pol: '偏', lbl: '才华出彩', rbl: '傲气口舌',
-    desc: '顺时，才华迸发、点子多，敢秀敢说敢闯，技艺长进、个人魅力足；走偏时，恃才傲物、爱抬杠顶撞上司，口无遮拦惹口舌，玩心重静不下来，锋芒太露得罪人。宜：把才华变成作品、技术、表达，考证学新技能，少争对错、对上级客气、管住嘴。' },
+    desc: '今年适合把才华拿出来，做作品、表达观点、学新技能、争取曝光。你可能会想突破旧规则，换一种方式证明自己。注意少争口舌，别一急就顶撞权威，把锋芒落到作品和结果上。' },
   偏财: { pol: '偏', lbl: '财路人脉广', rbl: '投机散财',
-    desc: '顺时，财路广、生意活络，交际带来机会，出手大方、说做就做；走偏时，爱投机押得太大，应酬酒色多，钱进得快散也快，感情上易分心。宜：拓业务、做副业、结交资源灵活变现，别投机押大、控住应酬开销。' },
+    desc: '今年适合拓业务、做副业、谈资源、跑市场，也适合把人脉变成实际机会。你可能会想多尝试几条财路，或把手里的资源流动起来。注意别投机押太大，应酬和开销要控住。' },
   正财: { pol: '正', lbl: '稳进顾家', rbl: '计较操劳',
-    desc: '顺时，进财稳、勤快务实，懂攒钱、有责任心，把日子经营得有条理；走偏时，太抠太计较、为钱操劳，舍不得花也不敢闯，患得患失。宜：踏实积累、理财存钱、长期经营，该花的别太省，适度为机会投入。' },
+    desc: '今年适合稳定进账、存钱理财、长期经营，也适合把生活和工作重新整理得更有秩序。你可能会想攒钱、买大件、做长期计划。注意别因为太计较而错过机会，该投入的地方别过度省。' },
   七杀: { pol: '偏', lbl: '闯劲担当', rbl: '焦躁冒险',
-    desc: '顺时，闯劲足、扛得住事，敢决断、有魄力，常得权威或贵人推一把，是成长快的一年；走偏时，紧张焦虑、易冲动好斗，爱铤而走险、动赌性，惹是非或要防伤病。宜：去攻坚、扛项目、健身竞技，借压力成长、找平台权威背书，别赌别担保，注意安全与休息。' },
+    desc: '今年适合攻坚、扛项目、做高压但能成长的事，也适合训练体能、争取更强的平台或权威背书。你可能会想快速突破、证明实力。注意别冒险赌一把，安全、合同和边界要先守住。' },
   正官: { pol: '正', lbl: '名分上进', rbl: '拘谨压力',
-    desc: '顺时，名正言顺、易得提拔认可，做事有章法、守规矩，地位口碑往上走；走偏时，顾虑多、怕担责怕出错，被规矩束住放不开，留意官非口舌、压力上身。宜：求职晋升、考公考证、立规矩争名分，按流程办事别钻空子，照顾好情绪。' },
+    desc: '今年适合求职晋升、考证考编、争取名分和正式身份，也适合立规矩、走流程、把口碑做稳。你可能会想让事情更正规、更被认可。注意别被压力和评价困住，按规则来，但别把自己绷太紧。' },
   偏印: { pol: '偏', lbl: '钻研充电', rbl: '发懒空想',
-    desc: '顺时，灵感多、适合学习钻研，能想通很多事，独处充电、专精一门手艺；走偏时，发懒不爱动、多想少做，孤僻钻牛角尖，提不起劲、爱胡思乱想。宜：去钻研学习、做研究策划、独处充电，逼自己动起来，定期运动社交别空想。' },
+    desc: '今年适合学习、研究、策划、做幕后准备，也适合独处充电、打磨一门偏专精的能力。你可能会想换一种理解世界的方式，或钻进某个小众方向。注意别只想不做，定期运动和社交，把灵感落地。' },
   正印: { pol: '正', lbl: '得助安稳', rbl: '发懒依赖',
-    desc: '顺时，常得长辈、贵人相助，适合进修考证，心里踏实、被托底照顾；走偏时，容易发懒、依赖心重，行动慢、准备过头，安于现状不想动弹。宜：进修考证、找贵人长辈帮、签长约稳中求进，克服懒散、主动迈出第一步。' }
+    desc: '今年适合进修、考证、找老师贵人、签长期稳定的安排，也适合修复关系、补足安全感。你可能会想先把基础打牢，再稳稳往前走。注意别准备太久、依赖太多，关键是主动迈出第一步。' }
 };
 
 function intensity(p) { return Math.round(Math.abs(p - 50) * 2); }
@@ -417,10 +424,82 @@ function build(chart, opts) {
     if (traitPattern && traitPattern.dirByGod && traitPattern.dirByGod[god]) return traitPattern.dirByGod[god];
     return xiji.dir[el];
   }
+  function posIndexOf(label) {
+    return { 年: 0, 月: 1, 日: 2, 时: 3 }[label];
+  }
+  function pillarGanInfo(pillar) {
+    var p = chart.pillars[pillar];
+    if (!p || p.empty || !p.gan) return null;
+    return {
+      sourceKind: 'gan',
+      pillar: pillar,
+      char: p.gan.text,
+      god: p.shiShenGan,
+      el: base.ganWx(p.gan.text),
+      isDay: p.shiShenGan === '日主'
+    };
+  }
+  function pillarMainInfo(pillar) {
+    var p = chart.pillars[pillar];
+    if (!p || p.empty || !p.zhi) return null;
+    var g = LunarUtil.ZHI_HIDE_GAN[p.zhi.text][0];
+    return {
+      sourceKind: 'zhiMain',
+      pillar: pillar,
+      char: g,
+      god: LunarUtil.SHI_SHEN[dayGan + g],
+      el: base.ganWx(g),
+      isDay: false
+    };
+  }
+  function samePillarPeer(src) {
+    if (src.pillar == null) return null;
+    return src.sourceKind === 'gan' ? pillarMainInfo(src.pillar) : pillarGanInfo(src.pillar);
+  }
+  function godIn(god, list) {
+    return list.indexOf(god) >= 0;
+  }
+  function isKe(controller, target) {
+    return controller && target && KE[controller.el] === target.el;
+  }
+  function samePillarOverride(src, currentDir) {
+    if (!src || src.pillar == null || !src.sourceKind) return null;
+    var peer = samePillarPeer(src);
+    if (!peer || peer.isDay) return null;
+    if (!isKe(peer, src)) return null;
+
+    if (src.sourceKind === 'gan' && src.god === '正印' && godIn(peer.god, ['正财', '偏财'])) {
+      return { dir: '-', reason: '正印天干被同柱财星克制' };
+    }
+    if (src.god === '七杀' && godIn(peer.god, ['食神', '伤官'])) {
+      return { dir: '+', reason: '七杀被同柱食伤克制' };
+    }
+    if (src.god === '劫财' && peer.god === '七杀') {
+      return { dir: '+', reason: '劫财被同柱七杀克制' };
+    }
+    if (src.god === '偏印' && peer.god === '偏财') {
+      return { dir: '+', reason: '偏印被同柱偏财克制' };
+    }
+    if (src.god === '伤官' && currentDir === '-' && peer.god === '正印') {
+      return { dir: '+', reason: '忌神伤官被同柱正印克制' };
+    }
+    if (src.god === '正官' && currentDir === '+' && peer.god === '伤官') {
+      return { dir: '-', reason: '喜用正官被同柱伤官克制' };
+    }
+    if (src.god === '正财' && currentDir === '+' && peer.god === '劫财') {
+      return { dir: '-', reason: '喜用正财被同柱劫财克制' };
+    }
+    if (src.god === '食神' && currentDir === '+' && peer.god === '偏印') {
+      return { dir: '-', reason: '喜用食神被同柱偏印克制' };
+    }
+    return null;
+  }
 
   function makeTraitItem(src, idx, max, copyKind) {
     var t = TEMP[src.god] || { name: src.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
-    var dir = traitDir(src.god, src.el);
+    var rawDir = traitDir(src.god, src.el);
+    var override = samePillarOverride(src, rawDir);
+    var dir = override ? override.dir : rawDir;
     return {
       god: src.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
       desc: narrativeText(src.god, copyKind, 'desc'),
@@ -428,15 +507,20 @@ function build(chart, opts) {
       descLabel: copyKind === 'inner' ? '解读' : '优点',
       conLabel: '留意',
       cls: src.cls,
-      slider: traitSliderPos(dir, godPct[src.god] || 0),
+      slider: traitSliderPos(dir, godPct[src.god] || 0, src.god),
       energy: src.energy,
       godPct: Math.round(godPct[src.god] || 0),
       traitDir: dir,
+      baseTraitDir: rawDir,
+      traitOverride: override ? override.reason : '',
+      copyKind: copyKind,
       traitPattern: traitPattern ? traitPattern.name : '',
       dots: energyDots(max > 0 ? src.energy / max : 1),
       isMain: idx === 0,
       source: src.source,
-      sourceChar: src.sourceChar
+      sourceChar: src.sourceChar,
+      sourceKind: src.sourceKind,
+      pillar: src.pillar
     };
   }
 
@@ -446,7 +530,9 @@ function build(chart, opts) {
       outerSources.push({
         god: c.god, el: c.el, cls: c.cls, energy: c.val,
         source: outerSources.length === 0 ? '外显一' : '外显二',
-        sourceChar: c.char
+        sourceChar: c.char,
+        sourceKind: 'gan',
+        pillar: posIndexOf(c.pos)
       });
     }
   });
@@ -462,7 +548,9 @@ function build(chart, opts) {
         var pp = chart.pillars[pillar];
         innerSources.push({
           god: u.god, el: u.el, cls: base.WX_CLS[u.el], energy: u.val,
-          source: source, sourceChar: pp && pp.zhi ? pp.zhi.text : ''
+          source: source, sourceChar: pp && pp.zhi ? pp.zhi.text : '',
+          sourceKind: 'zhiMain',
+          pillar: pillar
         });
         break;
       }
@@ -478,32 +566,144 @@ function build(chart, opts) {
 
   // —— 岁运叠加心性：取岁运天干十神（流年优先，否则大运），作为另一组气泡叠加 ——
   var luckGan = lnGan || ((opts.daYunGZ && opts.daYunGZ.length >= 2) ? opts.daYunGZ.charAt(0) : null);
+  var luckZhi = lnZhi || ((opts.daYunGZ && opts.daYunGZ.length >= 2) ? opts.daYunGZ.charAt(1) : null);
+  var luckKind = lnGan ? 'ln' : (opts.daYunGZ ? 'dy' : '');
   var luckTrait = null;
-  if (luckGan) {
-    var lkGod = LunarUtil.SHI_SHEN[dayGan + luckGan];
-    var lkEl = base.ganWx(luckGan);
-    var L0 = LIUNIAN[lkGod] || { lbl: '', rbl: '', desc: '' };
-    var dup = list.some(function (t) { return t.god === lkGod; });
-    var luckKind = lnGan ? 'ln' : 'dy';
-    var luckUnit = null;
-    (m.luckGanUnits || []).forEach(function (u) {
-      if (u.kind === luckKind && u.char === luckGan) luckUnit = u;
-    });
-    var luckEnergy = luckUnit ? luckUnit.val : 0.35;
+  var luckInnerTrait = null;
+  function makeLuckTrait(god, el, energy, char) {
+    var L0 = LIUNIAN[god] || { lbl: '', rbl: '', desc: '' };
+    var luckEnergy = energy || 0.35;
     var luckPct = totalE > 0 ? luckEnergy / (totalE + luckEnergy) * 100 : 10;
-    var luckDir = traitDir(lkGod, lkEl);
-    luckTrait = {
-      god: lkGod, name: lkGod, cls: base.WX_CLS[lkEl],
-      slider: luckSliderPos(luckDir, luckPct),
+    var luckDir = traitDir(god, el);
+    var isDiseaseLuck = xiji.mode === '病重' && el === xiji.disease;
+    if (isDiseaseLuck) luckDir = '-';
+    return {
+      god: god, name: god, cls: base.WX_CLS[el],
+      slider: isDiseaseLuck ? 75 : luckSliderPos(luckDir, luckPct, god),
       energy: luckEnergy,
       godPct: Math.round(luckPct),
       bubbleWeight: Math.max(0.45, Math.min(1.05, 0.45 + luckPct / 22)),
       lead: '',
       lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
       traitDir: luckDir,
-      dup: dup
+      diseaseHit: isDiseaseLuck,
+      char: char || ''
     };
   }
+  if (luckGan) {
+    var lkGod = LunarUtil.SHI_SHEN[dayGan + luckGan];
+    var lkEl = base.ganWx(luckGan);
+    var luckUnit = null;
+    (m.luckGanUnits || []).forEach(function (u) {
+      if (u.kind === luckKind && u.char === luckGan) luckUnit = u;
+    });
+    luckTrait = makeLuckTrait(lkGod, lkEl, luckUnit ? luckUnit.val : 0.35, luckGan);
+    luckTrait.dup = list.some(function (t) { return t.god === lkGod; });
+  }
+  if (luckZhi) {
+    var luckMainGan = LunarUtil.ZHI_HIDE_GAN[luckZhi][0];
+    var lzGod = LunarUtil.SHI_SHEN[dayGan + luckMainGan];
+    var lzEl = base.ganWx(luckMainGan);
+    var zhiUnit = null;
+    (m.luckZhiUnits || []).forEach(function (u) {
+      if (u.kind === luckKind && u.rank === 0 && u.char === luckMainGan) zhiUnit = u;
+    });
+    luckInnerTrait = makeLuckTrait(lzGod, lzEl, zhiUnit ? zhiUnit.val : 0.35, luckZhi);
+  }
+
+  function ganCellAt(pos) {
+    for (var i = 0; i < (m.ganCells || []).length; i++) if (m.ganCells[i].pos === pos) return m.ganCells[i];
+    return null;
+  }
+  function hiddenMainAt(pillar) {
+    for (var i = 0; i < (m.hiddenUnits || []).length; i++) {
+      var u = m.hiddenUnits[i];
+      if (u.pillar === pillar && u.rank === 0) return u;
+    }
+    return null;
+  }
+  function layerFromGan(pillarIndex, posLabel) {
+    var c = ganCellAt(posLabel);
+    if (!c || c.isDay) return null;
+    return makeTraitItem({
+      god: c.god, el: c.el, cls: c.cls, energy: c.val,
+      source: '外显心性', sourceChar: c.char,
+      sourceKind: 'gan', pillar: pillarIndex
+    }, 0, c.val || 1, 'outer');
+  }
+  function layerFromZhi(pillarIndex) {
+    var u = hiddenMainAt(pillarIndex);
+    if (!u) return null;
+    return makeTraitItem({
+      god: u.god, el: u.el, cls: base.WX_CLS[u.el], energy: u.val,
+      source: '内显心性', sourceChar: '',
+      sourceKind: 'zhiMain', pillar: pillarIndex
+    }, 0, u.val || 1, 'inner');
+  }
+  function layerTitle(stage, layer) {
+    if (stage.key === 'day') return '整体心性';
+    return layer === 'outer' ? '外显心性' : '内显心性';
+  }
+  function makeFlowOnlyLayer(luck) {
+    if (!luck) return null;
+    var t = TEMP[luck.god] || { name: luck.god, pol: '', desc: '', con: '' };
+    return {
+      god: luck.god,
+      name: t.name || luck.name,
+      pol: t.pol || '',
+      lbl: luck.lbl,
+      rbl: luck.rbl,
+      desc: luck.desc || narrativeText(luck.god, 'outer', 'desc'),
+      con: '',
+      descLabel: '流动',
+      conLabel: '留意',
+      cls: luck.cls,
+      slider: luck.slider,
+      energy: luck.energy,
+      godPct: luck.godPct,
+      traitDir: luck.traitDir,
+      copyKind: 'luck',
+      title: '流动外显',
+      isFlowOnly: true,
+      bubbles: buildTraitBubbles([], luck, 'outer')
+    };
+  }
+  function decorateLayer(stage, layer, luck) {
+    if (!layer) return null;
+    if (layer.isFlowOnly) return layer;
+    layer.title = layerTitle(stage, layer.source === '内显心性' ? 'inner' : 'outer');
+    layer.bubbles = buildTraitBubbles([layer], luck, layer.copyKind || (layer.source === '内显心性' ? 'inner' : 'outer'));
+    if (luck) {
+      layer.luckName = luck.name;
+      layer.luckSlider = luck.slider;
+      layer.luckLbl = luck.lbl;
+      layer.luckRbl = luck.rbl;
+    }
+    return layer;
+  }
+  var stageMetaList = [
+    { key: 'year', label: '少年', age: '0-16岁', phase: '根', theme: '祖业 · 家庭 · 求学根基', sub: '先天底色', pill: '性格底色', note: '少年阶段看最早形成的性格底色。它不只属于小时候，也会像底色一样被带到人生后面。', pillar: 0, pos: '年' },
+    { key: 'month', label: '青年', age: '17-32岁', phase: '苗', theme: '事业起步 · 求财 · 婚恋初期', sub: '社会面具', pill: '社会面具', note: '青年阶段看一个人如何向外表达、竞争、试探边界，也看进入社会后更容易戴上的那层面具。', pillar: 1, pos: '月' },
+    { key: 'day', label: '中年', age: '33-48岁', phase: '花', theme: '事业巅峰 · 婚姻 · 自身成就', sub: '整体心性', pill: '整体心性', note: '中年阶段更贴近真实关系和长期选择。这里不再拆外层表现，只看这一阶段真正稳定下来的整体心性。', pillar: 2, pos: '日' },
+    { key: 'hour', label: '晚年', age: '49岁以后', phase: '果', theme: '子女 · 健康 · 归宿享福', sub: '后期状态', pill: '后期状态', note: '晚年阶段看后半程更自然流露的状态，也看一个人最终更愿意怎样安排生活。', pillar: 3, pos: '时' }
+  ];
+  var stagePortraits = stageMetaList.map(function (sm, idx) {
+    var pp = chart.pillars[sm.pillar];
+    if (!pp || pp.empty || !pp.gan || !pp.zhi) {
+      return {
+        key: sm.key, label: sm.label, age: sm.age, phase: sm.phase, theme: sm.theme,
+        sub: sm.sub, pill: sm.pill, note: sm.note, index: idx + 1, empty: true
+      };
+    }
+    var outer = sm.key === 'day' ? makeFlowOnlyLayer(luckTrait) : layerFromGan(sm.pillar, sm.pos);
+    var inner = layerFromZhi(sm.pillar);
+    return {
+      key: sm.key, label: sm.label, age: sm.age, phase: sm.phase, theme: sm.theme,
+      sub: sm.sub, pill: sm.pill, note: sm.note, index: idx + 1, empty: false,
+      outer: decorateLayer(sm, outer, luckTrait),
+      inner: decorateLayer(sm, inner, luckInnerTrait)
+    };
+  });
 
   // —— 内在心性（branchList）——
   // 选了流年：只显示「流年地支本气十神」一条内在主旋律。
@@ -610,9 +810,11 @@ function build(chart, opts) {
     outerBubbles: buildTraitBubbles(outerList, luckTrait, 'outer'),
     innerBubbles: buildTraitBubbles(innerList, null, 'inner'),
     luckTrait: luckTrait,
+    luckInnerTrait: luckInnerTrait,
     branchList: branchList,
     relations: rels,
     stages: stages,
+    stagePortraits: stagePortraits,
     zhengNow: zhengNow, pianNow: 100 - zhengNow,
     hasLuck: m.hasLuck,
     hasTime: !chart.meta.unknownTime

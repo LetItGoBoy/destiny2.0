@@ -395,6 +395,10 @@ Page({
     });
   },
 
+  goRecords: function () {
+    wx.switchTab({ url: '/pages/records/records' });
+  },
+
   // 出生星图
   goAstro: function () {
     wx.navigateTo({

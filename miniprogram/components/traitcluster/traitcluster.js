@@ -7,6 +7,9 @@ Component({
   properties: {
     bubbles: { type: Array, value: [] }   // 每个泡泡自带 lean(由算法算出的滑标位置)
   },
+  data: {
+    dragging: false
+  },
 
   lifetimes: {
     attached: function () { this.initCanvas(); },
@@ -69,8 +72,8 @@ Component({
     targetR: function (kind, w, lean) {
       var base = 13 + (w || 0.6) * 15;
       if (kind === 'neu') return base;
-      if (kind === 'con') return base * (0.5 + 0.95 * lean);
-      return base * (1.45 - 0.95 * lean);
+      if (kind === 'con') return base * (0.38 + 1.20 * lean);
+      return base * (1.62 - 1.20 * lean);
     },
 
     loop: function () {
@@ -151,7 +154,12 @@ Component({
     onTouchStart: function (e) {
       var t = e.touches[0]; if (!t) return;
       this._drag = this.pick(t.x, t.y);
-      if (this._drag) this._drag.fix = true;
+      if (this._drag) {
+        this._drag.fix = true;
+        if (!this.data.dragging) this.setData({ dragging: true });
+      } else if (this.data.dragging) {
+        this.setData({ dragging: false });
+      }
     },
     onTouchMove: function (e) {
       if (!this._drag) return;
@@ -160,6 +168,7 @@ Component({
     },
     onTouchEnd: function () {
       if (this._drag) { this._drag.fix = false; this._drag = null; }
+      if (this.data.dragging) this.setData({ dragging: false });
     }
   }
 });

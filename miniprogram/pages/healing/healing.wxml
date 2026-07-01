@@ -1,4 +1,6 @@
 <view class="page">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
+
   <view class="head">
     <view class="head-title serif">疗愈空间</view>
     <view class="head-sub">慢下来，给心一点空隙</view>

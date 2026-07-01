@@ -166,6 +166,40 @@
 }
 .pol-zheng { background: linear-gradient(135deg, #5BB58C, #2E8C63); }
 .pol-pian { background: linear-gradient(135deg, #9D78F8, #6C4BD9); }
+.pol-explain {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+.pol-explain-item {
+  flex: 1;
+  min-width: 0;
+  padding: 14rpx 16rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid transparent;
+}
+.pol-explain-zheng {
+  background: rgba(91, 181, 140, 0.12);
+  border-color: rgba(46, 140, 99, 0.22);
+}
+.pol-explain-pian {
+  background: rgba(108, 75, 217, 0.11);
+  border-color: rgba(108, 75, 217, 0.22);
+}
+.pol-explain-k {
+  display: block;
+  font-size: 23rpx;
+  font-weight: 800;
+  margin-bottom: 4rpx;
+}
+.pol-explain-t {
+  display: block;
+  font-size: 21rpx;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.pol-explain-zheng .pol-explain-k { color: #2E8C63; }
+.pol-explain-pian .pol-explain-k { color: #6C4BD9; }
 .pol-legend {
   display: flex;
   justify-content: space-between;
@@ -240,8 +274,9 @@
   margin-left: 12rpx;
   font-size: 18rpx;
   font-weight: 600;
-  color: #fff;
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
+  color: #9A6B12;
+  background: rgba(201, 162, 39, 0.14);
+  border: 1rpx solid rgba(201, 162, 39, 0.28);
   padding: 3rpx 14rpx;
   border-radius: 100rpx;
 }
@@ -343,6 +378,347 @@
   padding: 30rpx 0;
   text-align: center;
   font-size: 24rpx;
+  color: var(--ink-3);
+}
+
+/* 四阶段竖向展开 */
+.stage-acc {
+  margin-top: 18rpx;
+}
+.acc-card {
+  margin-top: 18rpx;
+  overflow: hidden;
+  border-radius: 20rpx;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  border: 1rpx solid var(--line);
+}
+.acc-head {
+  min-height: 116rpx;
+  display: flex;
+  align-items: center;
+  padding: 22rpx 26rpx;
+}
+.acc-index {
+  flex: none;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #1D2638;
+  font-size: 22rpx;
+  font-weight: 800;
+  margin-right: 20rpx;
+}
+.luck-index {
+  color: #5C4108;
+  background: linear-gradient(135deg, #F4D985, #C9A227);
+}
+.acc-copy {
+  flex: 1;
+  min-width: 0;
+}
+.acc-action {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-left: 14rpx;
+}
+.acc-action-text {
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #B86B00;
+  background: rgba(255, 184, 56, 0.16);
+  border: 1rpx solid rgba(255, 184, 56, 0.40);
+  border-radius: 100rpx;
+  padding: 5rpx 12rpx;
+}
+.acc-card.open .acc-action-text {
+  color: #1D2638;
+  background: rgba(29, 38, 56, 0.08);
+  border-color: rgba(29, 38, 56, 0.16);
+}
+.acc-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.acc-name {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1rpx;
+}
+.acc-age {
+  flex: none;
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #6F5A3B;
+  background: rgba(201, 162, 39, 0.10);
+  border: 1rpx solid rgba(201, 162, 39, 0.24);
+  padding: 6rpx 12rpx;
+  border-radius: 100rpx;
+}
+.acc-sub {
+  flex: none;
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #1D2638;
+  background: rgba(29, 38, 56, 0.07);
+  border: 1rpx solid rgba(29, 38, 56, 0.10);
+  padding: 6rpx 12rpx;
+  border-radius: 100rpx;
+}
+.acc-stage-meta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-top: 10rpx;
+}
+.acc-phase {
+  flex: none;
+  min-width: 34rpx;
+  height: 34rpx;
+  line-height: 34rpx;
+  text-align: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #6F5A3B;
+  font-size: 20rpx;
+  font-weight: 800;
+  margin-right: 12rpx;
+}
+.acc-theme {
+  flex: 1;
+  min-width: 0;
+  font-size: 22rpx;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+.acc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 8rpx;
+}
+.acc-pill {
+  font-size: 20rpx;
+  color: var(--ink-2);
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  padding: 3rpx 12rpx;
+  border-radius: 100rpx;
+}
+.luck-pill {
+  color: #9A6B12;
+  background: rgba(201, 162, 39, 0.12);
+  border-color: rgba(201, 162, 39, 0.28);
+}
+.acc-arrow {
+  flex: none;
+  width: 52rpx;
+  height: 52rpx;
+  line-height: 48rpx;
+  text-align: center;
+  border-radius: 50%;
+  color: var(--ink-3);
+  border: 1rpx solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+.acc-card.open .acc-arrow {
+  transform: rotate(180deg);
+  color: #fff;
+  background: #1D2638;
+  border-color: #1D2638;
+}
+.acc-body {
+  padding: 24rpx 26rpx 26rpx;
+  border-top: 1rpx solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.52));
+}
+.stage-note {
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin-bottom: 20rpx;
+}
+.layer-card {
+  margin-top: 18rpx;
+  padding: 24rpx 22rpx 18rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.72);
+}
+.layer-card:first-of-type {
+  margin-top: 0;
+}
+.layer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-bottom: 12rpx;
+}
+.layer-head > view {
+  flex: 1;
+  min-width: 0;
+}
+.layer-arrow {
+  flex: none;
+  width: 42rpx;
+  height: 42rpx;
+  line-height: 38rpx;
+  text-align: center;
+  border-radius: 50%;
+  color: var(--ink-3);
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  font-size: 26rpx;
+  font-weight: 800;
+}
+.layer-body {
+  padding-top: 2rpx;
+}
+.layer-k {
+  display: inline-flex;
+  align-items: center;
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #B86B00;
+  background: rgba(255, 184, 56, 0.18);
+  border: 1rpx solid rgba(255, 184, 56, 0.42);
+  border-radius: 100rpx;
+  padding: 5rpx 14rpx;
+  margin-bottom: 8rpx;
+}
+.layer-k-inner {
+  color: #08746F;
+  background: rgba(8, 116, 111, 0.13);
+  border-color: rgba(8, 116, 111, 0.34);
+}
+.layer-help {
+  font-size: 22rpx;
+  line-height: 1.5;
+  font-weight: 600;
+  margin-bottom: 10rpx;
+}
+.layer-help-outer {
+  color: #B86B00;
+}
+.layer-help-inner {
+  color: #08746F;
+}
+.flow-slider .sl-lbl-l,
+.flow-slider .sl-lbl-r {
+  color: #9A6B12;
+}
+.flow-slider .sl-track {
+  background: rgba(201, 162, 39, 0.22);
+}
+.luck-thumb {
+  background: #C9A227;
+  box-shadow: 0 2rpx 8rpx rgba(154, 107, 18, 0.35);
+}
+.luck-controls {
+  margin-top: 18rpx;
+  padding: 20rpx;
+  border-radius: 18rpx;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+}
+.luck-control-title {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin-bottom: 14rpx;
+}
+.luck-stage-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.luck-stage {
+  padding: 10rpx 22rpx;
+  border-radius: 100rpx;
+  color: var(--ink-2);
+  background: #fff;
+  border: 1rpx solid var(--line);
+  font-size: 24rpx;
+}
+.luck-stage.on {
+  color: #fff;
+  background: #1D2638;
+  border-color: #1D2638;
+}
+.luck-step {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-bottom: 14rpx;
+}
+.luck-step-btn {
+  flex: none;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9A6B12;
+  background: rgba(201, 162, 39, 0.14);
+  border: 1rpx solid rgba(201, 162, 39, 0.28);
+  font-size: 38rpx;
+  line-height: 1;
+}
+.luck-year-main {
+  flex: 1;
+  text-align: center;
+  height: 58rpx;
+  line-height: 58rpx;
+  border-radius: 100rpx;
+  color: #9A6B12;
+  background: rgba(201, 162, 39, 0.12);
+  border: 1rpx solid rgba(201, 162, 39, 0.28);
+  font-size: 28rpx;
+  font-weight: 800;
+}
+.luck-year-scroll {
+  white-space: nowrap;
+}
+.luck-year-strip {
+  display: inline-flex;
+  gap: 12rpx;
+}
+.luck-year {
+  width: 116rpx;
+  padding: 12rpx 0;
+  border-radius: 16rpx;
+  background: #fff;
+  border: 1rpx solid var(--line);
+  text-align: center;
+}
+.luck-year.on {
+  background: rgba(201, 162, 39, 0.14);
+  border-color: #C9A227;
+}
+.luck-y {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--ink);
+}
+.luck-a {
+  display: block;
+  margin-top: 2rpx;
+  font-size: 20rpx;
   color: var(--ink-3);
 }
 

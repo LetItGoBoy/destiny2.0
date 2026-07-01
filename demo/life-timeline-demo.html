@@ -550,7 +550,7 @@
       "劫财": {
         desc: "这一层外放、热、敢争，容易被同伴和竞争点燃。顺的时候很有人气，偏的时候容易上头或边界不清。",
         pro: ["自信", "豪爽", "热情", "勇于竞争", "讲义气"],
-        neu: ["自尊心强", "不善拒绝"],
+        neu: ["自尊心强", "不会拒绝"],
         con: ["冲动", "霸道", "自我", "斗争", "攀比", "破财"]
       },
       "正财": {
@@ -587,7 +587,7 @@
         desc: "这一层表达欲、悟性和锋芒更强，不喜欢被死管。顺的时候很有才气和创新力，偏的时候容易不服管、没耐性。",
         pro: ["聪明", "悟性高", "表现欲", "才气", "有魅力", "创新力强"],
         neu: ["完美主义", "爱自由"],
-        con: ["恃才傲物", "不服管束", "没耐性", "放纵"]
+        con: ["持才傲物", "不服管束", "没耐性", "放纵"]
       },
       "正印": {
         desc: "这一层更需要安全感、照顾感和精神支撑。顺的时候平和有智慧，偏的时候容易行动慢、依赖或不想改变。",
@@ -600,19 +600,13 @@
         pro: ["专注", "精辟", "批判性强", "看透本质", "悟性强"],
         neu: ["心理学家"],
         con: ["孤僻", "悲观", "说话带刺", "太小众"]
-      },
-      "木型自我": {
-        desc: "中年外显这里按自我气质处理：更看重成长、方向和自我伸展。顺的时候有生命力，偏的时候容易较劲或不够柔软。",
-        pro: ["有生长感", "重方向", "愿意突破", "讲原则", "能恢复"],
-        neu: ["自我要求高", "需要空间"],
-        con: ["较劲", "不够圆融", "急着证明", "受不了停滞"]
       }
     };
 
     const stages = [
       { key: "young", title: "少年", subtitle: "先天底色", note: "少年阶段看最早形成的性格底色。它不只属于小时候，也会像底色一样被带到人生后面。", outer: "比肩", inner: "正印", outerSlider: 42, innerSlider: 39 },
       { key: "growth", title: "青年", subtitle: "成长表达", note: "青年阶段看一个人如何向外表达、竞争、试探边界，也看内心最容易被什么推动。", outer: "伤官", inner: "七杀", outerSlider: 61, innerSlider: 64 },
-      { key: "middle", title: "中年", subtitle: "自我气质", note: "中年外显不强行套十神，改看自我气质；内心部分仍看这个阶段的核心关系模式。", outer: "木型自我", inner: "偏财", outerSlider: 45, innerSlider: 53 },
+      { key: "middle", title: "中年", subtitle: "整体心性", note: "中年阶段更贴近真实关系和长期选择。这里不再拆外层表现，只看这一阶段真正稳定下来的整体心性。", outer: null, inner: "偏财", outerSlider: 45, innerSlider: 53 },
       { key: "later", title: "晚年", subtitle: "后期状态", note: "晚年阶段看后半程更自然流露的状态，也看一个人最终更愿意怎样安排生活。", outer: "正财", inner: "食神", outerSlider: 47, innerSlider: 44 }
     ];
 
@@ -670,11 +664,13 @@
     }
 
     function bubbleHtml(baseGod, baseSlider, flowGodName, flowValue) {
-      const base = words[baseGod] || words["比肩"];
       const items = [];
-      base.pro.slice(0, 5).forEach((label, index) => items.push({ label, kind: "pro", source: "base", slider: baseSlider, index }));
-      base.neu.slice(0, 3).forEach((label, index) => items.push({ label, kind: "neu", source: "base", slider: 50, index }));
-      base.con.slice(0, 5).forEach((label, index) => items.push({ label, kind: "con", source: "base", slider: baseSlider, index }));
+      if (baseGod) {
+        const base = words[baseGod] || words["比肩"];
+        base.pro.slice(0, 5).forEach((label, index) => items.push({ label, kind: "pro", source: "base", slider: baseSlider, index }));
+        base.neu.slice(0, 3).forEach((label, index) => items.push({ label, kind: "neu", source: "base", slider: 50, index }));
+        base.con.slice(0, 5).forEach((label, index) => items.push({ label, kind: "con", source: "base", slider: baseSlider, index }));
+      }
 
       if (flowGodName) {
         const flow = words[flowGodName] || words["正官"];
@@ -718,11 +714,28 @@
       </article>`;
     }
 
+    function flowOnlyCard(layer, god, slider) {
+      const data = words[god] || words["比肩"];
+      return `<article class="trait-card">
+        <header class="trait-head">
+          <div>
+            <p class="trait-kicker">${layer}</p>
+            <h3 class="trait-name"><span>${god}</span><small>流动</small></h3>
+          </div>
+          <span class="mood">${mood(slider)}</span>
+        </header>
+        <p class="desc">${data.desc}</p>
+        <div class="sliders">${sliderHtml("流动", slider, true)}</div>
+        ${bubbleHtml(null, 50, god, slider)}
+        <div class="legend"><span><i class="y"></i>流动心性</span></div>
+      </article>`;
+    }
+
     function stageBody(stage) {
       return `<p class="section-note">${stage.note}</p>
       <div class="two-col">
-        ${traitCard("外显心性", stage.outer, stage.outerSlider)}
-        ${traitCard("内心心性", stage.inner, stage.innerSlider)}
+        ${stage.outer ? traitCard("外显心性", stage.outer, stage.outerSlider) : ""}
+        ${traitCard(stage.key === "middle" ? "整体心性" : "内心心性", stage.inner, stage.innerSlider)}
       </div>`;
     }
 
@@ -750,8 +763,8 @@
         </div>
       </div>
       <div class="two-col">
-        ${traitCard(`${stage.title} · 外显心性`, stage.outer, stage.outerSlider, outerFlow, outerFlowValue)}
-        ${traitCard(`${stage.title} · 内心心性`, stage.inner, stage.innerSlider, innerFlow, innerFlowValue)}
+        ${stage.key === "middle" ? flowOnlyCard(`${stage.title} · 流动外显`, outerFlow, outerFlowValue) : traitCard(`${stage.title} · 外显心性`, stage.outer, stage.outerSlider, outerFlow, outerFlowValue)}
+        ${traitCard(stage.key === "middle" ? `${stage.title} · 整体心性` : `${stage.title} · 内心心性`, stage.inner, stage.innerSlider, innerFlow, innerFlowValue)}
       </div>`;
     }
 
