@@ -130,7 +130,7 @@ Page({
       months.map(function (m) { return m.label; }),
       days.map(function (d) { return d.label; })
     ];
-    var text = year + '年 ' + months[sel[1]].label + months[sel[2]].label;
+    var text = year + '年 ' + months[sel[1]].label + days[sel[2]].label;
     this.setData({
       lunarRange: range,
       lunarIndex: sel.slice(0),
