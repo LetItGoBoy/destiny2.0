@@ -23,6 +23,69 @@
   letter-spacing: 4rpx;
 }
 
+.time-panel {
+  padding: 20rpx;
+  margin-bottom: 22rpx;
+}
+.time-pickers {
+  display: flex;
+  gap: 14rpx;
+}
+.time-picker {
+  flex: 1;
+  min-width: 0;
+}
+.picker-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 66rpx;
+  padding: 0 18rpx;
+  border-radius: 14rpx;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+}
+.picker-name {
+  flex: none;
+  margin-right: 12rpx;
+  color: var(--ink-3);
+  font-size: 22rpx;
+}
+.picker-value {
+  min-width: 0;
+  color: var(--ink);
+  font-size: 26rpx;
+  font-weight: 700;
+  text-align: right;
+}
+.time-actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 16rpx;
+}
+.time-btn {
+  flex: 1;
+  min-height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  color: var(--primary);
+  background: var(--tint);
+  border: 1rpx solid rgba(138, 43, 39, 0.2);
+  font-size: 25rpx;
+  font-weight: 800;
+}
+.time-btn.primary {
+  color: #FFF7E4;
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
+  border-color: rgba(138, 43, 39, 0.35);
+}
+.time-btn-live {
+  color: #1A142E;
+  background: linear-gradient(135deg, #E3C27E, #F0D078);
+  border-color: rgba(227, 194, 126, 0.52);
+}
+
 /* 星图面板：深色太空，面板内文字回到亮色 */
 .sky-wrap {
   position: relative;
@@ -60,31 +123,19 @@
   color: var(--ink-3);
   pointer-events: none;
 }
-.flow-btn {
-  position: absolute;
-  right: 24rpx;
-  top: 24rpx;
-  padding: 12rpx 26rpx;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-  color: var(--primary);
-  background: rgba(27, 21, 49, 0.85);
-  border: 1rpx solid rgba(167, 139, 250, 0.45);
-}
-.flow-btn-on {
-  color: var(--gold);
-  border-color: rgba(227, 194, 126, 0.5);
-}
 .flow-label {
   position: absolute;
   left: 24rpx;
+  right: 24rpx;
   top: 24rpx;
   padding: 10rpx 22rpx;
   border-radius: 999rpx;
   font-size: 22rpx;
+  line-height: 1.35;
   color: var(--ink-2);
   background: rgba(27, 21, 49, 0.85);
   border: 1rpx solid var(--line);
+  text-align: center;
 }
 .sel-card {
   position: absolute;
@@ -123,6 +174,29 @@
   font-size: 30rpx;
   font-weight: 700;
   margin-bottom: 18rpx;
+}
+.astro-bazi {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 14rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 14rpx;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+}
+.astro-bazi-label {
+  flex: none;
+  margin-right: 4rpx;
+  color: var(--ink-3);
+  font-size: 22rpx;
+}
+.astro-bazi-pillar {
+  color: var(--ink);
+  font-size: 28rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
 }
 .li {
   display: flex;

@@ -84,16 +84,20 @@
 }
 .core-seal {
   flex-shrink: 0;
-  width: 108rpx;
-  height: 108rpx;
-  border-radius: 24rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 20rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 60rpx;
-  font-weight: 700;
   margin-right: 26rpx;
+  color: #FFF7E4;
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
+  box-shadow: 0 12rpx 30rpx rgba(138, 43, 39, 0.28);
+  font-size: 52rpx;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 3rpx 10rpx rgba(61, 7, 5, 0.42);
 }
 .core-body {
   flex: 1;
@@ -127,6 +131,26 @@
   margin-top: 6rpx;
   font-size: 22rpx;
   color: var(--ink-3);
+}
+
+.life-lead {
+  margin-top: 22rpx;
+  padding: 0 8rpx;
+}
+.life-title {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--ink);
+}
+.life-note {
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+.luck-guide {
+  margin-top: 28rpx;
+  padding-top: 4rpx;
 }
 
 /* 两种底色：守正 / 求变 */
@@ -295,14 +319,6 @@
 .te-dot.on {
   background: var(--primary);
 }
-.trait-tag {
-  margin-left: 12rpx;
-  font-size: 18rpx;
-  padding: 2rpx 12rpx;
-  border-radius: 6rpx;
-}
-.tag-z { color: #2E8C63; background: rgba(91, 181, 140, 0.16); }
-.tag-p { color: #6C4BD9; background: rgba(138, 43, 39, 0.16); }
 .trait-god {
   margin-left: 12rpx;
   font-size: 22rpx;
@@ -381,7 +397,7 @@
   color: var(--ink-3);
 }
 
-/* 四阶段竖向展开 */
+/* 八段人生竖向展开 */
 .stage-acc {
   margin-top: 18rpx;
 }
@@ -401,21 +417,22 @@
 }
 .acc-index {
   flex: none;
-  width: 58rpx;
+  width: 62rpx;
   height: 58rpx;
-  border-radius: 50%;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: #1D2638;
-  font-size: 22rpx;
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
+  font-size: 20rpx;
   font-weight: 800;
   margin-right: 20rpx;
+  box-shadow: 0 8rpx 18rpx rgba(138, 43, 39, 0.22);
 }
 .luck-index {
-  color: #5C4108;
-  background: linear-gradient(135deg, #F4D985, #C9A227);
+  color: #FFF7E4;
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
 }
 .acc-copy {
   flex: 1;
@@ -425,22 +442,15 @@
   flex: none;
   display: flex;
   align-items: center;
-  gap: 10rpx;
   margin-left: 14rpx;
 }
-.acc-action-text {
-  font-size: 22rpx;
-  font-weight: 800;
-  color: #B86B00;
-  background: rgba(255, 184, 56, 0.16);
-  border: 1rpx solid rgba(255, 184, 56, 0.40);
-  border-radius: 100rpx;
-  padding: 5rpx 12rpx;
-}
-.acc-card.open .acc-action-text {
-  color: #1D2638;
-  background: rgba(29, 38, 56, 0.08);
-  border-color: rgba(29, 38, 56, 0.16);
+.acc-plus {
+  width: 34rpx;
+  text-align: center;
+  color: var(--primary);
+  font-size: 44rpx;
+  font-weight: 600;
+  line-height: 1;
 }
 .acc-title {
   display: flex;
@@ -521,24 +531,6 @@
   background: rgba(201, 162, 39, 0.12);
   border-color: rgba(201, 162, 39, 0.28);
 }
-.acc-arrow {
-  flex: none;
-  width: 52rpx;
-  height: 52rpx;
-  line-height: 48rpx;
-  text-align: center;
-  border-radius: 50%;
-  color: var(--ink-3);
-  border: 1rpx solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
-  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
-}
-.acc-card.open .acc-arrow {
-  transform: rotate(180deg);
-  color: #fff;
-  background: #1D2638;
-  border-color: #1D2638;
-}
 .acc-body {
   padding: 24rpx 26rpx 26rpx;
   border-top: 1rpx solid var(--line);
@@ -557,6 +549,10 @@
   border-radius: 18rpx;
   background: rgba(255, 255, 255, 0.72);
 }
+.stage-layer {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(20, 21, 60, 0.10);
+}
 .layer-card:first-of-type {
   margin-top: 0;
 }
@@ -567,22 +563,26 @@
   gap: 16rpx;
   margin-bottom: 12rpx;
 }
-.layer-head > view {
+.trait-cat-wrap {
+  flex: none;
+  width: 216rpx;
+  height: 206rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -10rpx;
+  margin-left: 10rpx;
+  border-radius: 18rpx;
+  overflow: visible;
+}
+.trait-cat {
+  width: 206rpx;
+  height: 206rpx;
+  display: block;
+}
+.layer-copy {
   flex: 1;
   min-width: 0;
-}
-.layer-arrow {
-  flex: none;
-  width: 42rpx;
-  height: 42rpx;
-  line-height: 38rpx;
-  text-align: center;
-  border-radius: 50%;
-  color: var(--ink-3);
-  background: var(--fill);
-  border: 1rpx solid var(--line);
-  font-size: 26rpx;
-  font-weight: 800;
 }
 .layer-body {
   padding-top: 2rpx;
@@ -609,6 +609,7 @@
   line-height: 1.5;
   font-weight: 600;
   margin-bottom: 10rpx;
+  color: var(--ink-2);
 }
 .layer-help-outer {
   color: #B86B00;
@@ -1096,6 +1097,12 @@
   align-items: center;
   gap: 14rpx;
   margin-bottom: 10rpx;
+}
+.luck-cat {
+  flex: none;
+  width: 64rpx;
+  height: 64rpx;
+  margin-right: -2rpx;
 }
 .luck-badge {
   font-size: 22rpx;

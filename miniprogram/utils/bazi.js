@@ -256,12 +256,14 @@ function getLiuRi(ctx, liuYueGanZhi, year) {
 // 仅计算四柱（名人库列表用，避免整盘大运流年的开销）
 function quickBaZi(input) {
   var clockDate;
+  var hh = input.hour == null ? 12 : Number(input.hour);
+  var mm = input.minute == null ? 0 : Number(input.minute);
   if (input.calendar === 'lunar') {
-    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, input.hour || 12, input.minute || 0, 0);
+    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, hh, mm, 0);
     var sd = ld.getSolar();
-    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), input.hour || 12, input.minute || 0, 0);
+    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), hh, mm, 0);
   } else {
-    clockDate = new Date(input.year, input.month - 1, input.day, input.hour || 12, input.minute || 0, 0);
+    clockDate = new Date(input.year, input.month - 1, input.day, hh, mm, 0);
   }
   var solar = Solar.fromDate(clockDate);
   var lunar = solar.getLunar();
@@ -271,6 +273,78 @@ function quickBaZi(input) {
   var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
   var baZi = gans[0] + zhis[0] + ' ' + gans[1] + zhis[1] + ' ' + gans[2] + zhis[2] + ' ' + gans[3] + zhis[3];
   return { baZi: baZi, dayGan: gans[2] };
+}
+
+function solarToPillarCandidate(s) {
+  return {
+    year: s.getYear(),
+    month: s.getMonth(),
+    day: s.getDay(),
+    hour: s.getHour(),
+    minute: s.getMinute(),
+    date: s.toYmd(),
+    time: pad(s.getHour()) + ':' + pad(s.getMinute()),
+    label: s.getYear() + '年'
+  };
+}
+
+function findSolarByBaZi(yearGZ, monthGZ, dayGZ, timeGZ, startYear, endYear) {
+  startYear = Number(startYear) || 1900;
+  endYear = Number(endYear) || 2100;
+  if (endYear < startYear) return [];
+
+  var list = [];
+  var monthOffset = LunarUtil.index(monthGZ.substring(1), LunarUtil.ZHI, -1) - 2;
+  if (monthOffset < 0) monthOffset += 12;
+
+  var yearGanIndex = LunarUtil.index(yearGZ.substring(0, 1), LunarUtil.GAN, -1);
+  var monthGanIndex = LunarUtil.index(monthGZ.substring(0, 1), LunarUtil.GAN, -1);
+  if (yearGanIndex < 0 || monthGanIndex < 0) return [];
+  if (((yearGanIndex + 1) * 2 + monthOffset) % 10 !== monthGanIndex) return [];
+
+  var year = LunarUtil.getJiaZiIndex(yearGZ) - 57;
+  if (year < 0) year += 60;
+  year++;
+
+  var jieQiOffset = monthOffset * 2;
+  var hour = LunarUtil.index(timeGZ.substring(1), LunarUtil.ZHI, -1) * 2;
+  if (hour < 0) return [];
+  var searchStartYear = startYear - 1;
+
+  while (year <= endYear) {
+    if (year >= searchStartYear) {
+      var jieQiLunar = Lunar.fromYmd(year, 1, 1);
+      var jieQiList = jieQiLunar.getJieQiList();
+      var jieQiTable = jieQiLunar.getJieQiTable();
+      var solarTime = jieQiTable[jieQiList[4 + jieQiOffset]];
+      if (solarTime && solarTime.getYear() >= startYear) {
+        var dayOffset = LunarUtil.getJiaZiIndex(dayGZ) - LunarUtil.getJiaZiIndex(solarTime.getLunar().getDayInGanZhiExact2());
+        if (dayOffset < 0) dayOffset += 60;
+        if (dayOffset > 0) solarTime = solarTime.next(dayOffset);
+
+        var minute = 0;
+        var second = 0;
+        if (dayOffset === 0 && hour === solarTime.getHour()) {
+          minute = solarTime.getMinute();
+          second = solarTime.getSecond();
+        }
+
+        var solar = Solar.fromYmdHms(solarTime.getYear(), solarTime.getMonth(), solarTime.getDay(), hour, minute, second);
+        if (dayOffset === 30) solar = solar.nextHour(-1);
+        var lunar = solar.getLunar();
+        if (solar.getYear() <= endYear &&
+            lunar.getYearInGanZhiExact() === yearGZ &&
+            lunar.getMonthInGanZhiExact() === monthGZ &&
+            lunar.getDayInGanZhiExact() === dayGZ &&
+            lunar.getTimeInGanZhi() === timeGZ) {
+          list.push(solar);
+        }
+      }
+    }
+    year += 60;
+  }
+
+  return list.map(solarToPillarCandidate);
 }
 
 function formatDate(date) {
@@ -326,6 +400,7 @@ module.exports = {
   getLiuRi: getLiuRi,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
+  findSolarByBaZi: findSolarByBaZi,
   changSheng: changSheng,
   colorizeBaZi: colorizeBaZi
 };

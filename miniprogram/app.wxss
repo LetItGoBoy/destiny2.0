@@ -41,7 +41,7 @@ page {
   pointer-events: none;
 }
 
-.page > view:not(.ss-mask):not(.cast-mask):not(.panel-mask):not(.panel):not(.savebar):not(.timebar),
+.page > view:not(.ss-mask):not(.cast-mask):not(.panel-mask):not(.panel):not(.savebar):not(.timebar):not(.overlay),
 .page > scroll-view,
 .page > button {
   position: relative;

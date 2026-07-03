@@ -1,25 +1,8 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
   <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
-  <view class="card pan">
-    <view class="pan-col {{item.isDay ? 'pan-day' : ''}}" wx:for="{{paimian}}" wx:key="label">
-      <view class="pan-label">{{item.label}}</view>
-      <block wx:if="{{item.empty}}">
-        <view class="pan-god dim">-</view>
-        <view class="pan-gz serif dim">未知</view>
-      </block>
-      <block wx:else>
-        <view class="pan-god">{{item.god}}</view>
-        <view class="pan-gz serif">
-          <text class="wx-{{item.ganCls}}">{{item.gan}}</text>
-          <text class="wx-{{item.zhiCls}}">{{item.zhi}}</text>
-        </view>
-      </block>
-    </view>
-  </view>
-
   <view class="card core">
-    <view class="core-seal bg-{{core.cls}} serif">{{core.gan}}</view>
+    <view class="core-seal serif">{{core.gan}}</view>
     <view class="core-body">
       <view class="core-title serif">{{core.title}}</view>
       <view class="core-text">{{core.text}}</view>
@@ -27,8 +10,8 @@
   </view>
 
   <view class="intro">
-    心性画像按人生阶段展开。点开一个阶段，就能看到这一阶段的外显状态和内心反应；再点同一项会收起，点另一个阶段会切换展开。红色泡泡是顺的一面，蓝色泡泡是偏的一面，金色泡泡只出现在「岁运」里。
-    <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，晚年阶段的固定底色暂不可见）</text>
+    这张画像不展示八字原盘，只把命局里的心性结构拆成八段来看：一段一张卡，不再拆成上下两层。前半段更像先天投射，后半段更像内在反应；月令底色会承接相邻阶段，影响少年后段到入世初段的性格走向。
+    <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，后两段需要时柱信息，当前暂不可见）</text>
   </view>
 
   <view class="card pol">
@@ -56,10 +39,15 @@
     </view>
   </view>
 
+  <view class="life-lead">
+    <view class="life-title serif">八段人生</view>
+    <view class="life-note">每八年一段，把原来的阶段层次摊平成连续时间线；点开阶段卡即可查看这一段的主旋律。</view>
+  </view>
+
   <view class="stage-acc">
     <view class="acc-card {{openStageKey === stage.key ? 'open' : ''}}" wx:for="{{stagePortraits}}" wx:for-item="stage" wx:key="key">
       <view class="acc-head" bindtap="toggleStage" data-key="{{stage.key}}">
-        <view class="acc-index">{{stage.index}}</view>
+        <view class="acc-index">{{stage.indexText}}</view>
         <view class="acc-copy">
           <view class="acc-title">
             <text class="acc-name serif">{{stage.label}}</text>
@@ -72,8 +60,7 @@
           </view>
         </view>
         <view class="acc-action">
-          <text class="acc-action-text">{{openStageKey === stage.key ? '收起' : '点开查看'}}</text>
-          <view class="acc-arrow">⌄</view>
+          <text class="acc-plus">{{openStageKey === stage.key ? '−' : '+'}}</text>
         </view>
       </view>
 
@@ -82,85 +69,56 @@
         <block wx:if="{{stage.empty}}">
           <view class="comp-empty">这一阶段需要出生时辰，当前暂不可见。</view>
         </block>
-        <block wx:else>
-          <view class="layer-card" wx:if="{{stage.outer}}">
-            <view class="layer-head" bindtap="toggleLayer" data-stage="{{stage.key}}" data-layer="outer">
-              <view>
-                <view class="layer-k layer-k-outer">{{stage.outer.title}}</view>
-                <view class="layer-help layer-help-outer">别人更容易看见的表达方式、做事姿态和面对外界时的第一反应。</view>
+        <block wx:elif="{{stage.layer}}">
+          <view class="layer-card stage-layer">
+            <view class="layer-head">
+              <view class="layer-copy">
+                <view class="layer-k">{{stage.layer.title}}</view>
+                <view class="layer-help">{{stage.layer.help}}</view>
                 <view class="trait-line">
-                  <text class="trait-name serif">{{stage.outer.name}}</text>
-                  <text class="trait-main" wx:if="{{stage.outer.luckName}}">{{stage.outer.luckName}}</text>
+                  <text class="trait-name serif">{{stage.layer.name}}</text>
+                  <text class="trait-main" wx:if="{{stage.layer.luckName}}">{{stage.layer.luckName}}</text>
                 </view>
               </view>
-              <text class="trait-tag tag-{{stage.outer.pol === '正' ? 'z' : 'p'}}" wx:if="{{stage.outer.pol}}">{{stage.outer.pol === '正' ? '守正' : '求变'}}</text>
-              <text class="layer-arrow">{{stage.outer.open ? '⌃' : '⌄'}}</text>
+              <view class="trait-cat-wrap" wx:if="{{stage.layer.catImage}}">
+                <image class="trait-cat" src="{{stage.layer.catImage}}" mode="aspectFit" />
+              </view>
             </view>
-            <view class="layer-body" wx:if="{{stage.outer.open}}">
-              <view class="slider-row {{stage.outer.isFlowOnly ? 'flow-slider' : ''}}">
-                <text class="sl-lbl sl-lbl-l">{{stage.outer.lbl}}</text>
+            <view class="layer-body">
+              <view class="slider-row" wx:if="{{stage.layer.lbl && stage.layer.rbl}}">
+                <text class="sl-lbl sl-lbl-l">{{stage.layer.lbl}}</text>
                 <view class="sl-track">
-                  <view class="sl-thumb" style="left:{{stage.outer.slider}}%"></view>
+                  <view class="sl-thumb" style="left:{{stage.layer.slider}}%"></view>
                 </view>
-                <text class="sl-lbl sl-lbl-r">{{stage.outer.rbl}}</text>
+                <text class="sl-lbl sl-lbl-r">{{stage.layer.rbl}}</text>
               </view>
-              <view class="slider-row flow-slider" wx:if="{{stage.outer.luckName}}">
-                <text class="sl-lbl sl-lbl-l">{{stage.outer.luckLbl}}</text>
+              <view class="slider-row flow-slider" wx:if="{{stage.layer.luckName}}">
+                <text class="sl-lbl sl-lbl-l">{{stage.layer.luckLbl}}</text>
                 <view class="sl-track">
-                  <view class="sl-thumb luck-thumb" style="left:{{stage.outer.luckSlider}}%"></view>
+                  <view class="sl-thumb luck-thumb" style="left:{{stage.layer.luckSlider}}%"></view>
                 </view>
-                <text class="sl-lbl sl-lbl-r">{{stage.outer.luckRbl}}</text>
+                <text class="sl-lbl sl-lbl-r">{{stage.layer.luckRbl}}</text>
               </view>
-              <traitcluster wx:if="{{stage.outer.bubbles.length}}" bubbles="{{stage.outer.bubbles}}" />
+              <traitcluster wx:if="{{stage.layer.bubbles.length}}" bubbles="{{stage.layer.bubbles}}" />
               <view class="trait-pc">
-                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{stage.outer.descLabel}}</text>{{stage.outer.desc}}</view>
-                <view class="pc pc-on pc-con" wx:if="{{stage.outer.con}}"><text class="pc-key pc-key-con">{{stage.outer.conLabel}}</text>{{stage.outer.con}}</view>
-              </view>
-            </view>
-          </view>
-
-          <view class="layer-card" wx:if="{{stage.inner}}">
-            <view class="layer-head" bindtap="toggleLayer" data-stage="{{stage.key}}" data-layer="inner">
-              <view>
-                <view class="layer-k layer-k-inner">{{stage.inner.title}}</view>
-                <view class="layer-help layer-help-inner">更靠里的情绪底色、安全感来源和关系里的真实反应，不一定立刻表现出来。</view>
-                <view class="trait-line">
-                  <text class="trait-name serif">{{stage.inner.name}}</text>
-                  <text class="trait-main" wx:if="{{stage.inner.luckName}}">{{stage.inner.luckName}}</text>
-                </view>
-              </view>
-              <text class="trait-tag tag-{{stage.inner.pol === '正' ? 'z' : 'p'}}" wx:if="{{stage.inner.pol}}">{{stage.inner.pol === '正' ? '守正' : '求变'}}</text>
-              <text class="layer-arrow">{{stage.inner.open ? '⌃' : '⌄'}}</text>
-            </view>
-            <view class="layer-body" wx:if="{{stage.inner.open}}">
-              <view class="slider-row">
-                <text class="sl-lbl sl-lbl-l">{{stage.inner.lbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb" style="left:{{stage.inner.slider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{stage.inner.rbl}}</text>
-              </view>
-              <view class="slider-row flow-slider" wx:if="{{stage.inner.luckName}}">
-                <text class="sl-lbl sl-lbl-l">{{stage.inner.luckLbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb luck-thumb" style="left:{{stage.inner.luckSlider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{stage.inner.luckRbl}}</text>
-              </view>
-              <traitcluster wx:if="{{stage.inner.bubbles.length}}" bubbles="{{stage.inner.bubbles}}" />
-              <view class="trait-pc">
-                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{stage.inner.descLabel}}</text>{{stage.inner.desc}}</view>
-                <view class="pc pc-on pc-con" wx:if="{{stage.inner.con}}"><text class="pc-key pc-key-con">{{stage.inner.conLabel}}</text>{{stage.inner.con}}</view>
+                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{stage.layer.descLabel}}</text>{{stage.layer.desc}}</view>
+                <view class="pc pc-on pc-con" wx:if="{{stage.layer.con}}"><text class="pc-key pc-key-con">{{stage.layer.conLabel}}</text>{{stage.layer.con}}</view>
               </view>
             </view>
           </view>
         </block>
+        <view class="comp-empty" wx:else>这一阶段暂无可展示的心性信息。</view>
       </view>
+    </view>
+
+    <view class="life-lead luck-guide">
+      <view class="life-title serif">岁运叠加</view>
+      <view class="life-note">选择某一段人生和对应年份，查看这一年把哪种心性推到台前。金色气泡表示临时被激活的状态。</view>
     </view>
 
     <view class="acc-card luck-card {{openStageKey === 'luck' ? 'open' : ''}}">
       <view class="acc-head" bindtap="toggleStage" data-key="luck">
-        <view class="acc-index luck-index">流</view>
+        <view class="acc-index luck-index">运</view>
         <view class="acc-copy">
           <view class="acc-title">
             <text class="acc-name serif">岁运</text>
@@ -169,17 +127,16 @@
           <view class="acc-pills">
             <text class="acc-pill luck-pill">选择阶段</text>
             <text class="acc-pill luck-pill">选择年份</text>
-            <text class="acc-pill luck-pill">金色泡泡混入</text>
+            <text class="acc-pill luck-pill">金色泡泡叠加</text>
           </view>
         </view>
         <view class="acc-action">
-          <text class="acc-action-text">{{openStageKey === 'luck' ? '收起' : '点开查看'}}</text>
-          <view class="acc-arrow">⌄</view>
+          <text class="acc-plus">{{openStageKey === 'luck' ? '−' : '+'}}</text>
         </view>
       </view>
 
       <view class="acc-body" wx:if="{{openStageKey === 'luck'}}">
-        <view class="stage-note">先选择要叠加到哪个人生阶段，再选择该阶段对应的年份。金色泡泡会直接混进这一阶段的外显和内心星团里。</view>
+        <view class="stage-note">先选择要叠加的阶段，再选择对应年份。金色泡泡会混进这一阶段的心性星团里，表示当年更容易被激活的状态。</view>
 
         <view class="luck-controls">
           <view class="luck-control-title">选择阶段</view>
@@ -212,6 +169,7 @@
 
         <view class="luck-block" wx:if="{{luckFlow}}">
           <view class="luck-head">
+            <image class="luck-cat" wx:if="{{luckFlow.catImage}}" src="{{luckFlow.catImage}}" mode="aspectFit" />
             <text class="luck-badge">{{luckYear}}心性</text>
             <text class="luck-name serif">{{luckFlow.name}}</text>
             <text class="luck-lbls" wx:if="{{luckFlow.lbl}}">{{luckFlow.lbl}} · {{luckFlow.rbl}}</text>
@@ -220,75 +178,40 @@
           <view class="luck-desc">{{luckFlow.desc}}</view>
         </view>
 
-        <block wx:if="{{luckPortrait && !luckPortrait.empty}}">
-          <view class="layer-card" wx:if="{{luckPortrait.outer}}">
-            <view class="layer-head" bindtap="toggleLayer" data-stage="luck" data-layer="outer">
-              <view>
-                <view class="layer-k layer-k-outer">{{luckPortrait.outer.title}}</view>
-                <view class="layer-help layer-help-outer">别人更容易看见的表达方式、做事姿态和面对外界时的第一反应。</view>
+        <block wx:if="{{luckPortrait && !luckPortrait.empty && luckPortrait.layer}}">
+          <view class="layer-card stage-layer">
+            <view class="layer-head">
+              <view class="layer-copy">
+                <view class="layer-k">{{luckPortrait.layer.title}}</view>
+                <view class="layer-help">{{luckPortrait.layer.help}}</view>
                 <view class="trait-line">
-                  <text class="trait-name serif">{{luckPortrait.outer.name}}</text>
-                  <text class="trait-main">{{luckPortrait.outer.luckName}}</text>
+                  <text class="trait-name serif">{{luckPortrait.layer.name}}</text>
+                  <text class="trait-main" wx:if="{{luckPortrait.layer.luckName}}">{{luckPortrait.layer.luckName}}</text>
                 </view>
               </view>
-              <text class="trait-tag tag-{{luckPortrait.outer.pol === '正' ? 'z' : 'p'}}" wx:if="{{luckPortrait.outer.pol}}">{{luckPortrait.outer.pol === '正' ? '守正' : '求变'}}</text>
-              <text class="layer-arrow">{{luckPortrait.outer.open ? '⌃' : '⌄'}}</text>
+              <view class="trait-cat-wrap" wx:if="{{luckPortrait.layer.catImage}}">
+                <image class="trait-cat" src="{{luckPortrait.layer.catImage}}" mode="aspectFit" />
+              </view>
             </view>
-            <view class="layer-body" wx:if="{{luckPortrait.outer.open}}">
-              <view class="slider-row {{luckPortrait.outer.isFlowOnly ? 'flow-slider' : ''}}">
-                <text class="sl-lbl sl-lbl-l">{{luckPortrait.outer.lbl}}</text>
+            <view class="layer-body">
+              <view class="slider-row" wx:if="{{luckPortrait.layer.lbl && luckPortrait.layer.rbl}}">
+                <text class="sl-lbl sl-lbl-l">{{luckPortrait.layer.lbl}}</text>
                 <view class="sl-track">
-                  <view class="sl-thumb" style="left:{{luckPortrait.outer.slider}}%"></view>
+                  <view class="sl-thumb" style="left:{{luckPortrait.layer.slider}}%"></view>
                 </view>
-                <text class="sl-lbl sl-lbl-r">{{luckPortrait.outer.rbl}}</text>
+                <text class="sl-lbl sl-lbl-r">{{luckPortrait.layer.rbl}}</text>
               </view>
-              <view class="slider-row flow-slider" wx:if="{{luckPortrait.outer.luckName}}">
-                <text class="sl-lbl sl-lbl-l">{{luckPortrait.outer.luckLbl}}</text>
+              <view class="slider-row flow-slider" wx:if="{{luckPortrait.layer.luckName}}">
+                <text class="sl-lbl sl-lbl-l">{{luckPortrait.layer.luckLbl}}</text>
                 <view class="sl-track">
-                  <view class="sl-thumb luck-thumb" style="left:{{luckPortrait.outer.luckSlider}}%"></view>
+                  <view class="sl-thumb luck-thumb" style="left:{{luckPortrait.layer.luckSlider}}%"></view>
                 </view>
-                <text class="sl-lbl sl-lbl-r">{{luckPortrait.outer.luckRbl}}</text>
+                <text class="sl-lbl sl-lbl-r">{{luckPortrait.layer.luckRbl}}</text>
               </view>
-              <traitcluster wx:if="{{luckPortrait.outer.bubbles.length}}" bubbles="{{luckPortrait.outer.bubbles}}" />
+              <traitcluster wx:if="{{luckPortrait.layer.bubbles.length}}" bubbles="{{luckPortrait.layer.bubbles}}" />
               <view class="trait-pc">
-                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{luckPortrait.outer.descLabel}}</text>{{luckPortrait.outer.desc}}</view>
-                <view class="pc pc-on pc-con" wx:if="{{luckPortrait.outer.con}}"><text class="pc-key pc-key-con">{{luckPortrait.outer.conLabel}}</text>{{luckPortrait.outer.con}}</view>
-              </view>
-            </view>
-          </view>
-
-          <view class="layer-card" wx:if="{{luckPortrait.inner}}">
-            <view class="layer-head" bindtap="toggleLayer" data-stage="luck" data-layer="inner">
-              <view>
-                <view class="layer-k layer-k-inner">{{luckPortrait.inner.title}}</view>
-                <view class="layer-help layer-help-inner">更靠里的情绪底色、安全感来源和关系里的真实反应，不一定立刻表现出来。</view>
-                <view class="trait-line">
-                  <text class="trait-name serif">{{luckPortrait.inner.name}}</text>
-                  <text class="trait-main">{{luckPortrait.inner.luckName}}</text>
-                </view>
-              </view>
-              <text class="trait-tag tag-{{luckPortrait.inner.pol === '正' ? 'z' : 'p'}}" wx:if="{{luckPortrait.inner.pol}}">{{luckPortrait.inner.pol === '正' ? '守正' : '求变'}}</text>
-              <text class="layer-arrow">{{luckPortrait.inner.open ? '⌃' : '⌄'}}</text>
-            </view>
-            <view class="layer-body" wx:if="{{luckPortrait.inner.open}}">
-              <view class="slider-row">
-                <text class="sl-lbl sl-lbl-l">{{luckPortrait.inner.lbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb" style="left:{{luckPortrait.inner.slider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{luckPortrait.inner.rbl}}</text>
-              </view>
-              <view class="slider-row flow-slider" wx:if="{{luckPortrait.inner.luckName}}">
-                <text class="sl-lbl sl-lbl-l">{{luckPortrait.inner.luckLbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb luck-thumb" style="left:{{luckPortrait.inner.luckSlider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{luckPortrait.inner.luckRbl}}</text>
-              </view>
-              <traitcluster wx:if="{{luckPortrait.inner.bubbles.length}}" bubbles="{{luckPortrait.inner.bubbles}}" />
-              <view class="trait-pc">
-                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{luckPortrait.inner.descLabel}}</text>{{luckPortrait.inner.desc}}</view>
-                <view class="pc pc-on pc-con" wx:if="{{luckPortrait.inner.con}}"><text class="pc-key pc-key-con">{{luckPortrait.inner.conLabel}}</text>{{luckPortrait.inner.con}}</view>
+                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{luckPortrait.layer.descLabel}}</text>{{luckPortrait.layer.desc}}</view>
+                <view class="pc pc-on pc-con" wx:if="{{luckPortrait.layer.con}}"><text class="pc-key pc-key-con">{{luckPortrait.layer.conLabel}}</text>{{luckPortrait.layer.con}}</view>
               </view>
             </view>
           </view>

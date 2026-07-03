@@ -3,10 +3,14 @@ var portrait = require('../../utils/analyze/portrait.js');
 var prefs = require('../../utils/prefs.js');
 
 var STAGE_RANGES = [
-  { start: 0, end: 16 },
-  { start: 17, end: 32 },
-  { start: 33, end: 48 },
-  { start: 49, end: 120 }
+  { key: 'life1', start: 0, end: 7 },
+  { key: 'life2', start: 8, end: 16 },
+  { key: 'life3', start: 17, end: 24 },
+  { key: 'life4', start: 25, end: 32 },
+  { key: 'life5', start: 33, end: 40 },
+  { key: 'life6', start: 41, end: 48 },
+  { key: 'life7', start: 49, end: 56 },
+  { key: 'life8', start: 57, end: 120 }
 ];
 
 Page({
@@ -20,7 +24,7 @@ Page({
     pianNow: 50,
     hasTime: true,
     stagePortraits: [],
-    openStageKey: 'month',
+    openStageKey: 'life1',
     openLayers: {},
     luckStageIndex: 1,
     luckYear: null,
@@ -82,7 +86,7 @@ Page({
     this.setData({
       loaded: true,
       meta: chart.meta,
-      openStageKey: 'luck',
+      openStageKey: (STAGE_RANGES[defaultStageIndex] || STAGE_RANGES[0]).key,
       luckStageIndex: defaultStageIndex,
       luckYear: defaultYear
     });
@@ -106,12 +110,10 @@ Page({
   applyLayerOpen: function (stages, luckPortrait) {
     var self = this;
     (stages || []).forEach(function (stage) {
-      if (stage.outer) stage.outer.open = self.layerOpen(stage.key, 'outer');
-      if (stage.inner) stage.inner.open = self.layerOpen(stage.key, 'inner');
+      if (stage.layer) stage.layer.open = self.layerOpen(stage.key, 'main');
     });
     if (luckPortrait) {
-      if (luckPortrait.outer) luckPortrait.outer.open = this.layerOpen('luck', 'outer');
-      if (luckPortrait.inner) luckPortrait.inner.open = this.layerOpen('luck', 'inner');
+      if (luckPortrait.layer) luckPortrait.layer.open = this.layerOpen('luck', 'main');
     }
   },
 

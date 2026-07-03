@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>十神喜用与提醒态 Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #281b17;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #efefed;
+    }
+    .page {
+      width: min(1060px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 28px 0 46px;
+    }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+    .sub {
+      max-width: 650px;
+      margin: 9px 0 0;
+      color: #725f56;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .pill {
+      flex: none;
+      color: #fff7e4;
+      background: linear-gradient(135deg, #8a2b27, #a3382f);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 10px 22px rgba(138, 43, 39, .22);
+    }
+    .sheet {
+      margin-bottom: 16px;
+      padding: 12px;
+      border-radius: 22px;
+      background: #fffdf9;
+      box-shadow: 0 20px 60px rgba(39, 25, 21, .08);
+    }
+    .sheet img {
+      display: block;
+      width: 100%;
+      border-radius: 16px;
+    }
+    .focus {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .focus-art,
+    .focus-notes {
+      padding: 12px;
+      border-radius: 22px;
+      background: #fffdf9;
+      box-shadow: 0 20px 60px rgba(39, 25, 21, .08);
+    }
+    .focus-art img {
+      display: block;
+      width: 100%;
+      border-radius: 16px;
+    }
+    .focus-notes h2 {
+      margin: 2px 0 12px;
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .note {
+      padding: 10px 0;
+      border-top: 1px solid rgba(138, 43, 39, .1);
+    }
+    .note strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #8a2b27;
+      font-size: 15px;
+    }
+    .note p {
+      margin: 0;
+      color: #695850;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .card {
+      position: relative;
+      padding: 14px;
+      border: 1px solid rgba(138, 43, 39, .08);
+      border-radius: 18px;
+      background: #fffdf9;
+      box-shadow: 0 14px 34px rgba(39, 25, 21, .06);
+    }
+    .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .god {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .badge {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #fff7e4;
+      background: linear-gradient(135deg, #8a2b27, #a3382f);
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(138, 43, 39, .22);
+    }
+    .animal-name {
+      color: #8a2b27;
+      font-size: 13px;
+      font-weight: 900;
+      background: rgba(138, 43, 39, .08);
+      border-radius: 999px;
+      padding: 3px 9px;
+    }
+    .faces {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .face {
+      min-height: 176px;
+      position: relative;
+      overflow: hidden;
+      padding: 12px;
+      border-radius: 15px;
+      background: #fff8ed;
+    }
+    .face.warn {
+      background: #f7f1ee;
+    }
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #8a2b27;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .warn .label {
+      color: #9b6b33;
+    }
+    .animal {
+      display: grid;
+      place-items: center;
+      height: 82px;
+      margin: 4px 0 3px;
+      font-size: 58px;
+      filter: drop-shadow(0 7px 0 rgba(255,255,255,.92)) drop-shadow(0 8px 9px rgba(102, 61, 42, .09));
+    }
+    .warn .animal {
+      transform: rotate(-4deg);
+      opacity: .9;
+    }
+    .copy {
+      margin: 0;
+      color: #695850;
+      font-size: 13px;
+      line-height: 1.58;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 9px;
+    }
+    .tag {
+      color: #ef7847;
+      border: 1px solid rgba(239, 120, 71, .24);
+      background: rgba(239, 120, 71, .08);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .warn .tag {
+      color: #9b6b33;
+      border-color: rgba(155, 107, 51, .22);
+      background: rgba(155, 107, 51, .08);
+    }
+    @media (max-width: 820px) {
+      .hero { display: block; }
+      .pill { display: inline-flex; margin-top: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .focus { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .faces { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1>十神喜用与提醒态</h1>
+        <p class="sub">同一只小动物固定代表一个十神。喜用态表达顺畅、有力量的一面；提醒态表达过度、卡住、需要调和的一面，不做负面审判。</p>
+      </div>
+      <div class="pill">一神一兽 · 双面双态</div>
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-ten-gods-cutout-preview.png" alt="黑猫十神透明切图预览" />
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-ten-gods-isolated-source.png" alt="黑猫十神无背景源图" />
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-painterly-ten-gods-smile-gaze.png" alt="绘本油画黑猫十神微笑眼神修正版" />
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-painterly-ten-gods-gaze.png" alt="绘本油画黑猫十神眼神修正版" />
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-painterly-ten-gods-micro.png" alt="绘本油画黑猫十神微表情版" />
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-painterly-ten-gods.png" alt="绘本油画黑猫十神喜用态概念图" />
+    </section>
+
+    <section class="sheet">
+      <img src="./black-cat-ten-gods-concept.png" alt="黑猫十神喜用态 3D 概念图" />
+    </section>
+
+    <section class="sheet">
+      <img src="./ten-gods-favorable-stickers.png" alt="十神喜用态单图候选" />
+    </section>
+
+    <section class="sheet">
+      <img src="./ten-gods-yinji-stickers.png" alt="十神喜用与提醒态贴纸草图" />
+    </section>
+
+    <section class="focus">
+      <div class="focus-art">
+        <img src="./ten-gods-yinji-keyfix.png" alt="比肩劫财正印识别修正版" />
+      </div>
+      <div class="focus-notes">
+        <h2>识别修正版</h2>
+        <div class="note">
+          <strong>比肩：站稳 + 边界</strong>
+          <p>不要只画“可爱狗”。要有站台、护盾、边界线，提醒态是一个人硬扛太多。</p>
+        </div>
+        <div class="note">
+          <strong>劫财：冲抢 + 机会</strong>
+          <p>和比肩拉开距离，用狐狸、围巾、风线、钱袋或机会星，提醒态是拉扯太多资源。</p>
+        </div>
+        <div class="note">
+          <strong>正印：托底 + 保护</strong>
+          <p>不能只画温顺小羊。要加书、伞、毯子、被照顾感，提醒态是被保护过度。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="focus">
+      <div class="focus-art">
+        <img src="./ten-gods-yinji-rest.png" alt="其他七神识别修正版" />
+      </div>
+      <div class="focus-notes">
+        <h2>其他七神识别修正版</h2>
+        <div class="note">
+          <strong>食神：滋养 + 松弛</strong>
+          <p>兔子加小碗、勺子、热气。提醒态是太舒服、太慢，不要做成懒惰批判。</p>
+        </div>
+        <div class="note">
+          <strong>伤官：表达 + 锋芒</strong>
+          <p>猫加画笔、话筒、火花。提醒态是声音过大、纸张飞散，表达太满。</p>
+        </div>
+        <div class="note">
+          <strong>偏财：机会 + 人脉</strong>
+          <p>小猪加钱袋、金币花、连线。提醒态是资源太多、手忙脚乱。</p>
+        </div>
+        <div class="note">
+          <strong>正财：账本 + 积累</strong>
+          <p>仓鼠加账本、算盘、粮罐。提醒态是钱包抱太紧，过分谨慎。</p>
+        </div>
+        <div class="note">
+          <strong>七杀：压力 + 突破</strong>
+          <p>小虎加头盔、目标旗、山峰。提醒态是目标太多，绷得太紧。</p>
+        </div>
+        <div class="note">
+          <strong>正官：规则 + 责任</strong>
+          <p>小鹿加徽章、夹板、整齐丝带。提醒态是规则书太大，标准太满。</p>
+        </div>
+        <div class="note">
+          <strong>偏印：洞察 + 钻研</strong>
+          <p>猫头鹰加放大镜、月亮、拼图。提醒态是想太深，被思绪缠住。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">01</span>比肩</div><span class="animal-name">稳稳柴</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐶</div><p class="copy">站得住，有主见，知道自己的边界。</p><div class="tags"><span class="tag">独立</span><span class="tag">稳定</span><span class="tag">有骨气</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐶</div><p class="copy">太想自己扛，容易硬撑或听不进建议。</p><div class="tags"><span class="tag">别硬撑</span><span class="tag">可求助</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">02</span>劫财</div><span class="animal-name">冲冲狐</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🦊</div><p class="copy">反应快，敢争取，能把机会抢回来。</p><div class="tags"><span class="tag">果断</span><span class="tag">义气</span><span class="tag">行动</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🦊</div><p class="copy">一急就先冲，容易把关系和节奏搅乱。</p><div class="tags"><span class="tag">慢半拍</span><span class="tag">先确认</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">03</span>食神</div><span class="animal-name">松松兔</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐰</div><p class="copy">松弛、有福气，能把日子过舒服。</p><div class="tags"><span class="tag">温和</span><span class="tag">享受</span><span class="tag">滋养</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐰</div><p class="copy">舒服过头时，容易拖延或不想面对压力。</p><div class="tags"><span class="tag">收回来</span><span class="tag">动一动</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">04</span>伤官</div><span class="animal-name">闪闪猫</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐱</div><p class="copy">聪明会表达，有作品感，也有个人风格。</p><div class="tags"><span class="tag">才气</span><span class="tag">创意</span><span class="tag">锋芒</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐱</div><p class="copy">话太快或太尖时，容易让人跟不上。</p><div class="tags"><span class="tag">留余地</span><span class="tag">少一点刺</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">05</span>偏财</div><span class="animal-name">旺旺猪</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐷</div><p class="copy">人脉活，机会感强，懂变通也够大方。</p><div class="tags"><span class="tag">资源</span><span class="tag">灵活</span><span class="tag">机会</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐷</div><p class="copy">想抓的太多时，容易分心或花得太快。</p><div class="tags"><span class="tag">做取舍</span><span class="tag">稳现金</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">06</span>正财</div><span class="animal-name">账账仓</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐹</div><p class="copy">务实稳当，适合长期经营和积累。</p><div class="tags"><span class="tag">踏实</span><span class="tag">规划</span><span class="tag">守成</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐹</div><p class="copy">太怕浪费时，可能错过试错和变化。</p><div class="tags"><span class="tag">给弹性</span><span class="tag">别太紧</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">07</span>七杀</div><span class="animal-name">勇勇虎</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐯</div><p class="copy">能扛压，目标感强，敢打硬仗。</p><div class="tags"><span class="tag">决断</span><span class="tag">突破</span><span class="tag">胆识</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐯</div><p class="copy">太紧绷时，容易把所有事都当战场。</p><div class="tags"><span class="tag">先呼吸</span><span class="tag">分轻重</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">08</span>正官</div><span class="animal-name">端端鹿</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🦌</div><p class="copy">自律有分寸，重责任，也让人放心。</p><div class="tags"><span class="tag">秩序</span><span class="tag">体面</span><span class="tag">可靠</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🦌</div><p class="copy">太在意标准时，容易紧张或不敢松手。</p><div class="tags"><span class="tag">允许不完美</span><span class="tag">放轻</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">09</span>偏印</div><span class="animal-name">谜谜鸮</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🦉</div><p class="copy">直觉敏锐，脑回路独特，适合钻研。</p><div class="tags"><span class="tag">洞察</span><span class="tag">专注</span><span class="tag">灵感</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🦉</div><p class="copy">想太深时，容易绕进自己的小宇宙。</p><div class="tags"><span class="tag">说出来</span><span class="tag">接地气</span></div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="head"><div class="god"><span class="badge">10</span>正印</div><span class="animal-name">软软羊</span></div>
+        <div class="faces">
+          <div class="face"><div class="label">喜用态</div><div class="animal">🐑</div><p class="copy">温厚，有托底感，重学习和保护。</p><div class="tags"><span class="tag">宽厚</span><span class="tag">贵人</span><span class="tag">安稳</span></div></div>
+          <div class="face warn"><div class="label">提醒态</div><div class="animal">🐑</div><p class="copy">被保护太久时，容易慢热或不想决定。</p><div class="tags"><span class="tag">自己定</span><span class="tag">往前走</span></div></div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

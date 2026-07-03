@@ -308,6 +308,12 @@
   color: var(--gold);
   margin-left: 8rpx;
 }
+.muyu-checkin {
+  margin-top: -18rpx;
+  margin-bottom: 22rpx;
+  font-size: 24rpx;
+  color: var(--ink-3);
+}
 .muyu-stage {
   position: relative;
   width: 420rpx;

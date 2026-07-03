@@ -45,46 +45,81 @@
       <view class="seg">
         <view class="seg-item {{calendar === 'solar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="solar">公历</view>
         <view class="seg-item {{calendar === 'lunar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="lunar">农历</view>
+        <view class="seg-item {{calendar === 'pillar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="pillar">四柱</view>
       </view>
     </view>
 
-    <view class="form-row">
+    <view class="form-row" wx:if="{{calendar === 'solar'}}">
       <view class="form-label">出生日期</view>
-      <picker wx:if="{{calendar === 'solar'}}" class="form-picker" mode="date"
-        value="{{solarDate}}" start="1901-01-01" end="{{maxDate}}" bindchange="onSolarDateChange">
-        <view class="picker-value">{{solarDate}}<text class="arrow">›</text></view>
-      </picker>
-      <picker wx:else class="form-picker" mode="multiSelector"
-        range="{{lunarRange}}" value="{{lunarIndex}}"
-        bindcolumnchange="onLunarColumnChange" bindchange="onLunarChange">
-        <view class="picker-value">{{lunarText}}<text class="arrow">›</text></view>
+      <picker class="form-picker" mode="date"
+        value="{{solarDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onSolarDateChange">
+        <view class="picker-value">{{solarDate}}</view>
       </picker>
     </view>
 
-    <view class="form-row">
+    <view class="form-row" wx:if="{{calendar === 'lunar'}}">
+      <view class="form-label">出生日期</view>
+      <picker class="form-picker" mode="multiSelector"
+        range="{{lunarRange}}" value="{{lunarIndex}}"
+        bindcolumnchange="onLunarColumnChange" bindchange="onLunarChange">
+        <view class="picker-value">{{lunarText}}</view>
+      </picker>
+    </view>
+
+    <view class="pillar-pane" wx:if="{{calendar === 'pillar'}}">
+      <view class="direct-grid">
+        <view class="direct-field">
+          <text class="direct-label">年柱</text>
+          <input class="direct-input" placeholder="甲子" maxlength="2" value="{{pillarQuery.year}}" bindinput="onPillarQueryInput" data-key="year" />
+        </view>
+        <view class="direct-field">
+          <text class="direct-label">月柱</text>
+          <input class="direct-input" placeholder="丙寅" maxlength="2" value="{{pillarQuery.month}}" bindinput="onPillarQueryInput" data-key="month" />
+        </view>
+        <view class="direct-field">
+          <text class="direct-label">日柱</text>
+          <input class="direct-input" placeholder="戊辰" maxlength="2" value="{{pillarQuery.day}}" bindinput="onPillarQueryInput" data-key="day" />
+        </view>
+        <view class="direct-field">
+          <text class="direct-label">时柱</text>
+          <input class="direct-input" placeholder="庚午" maxlength="2" value="{{pillarQuery.hour}}" bindinput="onPillarQueryInput" data-key="hour" />
+        </view>
+      </view>
+      <view class="pillar-actions">
+        <text class="pillar-msg" wx:if="{{pillarYearMsg}}">{{pillarYearMsg}}</text>
+        <view class="pillar-btn" bindtap="onFindPillarYears">查找</view>
+      </view>
+      <view class="pillar-year-list" wx:if="{{pillarYearCandidates.length}}">
+        <view class="pillar-year" wx:for="{{pillarYearCandidates}}" wx:key="year" bindtap="onPickPillarYear" data-index="{{index}}">
+          <text class="pillar-year-main">{{item.year}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-row" wx:if="{{calendar !== 'pillar'}}">
       <view class="form-label">知道出生时辰
         <view class="form-note">{{unknownTime ? '未知 · 只排年月日三柱' : '已知 · 排全四柱'}}</view>
       </view>
       <switch checked="{{!unknownTime}}" color="#6D5DF6" bindchange="onKnowTimeChange" />
     </view>
 
-    <view class="form-row" wx:if="{{!unknownTime}}">
+    <view class="form-row" wx:if="{{calendar !== 'pillar' && !unknownTime}}">
       <view class="form-label">出生时间</view>
       <picker class="form-picker" mode="time" value="{{time}}" bindchange="onTimeChange">
-        <view class="picker-value">{{time}}<text class="arrow">›</text></view>
+        <view class="picker-value">{{time}}</view>
       </picker>
     </view>
 
-    <view class="form-row">
+    <view class="form-row" wx:if="{{calendar !== 'pillar'}}">
       <view class="form-label">出生地点</view>
       <picker class="form-picker" mode="multiSelector"
         range="{{regionRange}}" value="{{regionIndex}}"
         bindcolumnchange="onRegionColumnChange" bindchange="onRegionChange">
-        <view class="picker-value">{{regionText}}<text class="arrow">›</text></view>
+        <view class="picker-value">{{regionText}}</view>
       </picker>
     </view>
 
-    <view class="form-row no-line" wx:if="{{!unknownTime}}">
+    <view class="form-row no-line" wx:if="{{calendar !== 'pillar' && !unknownTime}}">
       <view class="form-label">
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>
@@ -92,21 +127,23 @@
       <switch checked="{{useTrueSolar}}" color="#6D5DF6" bindchange="onTrueSolarChange" />
     </view>
 
-    <button class="btn-primary btn-paipan" bindtap="onPaiPan">
-      <image class="btn-paipan-bg" src="/images/btn-paipan-bg.jpg" mode="scaleToFill" />
-      <text class="btn-paipan-text">开始排盘</text>
-    </button>
-    <button class="btn-quick" bindtap="onQuickXiangPi">
-      <text class="btn-quick-main">免费获取性格画像</text>
-      <text class="btn-quick-sub">看不懂排盘？直接看你的性格与天赋</text>
-    </button>
+    <block wx:if="{{calendar !== 'pillar'}}">
+      <button class="btn-primary btn-paipan" bindtap="onPaiPan">
+        <image class="btn-paipan-bg" src="/images/btn-paipan-bg.jpg" mode="scaleToFill" />
+        <text class="btn-paipan-text">开始排盘</text>
+      </button>
+      <button class="btn-quick" bindtap="onQuickXiangPi">
+        <text class="btn-quick-main">获取性格画像</text>
+        <text class="btn-quick-sub">看不懂排盘？直接看你的性格与天赋</text>
+      </button>
+    </block>
   </view>
 
   <!-- 最近排盘 -->
   <view class="recent" wx:if="{{recent.length > 0}}">
     <view class="recent-head">
       <view class="recent-title serif">最近排盘</view>
-      <view class="recent-more" bindtap="goRecords">全部记录 ›</view>
+      <view class="recent-more" bindtap="goRecords">全部记录 &gt;</view>
     </view>
     <view class="recent-item card" wx:for="{{recent}}" wx:key="_id"
       hover-class="mod-hover" bindtap="goRecord" data-index="{{index}}">

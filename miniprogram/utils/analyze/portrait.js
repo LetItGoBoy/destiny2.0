@@ -26,6 +26,25 @@ var YEAR_TRAIT_WORDS = {
   偏印: { pro: ['专注', '洞察', '灵感', '深挖'], con: ['孤僻', '挑剔', '空想', '不落地'] }
 };
 
+var TEN_GOD_CAT_IMAGES = {
+  '比肩': '/images/ten-gods/cat/01-bijian.png',
+  '劫财': '/images/ten-gods/cat/02-jiecai.png',
+  '食神': '/images/ten-gods/cat/03-shishen.png',
+  '伤官': '/images/ten-gods/cat/04-shangguan.png',
+  '偏财': '/images/ten-gods/cat/05-piancai.png',
+  '正财': '/images/ten-gods/cat/06-zhengcai.png',
+  '七杀': '/images/ten-gods/cat/07-qisha.png',
+  '正官': '/images/ten-gods/cat/08-zhengguan.png',
+  '偏印': '/images/ten-gods/cat/09-pianyin.png',
+  '正印': '/images/ten-gods/cat/10-zhengyin.png'
+};
+
+function tenGodCatImage(god) {
+  if (!god) return '';
+  var key = String(god).split(/\s*\+\s*/)[0];
+  return TEN_GOD_CAT_IMAGES[key] || '';
+}
+
 function wordCopy(god, kind) {
   if (kind === 'luck') return YEAR_TRAIT_WORDS[god] || {};
   var kw = traitWords[god];
@@ -40,17 +59,13 @@ function wordText(god, kind, side) {
 
 function narrativeText(god, kind, side) {
   var t = TEMP[god] || { desc: '', con: '' };
-  if (kind === 'inner') {
-    if (side === 'desc') return INNER[god] || t.desc;
-    return '';
-  }
   return side === 'desc' ? t.desc : t.con;
 }
 
 // 心性 → 气泡星团数据（原局 src=natal 红蓝 + 岁运叠加 src=luck 金）
 function buildTraitBubbles(list, luck, kind) {
   var out = [];
-  (list || []).slice(0, 2).forEach(function (t, idx) {
+  (list || []).forEach(function (t, idx) {
     var kw = wordCopy(t.god, t.copyKind || kind || 'outer');
     if (!kw) return;
     // 该心性算出的滑标位置(25-75) → lean(0顺…1偏)，驱动这组泡泡优缺涨缩
@@ -226,20 +241,6 @@ function rootElsOf(chart, opts) {
   return s;
 }
 
-// 十神 → 地支「内在心性」文案（安全感 / 内在驱动力视角；与天干外显文案区分）
-var INNER = {
-  比肩: '骨子里要强、不服输，凡事先在心里有了判断才动，自尊扎得很深。独立自主是本能，重平等也重边界，不爱欠人情、不喜欢被人硬压着走，守得住自己的付出与积累；只是对公平和被占便宜比较敏感，也不太愿意主动示弱。',
-  劫财: '内心有股不肯认输的冲劲，胜负感强、容易被气氛点燃，渴望被看见、被认可。很讲义气、重朋友，愿意为圈子出头，行动的底气往往来自身边人；只是情绪上来时容易上头、冲动，也容易为人情替别人扛事、被关系牵着走。',
-  食神: '内心向往轻松自在，知足、重感受，安全感来自衣食无忧与被善待。待人厚道宽和、体谅别人，对喜欢的事愿意慢慢投入、持续做下去，不喜欢被逼着赶着走；只是容易心软、边界不够硬，日子舒坦了动力也会跟着松下来。',
-  伤官: '内心藏着表达和被欣赏的渴望，聪明、有判断，不甘平庸、想活出自己。重自由、重欣赏，不喜欢被人情绑住，也看不上低水平的消耗，越被框住越想挣脱；只是锋芒难收时容易骄傲、不留余地，对自己和别人都要求偏高。',
-  偏财: '内心活络、看得开，机会感强、眼光灵活，安全感来自资源与人脉的流动。为人豪爽大方、不计较，喜欢热闹和机会，能把关系和事情分开看，对得失拿得起放得下；只是欲望容易过强、边界偏松，精力和资源都容易铺得太散。',
-  正财: '内心求稳务实，现实感强、重确定的回报，安全感来自踏实的积累与可掌控的生活。重责任、重承诺，边界清楚，愿意为长期的人和事持续投入，不太愿意冒没把握的险；只是太看重得失时容易显得保守、计较。',
-  七杀: '内心压着股危机感与狠劲，警觉性高、习惯从压力的角度看问题，越有压力越能逼出潜力。欣赏强者、重实力与气场，遇到难题反而被激发；只是容易紧绷、多疑，习惯自我加压、跟自己较劲，需要学着给这股劲松松弦。',
-  正官: '内心有一把尺，重秩序、重责任，自我要求高，安稳感来自规则与被认可。为人得体、有分寸，在意身份与体面，做事讲交代、讲结果；只是太在意评价时容易顾虑重重、怕越界、怕出错，思前想后，不太敢表达真实的不满。',
-  偏印: '内心敏感、好琢磨，喜欢自己搭一套理解方式，安全感来自独处与精神世界。边界感强、精神空间需求高，不喜欢太黏太浅的关系，凡事先在心里过一遍才放心；只是容易想得太深、把简单的事复杂化，也容易显得孤僻、让人猜不透。',
-  正印: '内心渴望被理解与庇护，重情义、重长期积累，安全感来自亲情、归属与依靠。为人温和有礼、包容照顾，愿意维持稳定与和气，习惯先接受再消化；只是容易过度理解别人而委屈自己，行动偏慢，也容易为了不冲突而藏起真实态度。'
-};
-
 // 十神 → 外显心性（name 心性名，pol 正/偏，lbl 左端顺，rbl 右端偏，desc 综合特质描述）
 var TEMP = {
   比肩: { name: '自立', pol: '正', lbl: '自主稳健', rbl: '固执较真',
@@ -286,20 +287,6 @@ var STAGE = {
   正官: '主旋律是重规矩、担责任。这一程看重秩序、身份与社会认可，做事稳重、按流程推进，愿意承担正式的角色，讲标准、讲交代、讲结果；为人温和得体、有分寸，靠自律和口碑一步步往上走。只是容易顾虑评价、怕越界，行动前思前想后，突破力偏弱。',
   偏印: '主旋律是向内沉淀、钻研专精。这一程靠独立判断和非标准的专长立身，喜欢自己搭一套理解方式，适合用技术、研究或特殊经验打开局面；话不多、边界感强，精神空间需求高，独处时反而最有灵感。只是容易想得太深、多思少动，也容易显得孤僻、不近人情。',
   正印: '主旋律是有庇护、重学习。这一程走正统路径、重基础与长期积累，常得师长、贵人之助，靠信誉与情义在平台和体系里稳稳成长；为人温和有礼、包容照顾，给人安全感。只是行动偏慢、准备过多，容易依赖既有框架，也容易为了不冲突而委屈自己。'
-};
-
-// 十神 → 该阶段「内心」一句话（地支本气，简短）
-var STAGE_INNER = {
-  比肩: '内心要强，想掌握主动',
-  劫财: '内心好胜，看重同伴',
-  食神: '内心向往轻松自在',
-  伤官: '内心不甘平庸、想被看见',
-  偏财: '内心活络，看重情义与机会',
-  正财: '内心求稳，在意踏实安稳',
-  七杀: '内心有压力感，习惯自我加压',
-  正官: '内心重规矩，在意对错',
-  偏印: '内心好静，爱琢磨',
-  正印: '内心念旧，渴望依靠与被理解'
 };
 
 // 四柱 → 人生阶段（宫位/分限）
@@ -502,9 +489,10 @@ function build(chart, opts) {
     var dir = override ? override.dir : rawDir;
     return {
       god: src.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
+      catImage: tenGodCatImage(src.god),
       desc: narrativeText(src.god, copyKind, 'desc'),
       con: narrativeText(src.god, copyKind, 'con'),
-      descLabel: copyKind === 'inner' ? '解读' : '优点',
+      descLabel: '优点',
       conLabel: '留意',
       cls: src.cls,
       slider: traitSliderPos(dir, godPct[src.god] || 0, src.god),
@@ -579,6 +567,7 @@ function build(chart, opts) {
     if (isDiseaseLuck) luckDir = '-';
     return {
       god: god, name: god, cls: base.WX_CLS[el],
+      catImage: tenGodCatImage(god),
       slider: isDiseaseLuck ? 75 : luckSliderPos(luckDir, luckPct, god),
       energy: luckEnergy,
       godPct: Math.round(luckPct),
@@ -615,64 +604,119 @@ function build(chart, opts) {
     for (var i = 0; i < (m.ganCells || []).length; i++) if (m.ganCells[i].pos === pos) return m.ganCells[i];
     return null;
   }
-  function hiddenMainAt(pillar) {
+  function hiddenUnitAt(pillar, rank) {
     for (var i = 0; i < (m.hiddenUnits || []).length; i++) {
       var u = m.hiddenUnits[i];
-      if (u.pillar === pillar && u.rank === 0) return u;
+      if (u.pillar === pillar && u.rank === rank) return u;
     }
     return null;
   }
+  function hiddenMainAt(pillar) {
+    return hiddenUnitAt(pillar, 0);
+  }
+  var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
+  var natalGanChars = {};
+  chart.pillars.forEach(function (p) {
+    if (!p.empty && p.gan && p.gan.text) natalGanChars[p.gan.text] = true;
+  });
+
   function layerFromGan(pillarIndex, posLabel) {
     var c = ganCellAt(posLabel);
     if (!c || c.isDay) return null;
     return makeTraitItem({
       god: c.god, el: c.el, cls: c.cls, energy: c.val,
-      source: '外显心性', sourceChar: c.char,
+      source: 'stageGan', sourceChar: c.char,
       sourceKind: 'gan', pillar: pillarIndex
     }, 0, c.val || 1, 'outer');
   }
   function layerFromZhi(pillarIndex) {
     var u = hiddenMainAt(pillarIndex);
     if (!u) return null;
+    var pp = chart.pillars[pillarIndex];
+    var hgs = pp && pp.zhi ? LunarUtil.ZHI_HIDE_GAN[pp.zhi.text] : [];
     return makeTraitItem({
       god: u.god, el: u.el, cls: base.WX_CLS[u.el], energy: u.val,
-      source: '内显心性', sourceChar: '',
+      source: 'stageZhi', sourceChar: hgs[0] || '',
       sourceKind: 'zhiMain', pillar: pillarIndex
     }, 0, u.val || 1, 'inner');
   }
-  function layerTitle(stage, layer) {
-    if (stage.key === 'day') return '整体心性';
-    return layer === 'outer' ? '外显心性' : '内显心性';
+  function layerFromMonthLing(stage) {
+    var pillarIndex = 1;
+    var pp = chart.pillars[pillarIndex];
+    if (!pp || pp.empty || !pp.zhi) return null;
+    var hgs = LunarUtil.ZHI_HIDE_GAN[pp.zhi.text] || [];
+    var sources = [];
+    for (var r = 0; r < hgs.length; r++) {
+      if (r > 0 && !natalGanChars[hgs[r]]) continue;
+      var u = hiddenUnitAt(pillarIndex, r);
+      if (!u) continue;
+      sources.push({
+        god: u.god, el: u.el, cls: base.WX_CLS[u.el], energy: u.val,
+        source: r === 0 ? '月令本气' : '月令透出',
+        sourceChar: hgs[r],
+        sourceKind: r === 0 ? 'zhiMain' : 'zhiExtra',
+        pillar: pillarIndex,
+        rank: r,
+        transparent: r > 0
+      });
+    }
+    if (!sources.length) return null;
+    var maxEnergy = 0;
+    sources.forEach(function (src) { if (src.energy > maxEnergy) maxEnergy = src.energy; });
+    var items = sources.map(function (src, idx) {
+      return makeTraitItem(src, idx, maxEnergy || src.energy || 1, 'inner');
+    });
+    var main = items[0];
+    var extras = items.slice(1);
+    var layer = {};
+    for (var k in main) layer[k] = main[k];
+    layer.name = [main].concat(extras).map(function (it) { return it.name; }).join(' + ');
+    layer.god = [main].concat(extras).map(function (it) { return it.god; }).join(' + ');
+    layer.source = 'monthLing';
+    layer.sourceKind = 'monthLing';
+    layer.bubbleTraits = [main].concat(extras);
+    layer.transParents = extras.map(function (it) { return it.sourceChar + '透出为' + it.name; }).join('、');
+    if (extras.length) {
+      layer.desc = main.desc + ' 透出心性：' + extras.map(function (it) { return it.name + '，' + it.desc; }).join('；');
+      layer.con = main.con + ' 透出也要留意：' + extras.map(function (it) { return it.name + '，' + it.con; }).join('；');
+    }
+    return layer;
   }
-  function makeFlowOnlyLayer(luck) {
-    if (!luck) return null;
-    var t = TEMP[luck.god] || { name: luck.god, pol: '', desc: '', con: '' };
+  function layerFromDayMaster() {
     return {
-      god: luck.god,
-      name: t.name || luck.name,
-      pol: t.pol || '',
-      lbl: luck.lbl,
-      rbl: luck.rbl,
-      desc: luck.desc || narrativeText(luck.god, 'outer', 'desc'),
+      god: '日主',
+      name: coreInfo.title,
+      catImage: '',
+      pol: '',
+      lbl: '',
+      rbl: '',
+      desc: coreInfo.text,
       con: '',
-      descLabel: '流动',
+      descLabel: '底色',
       conLabel: '留意',
-      cls: luck.cls,
-      slider: luck.slider,
-      energy: luck.energy,
-      godPct: luck.godPct,
-      traitDir: luck.traitDir,
-      copyKind: 'luck',
-      title: '流动外显',
-      isFlowOnly: true,
-      bubbles: buildTraitBubbles([], luck, 'outer')
+      cls: base.WX_CLS[base.ganWx(dayGan)],
+      slider: 50,
+      energy: 1,
+      godPct: 0,
+      traitDir: 'mid',
+      copyKind: 'core',
+      source: 'dayMaster',
+      sourceKind: 'dayMaster',
+      pillar: 2,
+      bubbles: []
     };
+  }
+  function stageLayer(sm) {
+    if (sm.sourceKind === 'dayMaster') return layerFromDayMaster();
+    if (sm.sourceKind === 'monthLing') return layerFromMonthLing(sm);
+    if (sm.sourceKind === 'zhiMain') return layerFromZhi(sm.pillar);
+    return layerFromGan(sm.pillar, sm.pos);
   }
   function decorateLayer(stage, layer, luck) {
     if (!layer) return null;
-    if (layer.isFlowOnly) return layer;
-    layer.title = layerTitle(stage, layer.source === '内显心性' ? 'inner' : 'outer');
-    layer.bubbles = buildTraitBubbles([layer], luck, layer.copyKind || (layer.source === '内显心性' ? 'inner' : 'outer'));
+    layer.title = stage.layerTitle;
+    layer.help = stage.help;
+    layer.bubbles = buildTraitBubbles(layer.sourceKind === 'dayMaster' ? [] : (layer.bubbleTraits || [layer]), luck, layer.copyKind || stage.copyKind || 'outer');
     if (luck) {
       layer.luckName = luck.name;
       layer.luckSlider = luck.slider;
@@ -682,26 +726,29 @@ function build(chart, opts) {
     return layer;
   }
   var stageMetaList = [
-    { key: 'year', label: '少年', age: '0-16岁', phase: '根', theme: '祖业 · 家庭 · 求学根基', sub: '先天底色', pill: '性格底色', note: '少年阶段看最早形成的性格底色。它不只属于小时候，也会像底色一样被带到人生后面。', pillar: 0, pos: '年' },
-    { key: 'month', label: '青年', age: '17-32岁', phase: '苗', theme: '事业起步 · 求财 · 婚恋初期', sub: '社会面具', pill: '社会面具', note: '青年阶段看一个人如何向外表达、竞争、试探边界，也看进入社会后更容易戴上的那层面具。', pillar: 1, pos: '月' },
-    { key: 'day', label: '中年', age: '33-48岁', phase: '花', theme: '事业巅峰 · 婚姻 · 自身成就', sub: '整体心性', pill: '整体心性', note: '中年阶段更贴近真实关系和长期选择。这里不再拆外层表现，只看这一阶段真正稳定下来的整体心性。', pillar: 2, pos: '日' },
-    { key: 'hour', label: '晚年', age: '49岁以后', phase: '果', theme: '子女 · 健康 · 归宿享福', sub: '后期状态', pill: '后期状态', note: '晚年阶段看后半程更自然流露的状态，也看一个人最终更愿意怎样安排生活。', pillar: 3, pos: '时' }
+    { key: 'life1', label: '幼年', age: '1-8岁', phase: '初', theme: '先天底色 · 贯穿一生', sub: '初光', note: '幼年看最早被世界看见的那层气质。它不只属于小时候，也会像底色一样贯穿一生。', pillar: 0, pos: '年', sourceKind: 'gan', copyKind: 'outer', layerTitle: '先天底色', help: '最先露出来的气质、反应速度和面对外界时的自然姿态。' },
+    { key: 'life2', label: '少时', age: '8-16岁', phase: '根', theme: '安全感 · 本能反应', sub: '藏根', note: '少时看内在反应怎么长出来：安全感、依赖方式、遇事先紧还是先松，都在这里开始成形。', pillar: 0, sourceKind: 'zhiMain', copyKind: 'inner', layerTitle: '本能底色', help: '更靠里的情绪底盘和安全感来源，会影响之后很多选择。' },
+    { key: 'life3', label: '青春', age: '17-24岁', phase: '萌', theme: '求学试声 · 初入人群', sub: '试声', note: '青春看一个人怎样向外试探边界：想被怎样看见，也会用什么方式证明自己。', pillar: 1, pos: '月', sourceKind: 'gan', copyKind: 'outer', layerTitle: '入世姿态', help: '走向人群时更容易拿出来的表达方式、竞争方式和做事姿态。' },
+    { key: 'life4', label: '青年', age: '25-32岁', phase: '令', theme: '月令承接 · 事业起步', sub: '承势', note: '青年看月支这层月令底色：本气一定表达，中气/余气只有透到天干时才加入阶段心性。', pillar: 1, sourceKind: 'monthLing', copyKind: 'inner', layerTitle: '月令底色', help: '月支像长期气候；透出的藏干会变成可见心性，直接混入这一段的气泡。' },
+    { key: 'life5', label: '立身', age: '33-40岁', phase: '立', theme: '月令成势 · 立身选择', sub: '成势', note: '立身沿用月支心性，看月令底色如何在自我选择、事业方向和长期关系里真正成势。', pillar: 1, sourceKind: 'monthLing', copyKind: 'inner', layerTitle: '月令成势', help: '这一段继续看月支本气；若月令中气/余气透出，也会作为成势心性进入气泡。' },
+    { key: 'life6', label: '成事', age: '41-48岁', phase: '成', theme: '亲密关系 · 长期成果', sub: '定心', note: '成事阶段看长期关系和稳定成果里的真实反应：亲密、合作、家庭与事业如何互相牵动。', pillar: 2, sourceKind: 'zhiMain', copyKind: 'inner', layerTitle: '关系底色', help: '更靠近亲密关系、长期承诺和日常相处里的真实反应。' },
+    { key: 'life7', label: '远行', age: '49-56岁', phase: '远', theme: '后程规划 · 经验输出', sub: '远望', note: '远行阶段看后半程怎样重新安排生活，也看经验、资源和影响力怎样被表达出来。', pillar: 3, pos: '时', sourceKind: 'gan', copyKind: 'outer', layerTitle: '后程姿态', help: '后半程更容易显出来的处事方式、表达风格和安排能力。' },
+    { key: 'life8', label: '归心', age: '57岁以后', phase: '归', theme: '归宿享福 · 自在晚景', sub: '归处', note: '归心阶段看最终更想回到什么生活状态：怎样享受、怎样放下，也怎样和后辈及世界相处。', pillar: 3, sourceKind: 'zhiMain', copyKind: 'inner', layerTitle: '晚境底色', help: '晚年更自然流露的内在状态，关系到舒适感、归属感和生活节奏。' }
   ];
   var stagePortraits = stageMetaList.map(function (sm, idx) {
     var pp = chart.pillars[sm.pillar];
     if (!pp || pp.empty || !pp.gan || !pp.zhi) {
       return {
         key: sm.key, label: sm.label, age: sm.age, phase: sm.phase, theme: sm.theme,
-        sub: sm.sub, pill: sm.pill, note: sm.note, index: idx + 1, empty: true
+        sub: sm.sub, note: sm.note, index: idx + 1, indexText: idx < 9 ? '0' + (idx + 1) : String(idx + 1), empty: true
       };
     }
-    var outer = sm.key === 'day' ? makeFlowOnlyLayer(luckTrait) : layerFromGan(sm.pillar, sm.pos);
-    var inner = layerFromZhi(sm.pillar);
+    var layer = stageLayer(sm);
+    var luckForLayer = (sm.sourceKind === 'zhiMain' || sm.sourceKind === 'monthLing') ? luckInnerTrait : luckTrait;
     return {
       key: sm.key, label: sm.label, age: sm.age, phase: sm.phase, theme: sm.theme,
-      sub: sm.sub, pill: sm.pill, note: sm.note, index: idx + 1, empty: false,
-      outer: decorateLayer(sm, outer, luckTrait),
-      inner: decorateLayer(sm, inner, luckInnerTrait)
+      sub: sm.sub, note: sm.note, index: idx + 1, indexText: idx < 9 ? '0' + (idx + 1) : String(idx + 1), empty: false,
+      layer: decorateLayer(sm, layer, luckForLayer)
     };
   });
 
@@ -716,7 +763,7 @@ function build(chart, opts) {
     var bt0 = TEMP[lzGod] || { name: lzGod, pol: '' };
     branchList.push({
       god: lzGod, name: bt0.name, pol: bt0.pol, cls: base.WX_CLS[lzEl],
-      desc: INNER[lzGod] || '', zhis: lnZhi,
+      desc: bt0.desc || '', zhis: lnZhi,
       energy: 1, dots: fullDots(), isMain: true
     });
   } else {
@@ -732,7 +779,7 @@ function build(chart, opts) {
       var bt = TEMP[bg] || { name: bg, pol: '' };
       branchList.push({
         god: bg, name: bt.name, pol: bt.pol, cls: bagg[bg].cls,
-        desc: INNER[bg] || '', zhis: bagg[bg].zhis.join('、'),
+        desc: bt.desc || '', zhis: bagg[bg].zhis.join('、'),
         energy: bagg[bg].energy
       });
     }
@@ -765,7 +812,7 @@ function build(chart, opts) {
     var theme, themeGod, desc;
     if (isDay) {
       theme = '自己'; themeGod = '日主';
-      desc = INNER[innerGod] || '';
+      desc = (TEMP[innerGod] || {}).desc || '';
     } else {
       var tt = TEMP[p.shiShenGan] || { name: p.shiShenGan };
       theme = tt.name; themeGod = p.shiShenGan;
@@ -777,11 +824,9 @@ function build(chart, opts) {
       theme: theme, themeGod: themeGod, desc: desc,
       // 日柱主旋律已用日支内在心性，避免再重复同一十神的「内心」一行
       innerName: isDay ? '' : ((TEMP[innerGod] || {}).name || ''),
-      inner: isDay ? '' : (STAGE_INNER[innerGod] || '')
+      inner: ''
     };
   });
-
-  var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
 
   // 盘面
   var paimian = chart.pillars.map(function (p) {

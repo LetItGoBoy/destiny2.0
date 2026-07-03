@@ -171,6 +171,90 @@
   color: var(--ink-3);
 }
 
+.pillar-pane {
+  padding: 18rpx 0 20rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.pillar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.pillar-btn {
+  flex: none;
+  height: 54rpx;
+  line-height: 54rpx;
+  padding: 0 22rpx;
+  border-radius: 12rpx;
+  color: #FFF7E4;
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
+  font-size: 23rpx;
+  font-weight: 800;
+}
+.pillar-msg {
+  flex: 1;
+  color: var(--ink-2);
+  font-size: 22rpx;
+  line-height: 1.55;
+}
+.pillar-year-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+.pillar-year {
+  min-width: 132rpx;
+  padding: 10rpx 14rpx;
+  border-radius: 14rpx;
+  color: var(--primary);
+  background: var(--tint);
+  border: 1rpx solid rgba(138, 43, 39, 0.22);
+}
+.pillar-year-main {
+  display: block;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+.pillar-year-sub {
+  display: block;
+  margin-top: 2rpx;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 18rpx;
+}
+.direct-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  padding: 12rpx 0 8rpx;
+}
+.direct-field {
+  display: flex;
+  align-items: center;
+  min-height: 82rpx;
+  padding: 0 18rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.66);
+}
+.direct-label {
+  flex: none;
+  color: var(--ink-3);
+  font-size: 24rpx;
+}
+.direct-input {
+  flex: 1;
+  min-width: 0;
+  margin-left: 18rpx;
+  color: var(--ink);
+  font-size: 34rpx;
+  font-weight: 800;
+  text-align: right;
+}
+
 /* 性别 chips */
 .chips {
   display: flex;
@@ -200,7 +284,7 @@
   padding: 4rpx;
 }
 .seg-item {
-  padding: 8rpx 36rpx;
+  padding: 8rpx 26rpx;
   border-radius: 10rpx;
   font-size: 26rpx;
   color: var(--ink-2);
@@ -243,7 +327,7 @@
   text-indent: 8rpx;
   text-shadow: 0 3rpx 10rpx rgba(61, 7, 5, 0.52);
 }
-/* 一键画像：黑金强调免费入口 */
+/* 一键画像：黑金强调入口 */
 .btn-quick {
   margin-top: 20rpx;
   height: 104rpx;

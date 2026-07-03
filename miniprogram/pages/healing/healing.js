@@ -1,12 +1,17 @@
 // 疗愈空间：呼吸放松 / 电子木鱼 / 烦恼焚化 / 静心雨声 / 每日抄经
 // 留存机制：连续打卡 + 今日心语 + 累计成就
 var MERIT_KEY = 'tl_merit';        // 累计功德
+var POINTS_KEY = 'tl_points';      // 打卡积分
 var STREAK_KEY = 'tl_streak';      // 当前连续天数
 var LASTDATE_KEY = 'tl_lastDate';  // 最近一次打卡日期（本地日期串）
 var MAXSTREAK_KEY = 'tl_maxStreak';// 历史最长连续
 var TOTALDAYS_KEY = 'tl_totalDays';// 累计打卡天数
 var SUTRA_KEY = 'tl_sutraDone';    // 累计完成抄经次数
 var SUTRADATE_KEY = 'tl_sutraDate';// 今日是否已抄经（日期串）
+var MUYU_DATE_KEY = 'tl_muyuDate'; // 今日木鱼计数日期
+var MUYU_COUNT_KEY = 'tl_muyuCount';// 今日木鱼次数
+var MUYU_CHECKIN_TARGET = 10;
+var CHECKIN_POINTS = 10;
 
 // 呼吸节奏：4-4-6（吸气-屏息-呼气），经典减压节奏
 var BREATH_PHASES = [
@@ -75,6 +80,7 @@ function buildAchievements(stat) {
     { key: 's30', icon: '🏔', name: '坚持', desc: '连续打卡 30 天', ok: stat.maxStreak >= 30 },
     { key: 'm100', icon: '🔔', name: '功德百', desc: '累计功德 100', ok: stat.merit >= 100 },
     { key: 'm1000', icon: '✨', name: '功德千', desc: '累计功德 1000', ok: stat.merit >= 1000 },
+    { key: 'p100', icon: '🎁', name: '小福袋', desc: '累计积分 100', ok: stat.points >= 100 },
     { key: 'c1', icon: '🖌', name: '提笔', desc: '完成抄经 1 次', ok: stat.sutra >= 1 },
     { key: 'c10', icon: '📜', name: '勤书', desc: '完成抄经 10 次', ok: stat.sutra >= 10 },
     { key: 'd30', icon: '🌕', name: '满月', desc: '累计打卡 30 天', ok: stat.totalDays >= 30 }
@@ -101,6 +107,7 @@ Page({
     todayQuote: '',
     streak: 0,
     checkedToday: false,
+    points: 0,
     totalDays: 0,
     sutraCount: 0,
     achievements: [],
@@ -112,6 +119,8 @@ Page({
     breathRound: 0,
     // 木鱼
     merit: 0,
+    muyuTodayCount: 0,
+    muyuCheckinTarget: MUYU_CHECKIN_TARGET,
     floats: [],
     // 焚化
     worry: '',
@@ -150,12 +159,15 @@ Page({
   // 读取并计算留存数据（心语、连续天数、成就）
   refreshStats: function () {
     var merit = wx.getStorageSync(MERIT_KEY) || 0;
+    var points = wx.getStorageSync(POINTS_KEY) || 0;
     var streak = wx.getStorageSync(STREAK_KEY) || 0;
     var last = wx.getStorageSync(LASTDATE_KEY) || '';
     var maxStreak = wx.getStorageSync(MAXSTREAK_KEY) || 0;
     var totalDays = wx.getStorageSync(TOTALDAYS_KEY) || 0;
     var sutra = wx.getStorageSync(SUTRA_KEY) || 0;
     var sutraDate = wx.getStorageSync(SUTRADATE_KEY) || '';
+    var muyuDate = wx.getStorageSync(MUYU_DATE_KEY) || '';
+    var muyuTodayCount = muyuDate === dateStr() ? (wx.getStorageSync(MUYU_COUNT_KEY) || 0) : 0;
 
     var today = dateStr();
     var yest = dateStr(new Date(Date.now() - 86400000));
@@ -163,15 +175,18 @@ Page({
     var alive = (last === today || last === yest);
     var dispStreak = alive ? streak : 0;
 
-    var stat = { merit: merit, maxStreak: maxStreak, totalDays: totalDays, sutra: sutra };
+    var stat = { merit: merit, points: points, maxStreak: maxStreak, totalDays: totalDays, sutra: sutra };
     var achs = buildAchievements(stat);
     var got = 0;
     for (var i = 0; i < achs.length; i++) if (achs[i].ok) got++;
 
     this.setData({
       merit: merit,
+      points: points,
       streak: dispStreak,
       checkedToday: last === today,
+      muyuTodayCount: muyuTodayCount,
+      muyuCheckinTarget: MUYU_CHECKIN_TARGET,
       totalDays: totalDays,
       sutraCount: sutra,
       achievements: achs,
@@ -181,7 +196,7 @@ Page({
     });
   },
 
-  // 打卡：每日一次（任意疗愈行为触发），断一天归零
+  // 打卡：每日一次，仅由木鱼当日达标触发，断一天归零
   doCheckin: function () {
     var today = dateStr();
     var last = wx.getStorageSync(LASTDATE_KEY) || '';
@@ -195,8 +210,9 @@ Page({
     wx.setStorageSync(STREAK_KEY, streak);
     wx.setStorageSync(MAXSTREAK_KEY, maxStreak);
     wx.setStorageSync(TOTALDAYS_KEY, totalDays);
+    wx.setStorageSync(POINTS_KEY, (wx.getStorageSync(POINTS_KEY) || 0) + CHECKIN_POINTS);
     this.refreshStats();
-    wx.showToast({ title: '已打卡 · 连续 ' + streak + ' 天', icon: 'none' });
+    wx.showToast({ title: '已打卡 · 积分 +' + CHECKIN_POINTS + ' · 连续 ' + streak + ' 天', icon: 'none' });
     return true;
   },
 
@@ -235,7 +251,6 @@ Page({
       if (i === 0) {
         var r = that.data.breathRound + 1;
         that.setData({ breathRound: r });
-        if (r === 1) that.doCheckin(); // 完成首轮即记为今日打卡
       }
       that.setData({ breathPhase: p.name, breathScale: p.scale, breathDur: p.dur });
       if (wx.vibrateShort) wx.vibrateShort({ type: 'light' });
@@ -255,12 +270,17 @@ Page({
   onMuyuTap: function () {
     var merit = this.data.merit + 1;
     wx.setStorageSync(MERIT_KEY, merit);
+    var today = dateStr();
+    var muyuDate = wx.getStorageSync(MUYU_DATE_KEY) || '';
+    var count = muyuDate === today ? (wx.getStorageSync(MUYU_COUNT_KEY) || 0) + 1 : 1;
+    wx.setStorageSync(MUYU_DATE_KEY, today);
+    wx.setStorageSync(MUYU_COUNT_KEY, count);
     var id = ++this._floatId;
     var floats = this.data.floats.concat([{ id: id, x: Math.floor(Math.random() * 120 - 60) }]);
-    this.setData({ merit: merit, floats: floats, muyuHit: id });
+    this.setData({ merit: merit, muyuTodayCount: count, floats: floats, muyuHit: id });
     if (wx.vibrateShort) wx.vibrateShort({ type: 'light' });
     this.playTick();
-    this.doCheckin();
+    if (count >= MUYU_CHECKIN_TARGET) this.doCheckin();
     var that = this;
     setTimeout(function () {
       that.setData({
@@ -279,7 +299,6 @@ Page({
     var that = this;
     this.setData({ burning: true });
     if (wx.vibrateShort) wx.vibrateShort({ type: 'medium' });
-    this.doCheckin();
     setTimeout(function () {
       that.setData({ burning: false, burned: true, worry: '' });
     }, 2000);
@@ -337,7 +356,6 @@ Page({
     }
     this.setData({ sutraDone: true });
     if (wx.vibrateShort) wx.vibrateShort({ type: 'medium' });
-    this.doCheckin();
     this.refreshStats();
   },
 
@@ -411,7 +429,6 @@ Page({
       src.start();
       this._rainSource = src;
       this.setData({ raining: true });
-      this.doCheckin();
     } catch (e) {
       wx.showToast({ title: '当前设备不支持音频合成', icon: 'none' });
     }

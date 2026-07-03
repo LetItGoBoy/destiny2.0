@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>十神心性小动物 Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #271915;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #eee;
+    }
+    .page {
+      width: min(980px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 26px 0 42px;
+    }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 42px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    .sub {
+      margin: 8px 0 0;
+      color: #7b6a61;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .pill {
+      flex: none;
+      color: #fff7e4;
+      background: linear-gradient(135deg, #8a2b27, #a3382f);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 10px 22px rgba(138, 43, 39, .22);
+    }
+    .sheet {
+      margin: 0 0 16px;
+      padding: 12px;
+      border-radius: 22px;
+      background: #fffdf9;
+      box-shadow: 0 20px 60px rgba(39, 25, 21, .08);
+    }
+    .sheet img {
+      display: block;
+      width: 100%;
+      border-radius: 16px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      padding: 18px;
+      border-radius: 24px;
+      background: #f7f3ed;
+      box-shadow: 0 20px 60px rgba(39, 25, 21, .08);
+    }
+    .card {
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+      padding: 14px 12px 12px;
+      border: 1px solid rgba(138, 43, 39, .08);
+      border-radius: 18px;
+      background: #fffdf9;
+    }
+    .badge {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #fff7e4;
+      background: linear-gradient(135deg, #8a2b27, #a3382f);
+      border-radius: 9px;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(138, 43, 39, .25);
+    }
+    .doodle {
+      position: absolute;
+      right: 12px;
+      top: 14px;
+      color: #ef7847;
+      font-size: 13px;
+      font-weight: 900;
+      transform: rotate(10deg);
+      writing-mode: vertical-rl;
+      opacity: .9;
+    }
+    .animal {
+      height: 128px;
+      display: grid;
+      place-items: end center;
+      margin-top: 8px;
+      font-size: 78px;
+      line-height: 1;
+      filter: drop-shadow(0 7px 0 rgba(255,255,255,.92)) drop-shadow(0 10px 12px rgba(102, 61, 42, .10));
+    }
+    .animal span {
+      display: block;
+      transform-origin: 50% 100%;
+    }
+    .card:nth-child(2n) .animal span { transform: rotate(-4deg); }
+    .card:nth-child(3n) .animal span { transform: rotate(4deg); }
+    .god {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      justify-content: center;
+      margin-top: 8px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .name {
+      color: #8a2b27;
+      font-size: 13px;
+      font-weight: 900;
+      background: rgba(138, 43, 39, .08);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+    .copy {
+      min-height: 44px;
+      margin: 8px 0 10px;
+      text-align: center;
+      color: #6a574e;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tag {
+      color: #ef7847;
+      border: 1px solid rgba(239, 120, 71, .24);
+      background: rgba(239, 120, 71, .08);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 3px solid #ff9b5f;
+      border-radius: 50%;
+      opacity: .45;
+    }
+    .card::before { left: 20px; bottom: 72px; }
+    .card::after { right: 24px; bottom: 94px; }
+    @media (max-width: 860px) {
+      .board { grid-template-columns: repeat(2, 1fr); padding: 12px; }
+      .hero { display: block; }
+      .pill { display: inline-flex; margin-top: 14px; }
+    }
+    @media (max-width: 420px) {
+      .board { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1>十神心性小动物</h1>
+        <p class="sub">贴纸包方向 demo：每个十神先定一只小动物、一组动作和三个关键词，后续可以替换成正式 PNG 资源。</p>
+      </div>
+      <div class="pill">宫墙红编号 · 橙色手写标注</div>
+    </section>
+
+    <section class="sheet">
+      <img src="./ten-gods-animal-stickers.png" alt="十神动物贴纸风格草图" />
+    </section>
+
+    <section class="board">
+      <article class="card">
+        <div class="badge">01</div><div class="doodle">自己来</div>
+        <div class="animal"><span>🐶</span></div>
+        <div class="god">比肩 <span class="name">稳稳柴</span></div>
+        <div class="copy">站得住、有主见，守边界也能扛事。</div>
+        <div class="tags"><span class="tag">独立</span><span class="tag">执行</span><span class="tag">硬气</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">02</div><div class="doodle">冲鸭</div>
+        <div class="animal"><span>🦊</span></div>
+        <div class="god">劫财 <span class="name">冲冲狐</span></div>
+        <div class="copy">敢争、讲义气，机会来了先上手。</div>
+        <div class="tags"><span class="tag">果敢</span><span class="tag">竞争</span><span class="tag">热血</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">03</div><div class="doodle">好吃</div>
+        <div class="animal"><span>🐰</span></div>
+        <div class="god">食神 <span class="name">松松兔</span></div>
+        <div class="copy">松弛、会享受，擅长把日子过舒服。</div>
+        <div class="tags"><span class="tag">温和</span><span class="tag">福气</span><span class="tag">内容感</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">04</div><div class="doodle">看我</div>
+        <div class="animal"><span>🐱</span></div>
+        <div class="god">伤官 <span class="name">闪闪猫</span></div>
+        <div class="copy">聪明有梗，表达欲强，适合出作品。</div>
+        <div class="tags"><span class="tag">才气</span><span class="tag">锋芒</span><span class="tag">创意</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">05</div><div class="doodle">会来事</div>
+        <div class="animal"><span>🐷</span></div>
+        <div class="god">偏财 <span class="name">旺旺猪</span></div>
+        <div class="copy">人脉活、机会感强，大方也会变通。</div>
+        <div class="tags"><span class="tag">资源</span><span class="tag">豪爽</span><span class="tag">灵活</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">06</div><div class="doodle">记账</div>
+        <div class="animal"><span>🐹</span></div>
+        <div class="god">正财 <span class="name">账账仓</span></div>
+        <div class="copy">务实、稳定，适合长期经营和积累。</div>
+        <div class="tags"><span class="tag">踏实</span><span class="tag">规划</span><span class="tag">守成</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">07</div><div class="doodle">不怕</div>
+        <div class="animal"><span>🐯</span></div>
+        <div class="god">七杀 <span class="name">勇勇虎</span></div>
+        <div class="copy">能扛压力，目标感强，敢打硬仗。</div>
+        <div class="tags"><span class="tag">决断</span><span class="tag">压力</span><span class="tag">开拓</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">08</div><div class="doodle">守规矩</div>
+        <div class="animal"><span>🦌</span></div>
+        <div class="god">正官 <span class="name">端端鹿</span></div>
+        <div class="copy">有分寸、重责任，讲秩序和名分。</div>
+        <div class="tags"><span class="tag">自律</span><span class="tag">体面</span><span class="tag">可靠</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">09</div><div class="doodle">想一想</div>
+        <div class="animal"><span>🦉</span></div>
+        <div class="god">偏印 <span class="name">谜谜鸮</span></div>
+        <div class="copy">爱钻研、直觉敏锐，脑回路很独特。</div>
+        <div class="tags"><span class="tag">洞察</span><span class="tag">专注</span><span class="tag">小众</span></div>
+      </article>
+      <article class="card">
+        <div class="badge">10</div><div class="doodle">抱抱</div>
+        <div class="animal"><span>🐑</span></div>
+        <div class="god">正印 <span class="name">软软羊</span></div>
+        <div class="copy">温厚、有托底感，重学习和保护。</div>
+        <div class="tags"><span class="tag">宽厚</span><span class="tag">贵人</span><span class="tag">安稳</span></div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
