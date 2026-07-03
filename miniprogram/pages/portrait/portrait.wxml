@@ -9,11 +9,6 @@
     </view>
   </view>
 
-  <view class="intro">
-    这张画像不展示八字原盘，只把命局里的心性结构拆成八段来看：一段一张卡，不再拆成上下两层。前半段更像先天投射，后半段更像内在反应；月令底色会承接相邻阶段，影响少年后段到入世初段的性格走向。
-    <text wx:if="{{!hasTime}}" class="intro-note">（未填出生时辰，后两段需要时柱信息，当前暂不可见）</text>
-  </view>
-
   <view class="card pol">
     <view class="pol-head">
       <text class="pol-t serif">两种底色</text>
@@ -41,7 +36,6 @@
 
   <view class="life-lead">
     <view class="life-title serif">八段人生</view>
-    <view class="life-note">每八年一段，把原来的阶段层次摊平成连续时间线；点开阶段卡即可查看这一段的主旋律。</view>
   </view>
 
   <view class="stage-acc">

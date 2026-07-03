@@ -275,28 +275,6 @@ var TEMP = {
           con: '依赖既有框架、反应偏慢、太在意体面认可；易假客气、藏真实态度；准备过多、怕离舒适区，开拓力不足。' }
 };
 
-// 十神 → 人生阶段「主旋律」（该柱天干在那段岁月的着力点；软措辞，不作硬性预测）
-var STAGE = {
-  比肩: '主旋律是靠自己站稳。这一程更想凡事自己拿主意、亲力亲为，做事有执行力、能扛事，节奏稳、不冒进；重平等也重边界，不爱欠人情、不喜欢被硬压着走，靠一点点积累守住属于自己的东西。只是启动偏慢，变化来得太快时容易跟不上。',
-  劫财: '主旋律是敢闯敢拼、人来人往。这一程胜负心强、反应快，敢冒险也敢顶事，做事果断、有爆发力；重朋友、讲义气，愿意为人出头，圈子感强，资源和机会来去都快。只是容易上头、用力过猛，也容易为人情冲动、替别人扛事。',
-  食神: '主旋律是顺势而为、张弛有度。这一程节奏偏舒缓，知足、重感受，不爱紧绷也不喜欢硬抢，擅长把能力慢慢变成内容、服务与口碑；待人厚道宽和、好相处，福气往往不请自来。只是动力容易不足，遇到强竞争时不够主动，也容易图舒坦而拖延。',
-  伤官: '主旋律是想突破、想被看见。这一程聪明、反应快，表达力和创造力都强，敢说真话、敢打破旧方式，靠才华、技术与个人魅力出头，最有棱角也最敢表达；重自由、重欣赏，不喜欢被人情和僵化规则绑住。只是锋芒难收时容易骄傲、不留余地，和权威、制度容易起冲突。',
-  偏财: '主旋律是机会多、人脉广。这一程眼光灵活、机会感强，善于在变化里找收益，敢试敢投、灵活切换；为人豪爽大方、不计较，能把关系和事情分开看，靠人脉、渠道与资金取势，钱财与缘分来去都比较活络。只是容易高估机会、押得太大，资源进出快、留存不稳。',
-  正财: '主旋律是踏实积累、稳扎稳打。这一程现实感强、重确定的回报，做事踏实本分、按计划推进，适合长期经营、慢慢攒下家底；重责任、重承诺，边界清楚，会管钱也守得住成果。只是节奏偏稳、变化感不足，太在意得失时容易显得保守、计较。',
-  七杀: '主旋律是压力与机遇并存。这一程危机感强、警觉性高，遇到压力和难题反而更被激发，果断敢冲、敢担事，擅长在复杂局面里抢出空间；欣赏强者、重实力与气场，扛得住时往往也是成长最快的阶段。只是容易紧绷、急躁、用力过猛，需要规则和分寸来约束这股劲。',
-  正官: '主旋律是重规矩、担责任。这一程看重秩序、身份与社会认可，做事稳重、按流程推进，愿意承担正式的角色，讲标准、讲交代、讲结果；为人温和得体、有分寸，靠自律和口碑一步步往上走。只是容易顾虑评价、怕越界，行动前思前想后，突破力偏弱。',
-  偏印: '主旋律是向内沉淀、钻研专精。这一程靠独立判断和非标准的专长立身，喜欢自己搭一套理解方式，适合用技术、研究或特殊经验打开局面；话不多、边界感强，精神空间需求高，独处时反而最有灵感。只是容易想得太深、多思少动，也容易显得孤僻、不近人情。',
-  正印: '主旋律是有庇护、重学习。这一程走正统路径、重基础与长期积累，常得师长、贵人之助，靠信誉与情义在平台和体系里稳稳成长；为人温和有礼、包容照顾，给人安全感。只是行动偏慢、准备过多，容易依赖既有框架，也容易为了不冲突而委屈自己。'
-};
-
-// 四柱 → 人生阶段（宫位/分限）
-var STAGE_META = {
-  年柱: { label: '少年', sub: '出身 · 童年根基' },
-  月柱: { label: '青年', sub: '求学 · 事业起步' },
-  日柱: { label: '中年', sub: '立身 · 婚姻家庭' },
-  时柱: { label: '晚年', sub: '子女 · 晚景归宿' }
-};
-
 // 日主天干 → 外在底色（第一印象）
 var CORE = {
   甲: { title: '甲木 · 栋梁', text: '像向上生长的大树，第一印象正直、有方向感，认定的事愿意一路扛到底；自带带头的气场。' },
@@ -800,34 +778,6 @@ function build(chart, opts) {
   if (opts.liuNianGZ && opts.liuNianGZ.length >= 2) branches.push({ zhi: opts.liuNianGZ.charAt(1), label: '流年' });
   var rels = relations.detect(branches);
 
-  // —— 人生四季：四柱分限速览（天干主旋律 + 地支内心） ——
-  var zhiGodByPos = {};
-  (m.zhiCells || []).forEach(function (c) { zhiGodByPos[c.pos] = c.god; });
-  var stages = chart.pillars.map(function (p) {
-    var sm = STAGE_META[p.label] || { label: p.label, sub: '' };
-    if (p.empty || !p.gan) return { label: sm.label, sub: sm.sub, empty: true };
-    var posChar = p.label.charAt(0);          // 年/月/日/时
-    var innerGod = zhiGodByPos[posChar];
-    var isDay = p.shiShenGan === '日主';
-    var theme, themeGod, desc;
-    if (isDay) {
-      theme = '自己'; themeGod = '日主';
-      desc = (TEMP[innerGod] || {}).desc || '';
-    } else {
-      var tt = TEMP[p.shiShenGan] || { name: p.shiShenGan };
-      theme = tt.name; themeGod = p.shiShenGan;
-      desc = STAGE[p.shiShenGan] || '';
-    }
-    return {
-      label: sm.label, sub: sm.sub, empty: false,
-      gan: p.gan.text, ganCls: p.gan.cls, zhi: p.zhi.text, zhiCls: p.zhi.cls,
-      theme: theme, themeGod: themeGod, desc: desc,
-      // 日柱主旋律已用日支内在心性，避免再重复同一十神的「内心」一行
-      innerName: isDay ? '' : ((TEMP[innerGod] || {}).name || ''),
-      inner: ''
-    };
-  });
-
   // 盘面
   var paimian = chart.pillars.map(function (p) {
     if (p.empty) return { label: p.label, empty: true };
@@ -858,7 +808,6 @@ function build(chart, opts) {
     luckInnerTrait: luckInnerTrait,
     branchList: branchList,
     relations: rels,
-    stages: stages,
     stagePortraits: stagePortraits,
     zhengNow: zhengNow, pianNow: 100 - zhengNow,
     hasLuck: m.hasLuck,
