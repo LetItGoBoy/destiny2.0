@@ -13,18 +13,26 @@ var STAGE_RANGES = [
   { key: 'life8', start: 57, end: 120 }
 ];
 
+// 命局特殊结构一句话解读（检测逻辑见 utils/analyze/portrait.js detectTraitPattern）
+var PATTERN_NOTES = {
+  食神制杀: '温和的输出与强悍的压力势均力敌、互相制衡：能把危机感转成章法，是很有张力的组合。',
+  羊刃驾杀: '刚劲与魄力互相咬合：敢扛硬仗、关键时刻压得住阵，但需要分寸来驾驭这股狠劲。',
+  身杀两停: '自我与挑战势均力敌：抗压耐打，压力越大越能被激发，越有目标越有劲。'
+};
+
 Page({
   data: {
     loaded: false,
     fs: 'std',
     meta: {},
     core: {},
-    paimian: [],
+    traitPattern: null,
     zhengNow: 50,
     pianNow: 50,
     hasTime: true,
     stagePortraits: [],
     openStageKey: 'life1',
+    currentStageKey: '',
     openLayers: {},
     luckStageIndex: 1,
     luckYear: null,
@@ -87,6 +95,7 @@ Page({
       loaded: true,
       meta: chart.meta,
       openStageKey: (STAGE_RANGES[defaultStageIndex] || STAGE_RANGES[0]).key,
+      currentStageKey: (STAGE_RANGES[defaultStageIndex] || STAGE_RANGES[0]).key,
       luckStageIndex: defaultStageIndex,
       luckYear: defaultYear
     });
@@ -249,7 +258,9 @@ Page({
 
     this.setData({
       core: p.core,
-      paimian: p.paimian,
+      traitPattern: p.traitPattern
+        ? { name: p.traitPattern.name, note: PATTERN_NOTES[p.traitPattern.name] || '' }
+        : null,
       zhengNow: p.zhengNow,
       pianNow: p.pianNow,
       hasTime: p.hasTime,
