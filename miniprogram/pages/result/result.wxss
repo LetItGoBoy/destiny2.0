@@ -1,5 +1,5 @@
 .page {
-  padding: 24rpx 24rpx 160rpx;
+  padding: 24rpx 24rpx calc(160rpx + env(safe-area-inset-bottom));
 }
 
 /* 选项卡 */

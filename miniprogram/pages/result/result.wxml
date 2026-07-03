@@ -146,7 +146,7 @@
 
       <view class="sy-row">
         <view class="sy-lab">大运</view>
-        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
           <view class="sy-strip">
             <view class="sy-cell {{dyIndex === item.index ? 'sy-on' : ''}}"
               wx:for="{{daYunBar}}" wx:key="index" bindtap="onDaYunTap" data-index="{{item.index}}">
@@ -165,7 +165,7 @@
 
       <view class="sy-row">
         <view class="sy-lab">流年</view>
-        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
           <view class="sy-strip">
             <view class="sy-cell {{lnIndex === item.index ? 'sy-on' : ''}}"
               wx:for="{{liuNianBar}}" wx:key="index" bindtap="onLiuNianTap" data-index="{{item.index}}">
@@ -181,7 +181,7 @@
 
       <view class="sy-row sy-liuyue" wx:if="{{liuYueBar.length}}">
         <view class="sy-lab">流月</view>
-        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
           <view class="sy-strip">
             <view class="sy-cell {{lyIndex === item.index ? 'sy-on' : ''}}"
               wx:for="{{liuYueBar}}" wx:key="index" bindtap="onLiuYueTap" data-index="{{item.index}}">
@@ -197,7 +197,7 @@
 
       <view class="sy-row sy-liuyue" wx:if="{{liuRiBar.length}}">
         <view class="sy-lab">流日</view>
-        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
           <view class="sy-strip">
             <view class="sy-cell {{lrIndex === item.index ? 'sy-on' : ''}}"
               wx:for="{{liuRiBar}}" wx:key="index" bindtap="onLiuRiTap" data-index="{{item.index}}">
@@ -265,7 +265,7 @@
 
     <view class="card yun-card">
       <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
-      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <scroll-view class="yun-scroll" scroll-x show-scrollbar="{{false}}">
         <view class="yun-strip">
           <view class="yun-cell {{qDyIndex === item.index ? 'yun-on' : ''}}"
             wx:for="{{qDaYunList}}" wx:key="index" bindtap="onQDaYun" data-index="{{item.index}}">
@@ -279,7 +279,7 @@
 
     <view class="card yun-card" wx:if="{{qLiuNianList.length}}">
       <view class="section-title serif">流年 <text class="section-note">{{qDaYunList[qDyIndex].gz}} 运内</text></view>
-      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <scroll-view class="yun-scroll" scroll-x show-scrollbar="{{false}}">
         <view class="yun-strip">
           <view class="yun-cell {{qLnIndex === item.index ? 'yun-on' : ''}}"
             wx:for="{{qLiuNianList}}" wx:key="index" bindtap="onQLiuNian" data-index="{{item.index}}">
