@@ -1,18 +1,39 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
   <view class="head">
-    <view class="head-title serif">{{isNow ? '此刻星象' : (meta.name || '未署名') + ' 的出生星图'}}</view>
-    <view class="head-sub">{{meta.chartStr}} · 日心视角</view>
+    <view class="head-title serif">{{isNow ? '此刻星象' : (meta.name || '未署名') + ' 的星象图'}}</view>
+    <view class="head-sub">{{viewLabel}} · 日心视角</view>
     <view class="head-bz serif" wx:if="{{baZiStr}}">{{baZiStr}}</view>
+  </view>
+
+  <view class="card time-panel">
+    <view class="time-pickers">
+      <picker class="time-picker" mode="date" value="{{viewDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onDateChange">
+        <view class="picker-chip">
+          <text class="picker-name">日期</text>
+          <text class="picker-value">{{viewDate}}</text>
+        </view>
+      </picker>
+      <picker class="time-picker" mode="time" value="{{viewTime}}" bindchange="onTimeChange">
+        <view class="picker-chip">
+          <text class="picker-name">时间</text>
+          <text class="picker-value">{{viewTime}}</text>
+        </view>
+      </picker>
+    </view>
+    <view class="time-actions">
+      <view class="time-btn primary {{flowing && !paused ? 'time-btn-live' : ''}}" bindtap="toggleFlow">{{flowing ? (paused ? '继续' : '暂停') : '时光流动'}}</view>
+      <view class="time-btn" bindtap="resetTime">{{isNow ? '回到此刻' : '回到出生'}}</view>
+    </view>
   </view>
 
   <!-- 3D 星图 -->
   <view class="sky-wrap">
     <canvas type="2d" id="sky" class="sky"
       bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
-    <view class="sky-tip">{{flowing ? '行星正按真实速度运行 · 水星疾驰而土星缓行' : (isNow ? '此刻星河 · 画面缓转仅为视角 · 点击星体看详情' : '星体定格于出生时刻 · 画面缓转仅为视角 · 点击星体看详情')}}</view>
-    <view class="flow-label" wx:if="{{flowing && flowLabel}}">{{flowLabel}}</view>
-    <view class="flow-btn {{flowing ? 'flow-btn-on' : ''}}" bindtap="toggleFlow">{{flowing ? (isNow ? '回到此刻' : '回到出生时刻') : '▶ 时光流动'}}</view>
+    <view class="sky-tip">{{flowing ? (paused ? '时光已暂停 · 点击星体看详情' : '行星正按真实速度运行 · 水星疾驰而土星缓行') : '可切换日期时间查看星象 · 点击星体看详情'}}</view>
+    <view class="flow-label" wx:if="{{flowDisplayLabel}}">{{flowDisplayLabel}}</view>
     <!-- 选中星体信息 -->
     <view class="sel-card" wx:if="{{selected}}" bindtap="closeSelected">
       <view class="sel-name serif {{selected.cls ? 'wx-' + selected.cls : ''}}">{{selected.name}}<text class="sel-ancient">{{selected.ancient}}</text></view>
@@ -22,7 +43,13 @@
 
   <!-- 七政位置表 -->
   <view class="card list-card">
-    <view class="list-title serif">{{isNow ? '此刻七政经纬' : '出生时刻七政经纬'}}</view>
+    <view class="list-title serif">所选时刻七政经纬</view>
+    <view class="astro-bazi" wx:if="{{baZiView.length}}">
+      <text class="astro-bazi-label">对应八字</text>
+      <text class="astro-bazi-pillar serif" wx:for="{{baZiView}}" wx:for-item="gz" wx:key="index">
+        <text class="wx-{{gz[0].cls}}">{{gz[0].text}}</text><text class="wx-{{gz[1].cls}}">{{gz[1].text}}</text>
+      </text>
+    </view>
     <view class="li" wx:for="{{list}}" wx:key="name">
       <text class="li-dot dot-{{item.cls}}"></text>
       <text class="li-name">{{item.name}}</text>
@@ -37,8 +64,8 @@
   <view class="card note-card">
     <view class="note-title serif">五星与五行</view>
     <view class="note-text">古人仰观天文，以五大行星命名五行：辰星（水星）、太白（金星）、荧惑（火星）、岁星（木星）、镇星（土星）。岁星十二年一周天，正是十二地支纪年的源头。</view>
-    <view class="note-text">需要说明的是：八字以节气历法为骨架——本质是地球绕太阳的位置（节气即太阳黄经每 15°），而非行星占星。此图呈现的是你出生那一刻太阳系的真实面貌，行星位置由轨道力学计算，精度约 1°。</view>
+    <view class="note-text">需要说明的是：八字以节气历法为骨架——本质是地球绕太阳的位置（节气即太阳黄经每 15°），而非行星占星。此图呈现的是所选时刻太阳系的真实面貌，行星位置由轨道力学计算，精度约 1°。</view>
   </view>
 
-  <view class="footer">{{isNow ? '行星位置由轨道力学实时计算，精度约 1°' : '星图基于真太阳时校正的出生时刻计算'}}</view>
+  <view class="footer">行星位置由轨道力学按所选时刻计算，精度约 1°</view>
 </view>

@@ -1,4 +1,5 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
   <!-- 命主信息 + 八字 -->
   <view class="card head-card">
@@ -14,6 +15,26 @@
       </view>
     </view>
     <view class="summary serif">{{summary}}</view>
+  </view>
+
+  <!-- 调候（首位） -->
+  <view class="card sec">
+    <view class="sec-head">
+      <text class="sec-tag tag-th">调候</text>
+      <text class="sec-title serif">气候{{tiaoHou.climate}} · {{tiaoHou.deLi}}</text>
+    </view>
+    <view class="chip-row" wx:if="{{tiaoHou.yong.length}}">
+      <text class="chip-label">用神</text>
+      <view class="yong-chip" wx:for="{{tiaoHou.yong}}" wx:key="gan">
+        <text class="yong-gan serif wx-{{item.cls}}">{{item.gan}}</text>
+        <text class="yong-status {{item.status === '透干' ? 'st-tou' : (item.status === '藏支' ? 'st-cang' : 'st-none')}}">{{item.status}}</text>
+      </view>
+    </view>
+    <view class="chip-row" wx:if="{{tiaoHou.xiYong.length}}">
+      <text class="chip-label">喜用</text>
+      <text class="wx-chip wx-{{item.cls}}" wx:for="{{tiaoHou.xiYong}}" wx:key="gan">{{item.gan}}</text>
+    </view>
+    <view class="sec-line" wx:for="{{tiaoHou.lines}}" wx:key="*this">{{item}}</view>
   </view>
 
   <!-- 旺衰 -->
@@ -40,22 +61,49 @@
       </block>
     </view>
     <view class="sec-note">{{wangShuai.xiNote}}</view>
-  </view>
 
-  <!-- 调候 -->
-  <view class="card sec">
-    <view class="sec-head">
-      <text class="sec-tag tag-th">调候</text>
-      <text class="sec-title serif">气候{{tiaoHou.climate}} · {{tiaoHou.deLi}}</text>
+    <!-- 计算过程折叠面板 -->
+    <view class="calc-toggle" bindtap="onToggleBreakdown">
+      <text class="calc-toggle-text">{{showBreakdown ? '收起' : '展开'}}计算过程</text>
+      <text class="calc-arrow {{showBreakdown ? 'calc-arrow-up' : ''}}">▾</text>
     </view>
-    <view class="chip-row" wx:if="{{tiaoHou.yong.length}}">
-      <text class="chip-label">用神</text>
-      <view class="yong-chip" wx:for="{{tiaoHou.yong}}" wx:key="gan">
-        <text class="yong-gan serif wx-{{item.cls}}">{{item.gan}}</text>
-        <text class="yong-status {{item.status === '透干' ? 'st-tou' : (item.status === '藏支' ? 'st-cang' : 'st-none')}}">{{item.status}}</text>
+    <view wx:if="{{showBreakdown}}" class="calc-breakdown">
+      <!-- 逐字明细 -->
+      <view class="bd-row {{item.pillarIdx > 0 && item.isGanRow ? 'bd-sep' : ''}}"
+            wx:for="{{wangShuai.breakdown}}" wx:key="label">
+        <text class="bd-pos">{{item.label}}</text>
+        <text class="bd-char wx-{{item.cls}}">{{item.char}}</text>
+        <text class="bd-godwx">{{item.godWx}}</text>
+        <text class="bd-math {{item.party === 'same' ? 'bd-same' : (item.party === 'diff' ? 'bd-diff' : 'bd-day')}}">{{item.math}}</text>
+        <text class="bd-ptag {{item.party === 'same' ? 'bd-same' : (item.party === 'diff' ? 'bd-diff' : '')}}">
+          {{item.party === 'same' ? '生扶' : (item.party === 'diff' ? '克泄耗' : '')}}
+        </text>
+      </view>
+      <!-- 汇总行 -->
+      <view class="bd-footer">
+        <view class="bd-foot-row">
+          <text class="bd-foot-lbl">生扶合计</text>
+          <text class="bd-same bd-foot-val">{{wangShuai.rawSame}}</text>
+          <text class="bd-foot-sep">·</text>
+          <text class="bd-foot-lbl">克泄耗合计</text>
+          <text class="bd-diff bd-foot-val">{{wangShuai.rawDiff}}</text>
+        </view>
+        <view class="bd-foot-row">
+          <text class="bd-foot-lbl">原始比例</text>
+          <text class="bd-foot-val">{{wangShuai.rawSame}} ÷ {{wangShuai.rawTotal}} = {{wangShuai.samePct}}%</text>
+        </view>
+        <view class="bd-foot-row" wx:for="{{wangShuai.bonusLines}}" wx:key="label" wx:for-item="bl">
+          <text class="bd-foot-lbl">三才·{{bl.label}}</text>
+          <text class="bd-same bd-foot-val">{{bl.val}}</text>
+          <text class="bd-foot-note">{{bl.note}}</text>
+        </view>
+        <view class="bd-foot-row bd-foot-total">
+          <text class="bd-foot-lbl">有效强度</text>
+          <text class="bd-same bd-foot-val">{{wangShuai.scorePct}}%</text>
+          <text class="bd-foot-result">→ 日主{{wangShuai.special || wangShuai.level}}</text>
+        </view>
       </view>
     </view>
-    <view class="sec-line" wx:for="{{tiaoHou.lines}}" wx:key="*this">{{item}}</view>
   </view>
 
   <!-- 格局 -->

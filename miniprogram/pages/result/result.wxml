@@ -1,17 +1,12 @@
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
   <!-- 选项卡 -->
   <view class="tabs">
     <view class="tab serif {{tab === 'base' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="base">基础盘</view>
     <view class="tab serif {{tab === 'detail' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="detail">详盘</view>
     <view class="tab serif {{tab === 'info' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="info">基本信息</view>
-  </view>
-
-  <!-- 盘面页：仅保留精简生日条 -->
-  <view class="card birth-strip" wx:if="{{tab !== 'info'}}">
-    <text class="info-tag {{meta.gender === 1 ? 'tag-m' : 'tag-f'}}">{{meta.gender === 1 ? '乾造' : '坤造'}}</text>
-    <text class="birth-main">{{meta.clockStr}}</text>
-    <text class="birth-lunar">{{meta.lunarShort}}</text>
+    <view class="tab tab-energy serif {{tab === 'energy' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="energy">能量盘<text class="tab-free">免费</text></view>
   </view>
 
   <!-- 出生星图入口（基础盘内，默认静止，进入后可时光流动）-->
@@ -44,157 +39,263 @@
   </view>
 
   <!-- 命盘表：基础盘四柱 / 详盘六柱（大运、流年在左） -->
-  <view class="card chart" wx:if="{{tab !== 'info'}}">
+  <view class="card chart" wx:if="{{tab === 'base' || tab === 'detail'}}">
     <view class="chart-row head-row">
       <view class="cell label-cell"></view>
-      <view class="cell head-cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell head-cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <view class="serif head-name">{{item.label}}</view>
-        <view class="head-sub" wx:if="{{item.sub}}">{{item.sub}}</view>
+        <view class="head-sub" wx:if="{{item.sub && !item.empty}}">{{item.sub}}</view>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">主星</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text wx:if="{{item.empty}}" class="dim">—</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
         <text wx:elif="{{item.shiShenGan === '日主'}}" class="rizhu">日主</text>
         <text wx:else class="shishen" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
       </view>
     </view>
 
-    <view class="chart-row">
+    <view class="chart-row gan-zhi-row">
       <view class="cell label-cell">天干</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
           <view class="wx-mark wx-{{item.gan.cls}}"><view class="el-ico el-{{item.gan.cls}}"></view><text>{{item.gan.wx}}</text></view>
         </block>
-        <text wx:else class="dim">—</text>
+        <text wx:else class="dim">*</text>
       </view>
     </view>
 
-    <view class="chart-row">
+    <view class="chart-row gan-zhi-row">
       <view class="cell label-cell">地支</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <block wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
           <view class="wx-mark wx-{{item.zhi.cls}}"><view class="el-ico el-{{item.zhi.cls}}"></view><text>{{item.zhi.wx}}</text></view>
         </block>
-        <text wx:else class="dim">—</text>
+        <text wx:else class="dim">*</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">藏干</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text"
           bindtap="onTermTap" data-term="{{hg.shiShen}}">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
           <text class="hg-ss">{{hg.shiShen}}</text>
         </view>
-        <text wx:if="{{item.empty}}" class="dim">—</text>
+        <text wx:if="{{item.empty}}" class="dim">*</text>
       </view>
     </view>
 
+    <view class="sub-toggle" bindtap="onToggleSubRows">
+      <text class="sub-toggle-t">{{showSubRows ? '收起' : '展开'}}星运 · 自坐 · 空亡 · 纳音 · 神煞</text>
+      <text class="sub-arrow {{showSubRows ? 'sub-arrow-up' : ''}}">▾</text>
+    </view>
+    <block wx:if="{{showSubRows}}">
     <view class="chart-row">
       <view class="cell label-cell">星运</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.empty ? '—' : item.xingYun}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.xingYun}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">自坐</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.empty ? '—' : item.ziZuo}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.ziZuo}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">空亡</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain dim">{{item.empty ? '—' : item.xunKong}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain">{{item.xunKong}}</text>
       </view>
     </view>
 
     <view class="chart-row">
       <view class="cell label-cell">纳音</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="plain dim naying" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.empty ? '—' : item.naYin}}</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text wx:if="{{item.empty}}" class="dim">*</text>
+        <text wx:else class="plain naying" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.naYin}}</text>
       </view>
     </view>
 
     <view class="chart-row no-line shensha-row">
       <view class="cell label-cell">神煞</view>
-      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="ss-item" wx:for="{{item.shenSha}}" wx:for-item="ss" wx:key="*this"
-          bindtap="onTermTap" data-term="{{ss}}">{{ss}}</text>
-        <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">—</text>
+      <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
+        <text class="ss-item" wx:if="{{!item.empty && item.shenSha.length}}"
+          bindtap="onTermTap" data-term="{{item.shenSha[0]}}">{{item.shenSha[0]}}</text>
+        <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">*</text>
       </view>
     </view>
+    </block>
   </view>
 
-  <!-- 详盘：大运/流年选择条 + 流月 -->
+  <!-- 详盘：岁运密集表（大运 / 流年 / 流月 / 流日 一屏铺开） -->
   <block wx:if="{{tab === 'detail'}}">
-    <view class="card yun-card">
-      <view class="section-title serif">大运 <text class="section-note">{{meta.qiYun}} · 点击切换上表大运柱</text></view>
-      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-        <view class="yun-strip">
-          <view class="yun-cell {{dyIndex === item.index ? 'yun-on' : ''}}"
-            wx:for="{{daYunBar}}" wx:key="index"
-            bindtap="onDaYunTap" data-index="{{item.index}}">
-            <block wx:if="{{item.isQian}}">
-              <view class="yun-ss">　</view>
-              <view class="yun-gz serif dim">童限</view>
-            </block>
-            <block wx:else>
-              <view class="yun-ss" catchtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
-              <view class="yun-gz serif">
-                <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
-              </view>
-            </block>
-            <view class="yun-year">{{item.startYear}}</view>
-            <view class="yun-age">{{item.startAge}}岁</view>
+    <view class="card sy-card">
+      <view class="section-title serif">岁运 <text class="section-note">点选切换上表岁运柱 · 柱底标刑冲合害</text></view>
+
+      <view class="sy-row">
+        <view class="sy-lab">大运</view>
+        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="sy-strip">
+            <view class="sy-cell {{dyIndex === item.index ? 'sy-on' : ''}}"
+              wx:for="{{daYunBar}}" wx:key="index" bindtap="onDaYunTap" data-index="{{item.index}}">
+              <view wx:if="{{item.isQian}}" class="sy-qian serif">童限</view>
+              <block wx:else>
+                <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
+                <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
+                <view class="sy-rels">
+                  <text class="sy-rel sy-rel-{{r.cls}}" wx:for="{{item.rels}}" wx:for-item="r" wx:key="cls">{{r.t}}</text>
+                </view>
+              </block>
+            </view>
           </view>
+        </scroll-view>
+      </view>
+
+      <view class="sy-row">
+        <view class="sy-lab">流年</view>
+        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="sy-strip">
+            <view class="sy-cell {{lnIndex === item.index ? 'sy-on' : ''}}"
+              wx:for="{{liuNianBar}}" wx:key="index" bindtap="onLiuNianTap" data-index="{{item.index}}">
+              <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
+              <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
+              <view class="sy-rels">
+                <text class="sy-rel sy-rel-{{r.cls}}" wx:for="{{item.rels}}" wx:for-item="r" wx:key="cls">{{r.t}}</text>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <view class="sy-row sy-liuyue" wx:if="{{liuYueBar.length}}">
+        <view class="sy-lab">流月</view>
+        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="sy-strip">
+            <view class="sy-cell {{lyIndex === item.index ? 'sy-on' : ''}}"
+              wx:for="{{liuYueBar}}" wx:key="index" bindtap="onLiuYueTap" data-index="{{item.index}}">
+              <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
+              <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
+              <view class="sy-rels">
+                <text class="sy-rel sy-rel-{{r.cls}}" wx:for="{{item.rels}}" wx:for-item="r" wx:key="cls">{{r.t}}</text>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <view class="sy-row sy-liuyue" wx:if="{{liuRiBar.length}}">
+        <view class="sy-lab">流日</view>
+        <scroll-view class="sy-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+          <view class="sy-strip">
+            <view class="sy-cell {{lrIndex === item.index ? 'sy-on' : ''}}"
+              wx:for="{{liuRiBar}}" wx:key="index" bindtap="onLiuRiTap" data-index="{{item.index}}">
+              <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
+              <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
+              <view class="sy-rels">
+                <text class="sy-rel sy-rel-{{r.cls}}" wx:for="{{item.rels}}" wx:for-item="r" wx:key="cls">{{r.t}}</text>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 能量盘 -->
+  <block wx:if="{{tab === 'energy'}}">
+    <view class="q-curbar card">
+      <text class="q-cur">{{qCurLabel}}</text>
+      <text class="q-tip">日主{{meta.dayGan}}</text>
+    </view>
+
+    <view class="modes">
+      <view class="mode {{qMode === 'fill' ? 'on' : ''}}" bindtap="onQMode" data-mode="fill">充能水位</view>
+      <view class="mode {{qMode === 'size' ? 'on' : ''}}" bindtap="onQMode" data-mode="size">字号大小</view>
+    </view>
+
+    <view class="card disk">
+      <view class="cols">
+        <view class="ch-col" wx:for="{{qGanCells}}" wx:key="pos"><text class="pos">{{item.pos}}</text></view>
+      </view>
+      <view class="cells">
+        <view class="q-cell" wx:for="{{qGanCells}}" wx:key="pos">
+          <view wx:if="{{qMode === 'fill'}}" class="fillbox {{item.isDay ? 'is-day' : ''}}">
+            <view class="fill bg-{{item.cls}}" style="height:{{item.fill}}%"></view>
+            <text class="fill-ch">{{item.char}}</text>
+          </view>
+          <view wx:else class="sizebox {{item.isDay ? 'is-day' : ''}}">
+            <text class="size-ch wx-{{item.cls}}" style="font-size:{{item.fs}}rpx">{{item.char}}</text>
+          </view>
+          <text class="qgod">{{item.god}}</text>
         </view>
-      </scroll-view>
+      </view>
+      <view class="cells">
+        <view class="q-cell" wx:for="{{qZhiCells}}" wx:key="pos">
+          <view wx:if="{{qMode === 'fill'}}" class="fillbox">
+            <view class="fill bg-{{item.cls}}" style="height:{{item.fill}}%"></view>
+            <text class="fill-ch">{{item.char}}</text>
+          </view>
+          <view wx:else class="sizebox">
+            <text class="size-ch wx-{{item.cls}}" style="font-size:{{item.fs}}rpx">{{item.char}}</text>
+          </view>
+          <text class="qgod">{{item.god}}</text>
+        </view>
+      </view>
+      <view class="ws">
+        <view class="ws-bar"><view class="ws-same" style="width:{{qpNow}}%"></view></view>
+        <view class="ws-legend">
+          <text class="lg-same">生扶 {{qpNow}}%</text>
+          <text class="lg-delta" wx:if="{{qHasLuck && qpNow !== qpBase}}">原局 {{qpBase}}% → {{qpNow}}%</text>
+          <text class="lg-diff">克泄耗 {{100 - qpNow}}%</text>
+        </view>
+      </view>
     </view>
 
     <view class="card yun-card">
-      <view class="section-title serif">流年 <text class="section-note">点击切换上表流年柱</text></view>
+      <view class="section-title serif">大运 <text class="section-note">点选叠加，重复点取消</text></view>
       <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
         <view class="yun-strip">
-          <view class="yun-cell {{lnIndex === item.index ? 'yun-on' : ''}}"
-            wx:for="{{liuNianBar}}" wx:key="index"
-            bindtap="onLiuNianTap" data-index="{{item.index}}">
-            <view class="yun-ss" catchtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
-            <view class="yun-gz serif">
-              <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
-            </view>
-            <view class="yun-year">{{item.year}}</view>
+          <view class="yun-cell {{qDyIndex === item.index ? 'yun-on' : ''}}"
+            wx:for="{{qDaYunList}}" wx:key="index" bindtap="onQDaYun" data-index="{{item.index}}">
+            <view class="yun-ss">{{item.god}}</view>
+            <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
             <view class="yun-age">{{item.age}}岁</view>
           </view>
         </view>
       </scroll-view>
     </view>
 
-    <!-- 流月 -->
-    <view class="card yun-card" wx:if="{{selLiuNian}}">
-      <view class="section-title serif">流月 <text class="section-note">{{selLiuNian.year}}年（农历）</text></view>
-      <view class="liuyue-grid">
-        <view class="liuyue-cell" wx:for="{{selLiuNian.liuYue}}" wx:key="name">
-          <view class="ly-name">{{item.name}}</view>
-          <view class="ly-gz serif">
-            <text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text>
+    <view class="card yun-card" wx:if="{{qLiuNianList.length}}">
+      <view class="section-title serif">流年 <text class="section-note">{{qDaYunList[qDyIndex].gz}} 运内</text></view>
+      <scroll-view class="yun-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="yun-strip">
+          <view class="yun-cell {{qLnIndex === item.index ? 'yun-on' : ''}}"
+            wx:for="{{qLiuNianList}}" wx:key="index" bindtap="onQLiuNian" data-index="{{item.index}}">
+            <view class="yun-ss">{{item.god}}</view>
+            <view class="yun-gz serif"><text class="wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="wx-{{item.zhi.cls}}">{{item.zhi.text}}</text></view>
+            <view class="yun-year">{{item.year}}</view>
           </view>
-          <view class="ly-ss" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</view>
         </view>
-      </view>
+      </scroll-view>
     </view>
+
+    <view class="q-foot">字越大 / 水位越高，该字（十神）能量越强 · 岁运令原局逐字升降</view>
   </block>
 
   <!-- 五行 -->
-  <view class="card wuxing" wx:if="{{tab !== 'info'}}">
+  <view class="card wuxing" wx:if="{{tab === 'base' || tab === 'detail'}}">
     <view class="section-title serif">五行</view>
     <view class="wx-bar">
       <view class="wx-item" wx:for="{{wuXing}}" wx:key="wx">
@@ -206,12 +307,13 @@
 
   <view class="bottom-space"></view>
 
-  <!-- 底部操作栏：保存 + 详批 -->
+  <!-- 底部操作栏：保存 + 性格画像 -->
   <view class="savebar">
     <button class="btn-save {{saved ? 'btn-saved' : ''}}" bindtap="onSave">
       {{saved ? '已保存' : '保存'}}
     </button>
-    <button class="btn-xiangpi" bindtap="onXiangPi">详批</button>
+    <button class="btn-record" bindtap="goRecords">记录</button>
+    <button class="btn-xiangpi" bindtap="onXiangPi">获取画像</button>
   </view>
 
   <!-- 词条解读卡（十神/长生/神煞/纳音） -->

@@ -1,7 +1,42 @@
 <view class="page">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
+
   <view class="head">
     <view class="head-title serif">疗愈空间</view>
     <view class="head-sub">慢下来，给心一点空隙</view>
+  </view>
+
+  <!-- 今日心语 -->
+  <view class="quote-card card">
+    <view class="quote-label">今日心语</view>
+    <view class="quote-text serif">{{todayQuote}}</view>
+  </view>
+
+  <!-- 我的修行：连续打卡 + 累计成就 -->
+  <view class="practice card">
+    <view class="practice-top">
+      <view class="pt-streak">
+        <text class="pt-num serif {{checkedToday ? 'pt-on' : ''}}">{{streak}}</text>
+        <text class="pt-unit">天</text>
+        <view class="pt-cap">连续打卡{{checkedToday ? ' · 今日已修行' : ' · 今日待修行'}}</view>
+      </view>
+      <view class="pt-stats">
+        <view class="pt-stat"><text class="pt-sv serif">{{merit}}</text><text class="pt-sl">功德</text></view>
+        <view class="pt-stat"><text class="pt-sv serif">{{points}}</text><text class="pt-sl">积分</text></view>
+        <view class="pt-stat"><text class="pt-sv serif">{{totalDays}}</text><text class="pt-sl">累计天</text></view>
+        <view class="pt-stat"><text class="pt-sv serif">{{sutraCount}}</text><text class="pt-sl">抄经</text></view>
+      </view>
+    </view>
+    <view class="ach-row-t">累计成就 <text class="ach-prog">{{achGot}}/{{achievements.length}}</text></view>
+    <scroll-view class="ach-scroll" scroll-x="true">
+      <view class="ach-list">
+        <view class="ach {{item.ok ? 'ach-on' : ''}}" wx:for="{{achievements}}" wx:key="key">
+          <view class="ach-ico">{{item.ok ? item.icon : '🔒'}}</view>
+          <view class="ach-name">{{item.name}}</view>
+          <view class="ach-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 
   <!-- 模块入口 -->
@@ -14,7 +49,7 @@
     <view class="mod card mod-muyu" hover-class="mod-hover" bindtap="openMode" data-mode="muyu">
       <view class="mod-ico"><view class="mod-ico-img ico-muyu"></view></view>
       <view class="mod-title serif">电子木鱼</view>
-      <view class="mod-sub">敲一敲 · 功德 {{merit}}</view>
+      <view class="mod-sub">今日 {{muyuTodayCount}}/{{muyuCheckinTarget}} · 功德 {{merit}}</view>
     </view>
     <view class="mod card mod-burn" hover-class="mod-hover" bindtap="openMode" data-mode="burn">
       <view class="mod-ico"><view class="mod-ico-img ico-burn"></view></view>
@@ -25,6 +60,11 @@
       <view class="mod-ico"><view class="mod-ico-img ico-rain"></view></view>
       <view class="mod-title serif">静心雨声</view>
       <view class="mod-sub">{{raining ? '正在播放 · 点击停止' : '白噪音 · 助眠专注'}}</view>
+    </view>
+    <view class="mod card mod-sutra" hover-class="mod-hover" bindtap="openMode" data-mode="sutra">
+      <view class="mod-ico"><view class="mod-ico-img ico-sutra"></view></view>
+      <view class="mod-title serif">每日抄经<text class="mod-flag" wx:if="{{sutraTodayDone}}">今日已完成</text></view>
+      <view class="mod-sub">逐字描红 · 一笔一念皆安宁</view>
     </view>
   </view>
 
@@ -45,6 +85,7 @@
   <view class="overlay" wx:if="{{mode === 'muyu'}}">
     <view class="ov-close" bindtap="closeMode">✕</view>
     <view class="merit-count">功德 <text class="merit-num serif">{{merit}}</text></view>
+    <view class="muyu-checkin">今日木鱼 {{muyuTodayCount}}/{{muyuCheckinTarget}} · 达成打卡送积分</view>
     <view class="muyu-stage" bindtap="onMuyuTap">
       <view class="muyu-body {{muyuHit ? 'muyu-hit-' + (muyuHit % 2) : ''}}">
         <view class="muyu-slit"></view>
@@ -53,7 +94,7 @@
       <view class="merit-float serif" wx:for="{{floats}}" wx:key="id"
         style="margin-left: {{item.x}}rpx;">功德 +1</view>
     </view>
-    <view class="muyu-tip">轻敲木鱼，烦恼随声而散</view>
+    <view class="muyu-tip">每天轻敲 10 次，算一次修行打卡</view>
   </view>
 
   <!-- 烦恼焚化 -->
@@ -78,5 +119,24 @@
         <view class="burn-again" bindtap="onBurnAgain">再写一条</view>
       </view>
     </block>
+  </view>
+
+  <!-- 每日抄经 -->
+  <view class="overlay" wx:if="{{mode === 'sutra'}}">
+    <view class="ov-close" bindtap="closeMode">✕</view>
+    <view class="sutra-title serif">{{sutraTitle}}</view>
+    <view class="sutra-prog">{{sutraDone ? '已抄毕' : '描红 ' + sutraInk + ' / ' + sutraTotal}}</view>
+    <view class="sutra-grid">
+      <text class="sutra-ch serif {{item.punct ? 'sutra-punct' : ''}} {{item.ink ? 'sutra-inked' : ''}}"
+        wx:for="{{sutraChars}}" wx:key="index" data-i="{{index}}" bindtap="onSutraChar">{{item.ch}}</text>
+    </view>
+    <block wx:if="{{sutraDone}}">
+      <view class="sutra-done-text">心随笔静，今日抄经圆满</view>
+      <view class="sutra-actions">
+        <view class="sutra-again" bindtap="resetSutra">再抄一遍</view>
+        <view class="sutra-back" bindtap="closeMode">完成</view>
+      </view>
+    </block>
+    <view class="sutra-tip" wx:else>逐字轻点，让笔画在心里落下</view>
   </view>
 </view>

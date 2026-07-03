@@ -1,0 +1,266 @@
+var bazi = require('../../utils/bazi.js');
+var portrait = require('../../utils/analyze/portrait.js');
+var prefs = require('../../utils/prefs.js');
+
+var STAGE_RANGES = [
+  { key: 'life1', start: 0, end: 7 },
+  { key: 'life2', start: 8, end: 16 },
+  { key: 'life3', start: 17, end: 24 },
+  { key: 'life4', start: 25, end: 32 },
+  { key: 'life5', start: 33, end: 40 },
+  { key: 'life6', start: 41, end: 48 },
+  { key: 'life7', start: 49, end: 56 },
+  { key: 'life8', start: 57, end: 120 }
+];
+
+Page({
+  data: {
+    loaded: false,
+    fs: 'std',
+    meta: {},
+    core: {},
+    paimian: [],
+    zhengNow: 50,
+    pianNow: 50,
+    hasTime: true,
+    stagePortraits: [],
+    openStageKey: 'life1',
+    openLayers: {},
+    luckStageIndex: 1,
+    luckYear: null,
+    luckYearList: [],
+    luckPortrait: null,
+    luckFlow: null,
+    relations: []
+  },
+
+  onLoad: function (options) {
+    this.setData({ fs: prefs.getFontSize() });
+    var input = null;
+    try {
+      input = JSON.parse(decodeURIComponent(options.input));
+    } catch (e) {}
+    if (!input) {
+      wx.showToast({ title: '参数有误', icon: 'none' });
+      setTimeout(function () { wx.navigateBack(); }, 1200);
+      return;
+    }
+    this._input = input;
+
+    var chart;
+    try {
+      chart = bazi.computeChart(input);
+    } catch (e) {
+      wx.showToast({ title: '分析失败，请重试', icon: 'none' });
+      setTimeout(function () { wx.navigateBack(); }, 1200);
+      return;
+    }
+    this._chart = chart;
+    this._birthYear = new Date(chart.meta.timestamp).getFullYear();
+
+    this._dy = (chart.daYun || []).filter(function (d) {
+      return d.ganZhi && !d.isQian;
+    }).map(function (d, i) {
+      return {
+        index: i,
+        gz: d.ganZhi,
+        gan: d.gan,
+        zhi: d.zhi,
+        god: d.shiShenGan,
+        age: d.startAge + '-' + d.endAge,
+        _liuNian: d.liuNian || []
+      };
+    });
+
+    this._yearMap = {};
+    var self = this;
+    this._dy.forEach(function (d) {
+      (d._liuNian || []).forEach(function (x, i) {
+        self._yearMap[x.year] = { dy: d.index, ln: i };
+      });
+    });
+
+    var currentYear = new Date().getFullYear();
+    var defaultStageIndex = this.stageIndexForYear(currentYear);
+    var defaultYear = this.ensureLuckYear(defaultStageIndex, currentYear);
+    this.setData({
+      loaded: true,
+      meta: chart.meta,
+      openStageKey: (STAGE_RANGES[defaultStageIndex] || STAGE_RANGES[0]).key,
+      luckStageIndex: defaultStageIndex,
+      luckYear: defaultYear
+    });
+    this.recompute();
+  },
+
+  stageIndexForYear: function (year) {
+    var birthYear = this._birthYear || new Date().getFullYear();
+    var age = year - birthYear;
+    for (var i = 0; i < STAGE_RANGES.length; i++) {
+      if (age >= STAGE_RANGES[i].start && age <= STAGE_RANGES[i].end) return i;
+    }
+    return age < 0 ? 0 : STAGE_RANGES.length - 1;
+  },
+
+  layerOpen: function (stageKey, layerKey) {
+    var key = stageKey + ':' + layerKey;
+    return this.data.openLayers[key] !== false;
+  },
+
+  applyLayerOpen: function (stages, luckPortrait) {
+    var self = this;
+    (stages || []).forEach(function (stage) {
+      if (stage.layer) stage.layer.open = self.layerOpen(stage.key, 'main');
+    });
+    if (luckPortrait) {
+      if (luckPortrait.layer) luckPortrait.layer.open = this.layerOpen('luck', 'main');
+    }
+  },
+
+  toggleStage: function (e) {
+    var key = e.currentTarget.dataset.key;
+    var next = this.data.openStageKey === key ? '' : key;
+    var patch = { openStageKey: next };
+    if (next === 'luck') {
+      patch.luckYear = this.ensureLuckYear(this.data.luckStageIndex, this.data.luckYear);
+    }
+    var self = this;
+    this.setData(patch, function () { self.recompute(); });
+  },
+
+  toggleLayer: function (e) {
+    var stage = e.currentTarget.dataset.stage;
+    var layer = e.currentTarget.dataset.layer;
+    if (!stage || !layer) return;
+    var key = stage + ':' + layer;
+    var next = {};
+    for (var k in this.data.openLayers) next[k] = this.data.openLayers[k];
+    next[key] = this.data.openLayers[key] === false;
+    var self = this;
+    this.setData({ openLayers: next }, function () { self.recompute(); });
+  },
+
+  selectLuckStage: function (e) {
+    var idx = Number(e.currentTarget.dataset.index);
+    var year = this.ensureLuckYear(idx, this.data.luckYear);
+    var self = this;
+    this.setData({
+      openStageKey: 'luck',
+      luckStageIndex: idx,
+      luckYear: year
+    }, function () { self.recompute(); });
+  },
+
+  selectLuckYear: function (e) {
+    var year = Number(e.currentTarget.dataset.year);
+    var self = this;
+    this.setData({
+      openStageKey: 'luck',
+      luckYear: year
+    }, function () { self.recompute(); });
+  },
+
+  stepLuckYear: function (e) {
+    var delta = Number(e.currentTarget.dataset.d);
+    var list = this.buildLuckYearList(this.data.luckStageIndex, this.data.luckYear);
+    if (!list.length) return;
+    var cur = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].year === this.data.luckYear) { cur = i; break; }
+    }
+    var next = Math.max(0, Math.min(list.length - 1, cur + delta));
+    var self = this;
+    this.setData({
+      openStageKey: 'luck',
+      luckYear: list[next].year
+    }, function () { self.recompute(); });
+  },
+
+  ensureLuckYear: function (stageIndex, preferredYear) {
+    var list = this.buildLuckYearList(stageIndex, preferredYear);
+    if (!list.length) return null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].year === preferredYear) return preferredYear;
+    }
+    return list[0].year;
+  },
+
+  buildLuckYearList: function (stageIndex, activeYear) {
+    var range = STAGE_RANGES[stageIndex] || STAGE_RANGES[1];
+    var birthYear = this._birthYear || new Date().getFullYear();
+    var out = [];
+    var years = Object.keys(this._yearMap || {}).map(function (y) { return Number(y); });
+    years.sort(function (a, b) { return a - b; });
+    for (var i = 0; i < years.length; i++) {
+      var year = years[i];
+      var age = year - birthYear;
+      if (age < range.start || age > range.end) continue;
+      var sel = this._yearMap[year];
+      var dy = this._dy[sel.dy];
+      var ln = dy && dy._liuNian ? dy._liuNian[sel.ln] : null;
+      if (!ln) continue;
+      out.push({
+        year: year,
+        age: age,
+        gz: ln.ganZhi,
+        active: year === activeYear
+      });
+    }
+    return out;
+  },
+
+  selectionForLuckYear: function (year) {
+    if (year == null) return {};
+    var sel = this._yearMap[year];
+    if (!sel) return {};
+    var dy = this._dy[sel.dy];
+    var ln = dy && dy._liuNian ? dy._liuNian[sel.ln] : null;
+    if (!dy || !ln) return {};
+    return {
+      daYunGZ: dy.gz,
+      liuNianGZ: ln.ganZhi
+    };
+  },
+
+  recompute: function () {
+    var luckYear = this.data.luckYear;
+    var luckYearList = this.buildLuckYearList(this.data.luckStageIndex, luckYear);
+    if (this.data.openStageKey === 'luck' && luckYearList.length) {
+      var found = false;
+      for (var i = 0; i < luckYearList.length; i++) {
+        if (luckYearList[i].year === luckYear) found = true;
+      }
+      if (!found) {
+        luckYear = luckYearList[0].year;
+        luckYearList = this.buildLuckYearList(this.data.luckStageIndex, luckYear);
+      }
+    }
+
+    var opts = {};
+    if (this.data.openStageKey === 'luck') {
+      opts = this.selectionForLuckYear(luckYear);
+    }
+    var p = portrait.build(this._chart, opts);
+    var luckPortrait = null;
+    if (this.data.openStageKey === 'luck') {
+      luckPortrait = (p.stagePortraits || [])[this.data.luckStageIndex] || null;
+    }
+    this.applyLayerOpen(p.stagePortraits || [], luckPortrait);
+
+    this.setData({
+      core: p.core,
+      paimian: p.paimian,
+      zhengNow: p.zhengNow,
+      pianNow: p.pianNow,
+      hasTime: p.hasTime,
+      stagePortraits: p.stagePortraits || [],
+      luckYear: luckYear,
+      luckYearList: luckYearList,
+      luckPortrait: luckPortrait,
+      luckFlow: this.data.openStageKey === 'luck' ? (p.luckTrait || null) : null,
+      relations: p.relations || []
+    });
+  },
+
+  noop: function () {}
+});

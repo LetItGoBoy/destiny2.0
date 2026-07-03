@@ -1,10 +1,16 @@
 <view class="page fs-{{fs}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
+
   <!-- 头部：LOGO + 标题 -->
   <view class="hero">
-    <view class="seal logo">同乐</view>
+    <image class="logo" src="/images/logo-tongle-palace-gold.png" mode="aspectFill" />
     <view class="hero-right">
       <view class="hero-title serif">八字排盘</view>
       <view class="hero-sub">四柱八字 · 真太阳时 · 大运流年</view>
+    </view>
+    <view class="elder-toggle {{fs === 'xl' ? 'on' : ''}}" bindtap="toggleElder">
+      <text class="elder-aa">A<text class="elder-aa-big">A</text></text>
+      <text class="elder-tx">长辈模式</text>
     </view>
   </view>
 
@@ -16,29 +22,6 @@
       <view class="starhero-title serif">此刻星象</view>
       <view class="starhero-sub">日月五星正在运行 · 点击进入星图</view>
     </view>
-  </view>
-
-  <!-- 今日运势卡 -->
-  <view class="card today" hover-class="mod-hover" bindtap="onTodayTap" wx:if="{{daily}}">
-    <view class="today-head">
-      <text class="today-title serif">今日运势</text>
-      <text class="today-date">{{daily.dateStr}} · {{daily.lunarStr}}</text>
-    </view>
-    <block wx:if="{{daily.bound}}">
-      <view class="today-body">
-        <view class="today-gz serif">
-          <text class="wx-{{daily.ganZhi[0].cls}}">{{daily.ganZhi[0].text}}</text><text class="wx-{{daily.ganZhi[1].cls}}">{{daily.ganZhi[1].text}}</text>
-        </view>
-        <view class="today-who">{{daily.name}} ›</view>
-      </view>
-      <view class="today-advice">{{daily.advice}}</view>
-    </block>
-    <block wx:else>
-      <view class="today-unbound">
-        <text>绑定本人命盘后，每天为你解读当日能量</text>
-        <text class="today-bind">去绑定 ›</text>
-      </view>
-    </block>
   </view>
 
   <!-- 排盘表单 -->
@@ -62,39 +45,81 @@
       <view class="seg">
         <view class="seg-item {{calendar === 'solar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="solar">公历</view>
         <view class="seg-item {{calendar === 'lunar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="lunar">农历</view>
+        <view class="seg-item {{calendar === 'pillar' ? 'seg-on' : ''}}" bindtap="onCalendarTap" data-calendar="pillar">四柱</view>
       </view>
     </view>
 
-    <view class="form-row">
+    <view class="form-row" wx:if="{{calendar === 'solar'}}">
       <view class="form-label">出生日期</view>
-      <picker wx:if="{{calendar === 'solar'}}" class="form-picker" mode="date"
-        value="{{solarDate}}" start="1901-01-01" end="{{maxDate}}" bindchange="onSolarDateChange">
-        <view class="picker-value">{{solarDate}}<text class="arrow">›</text></view>
+      <picker class="form-picker" mode="date"
+        value="{{solarDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onSolarDateChange">
+        <view class="picker-value">{{solarDate}}</view>
       </picker>
-      <picker wx:else class="form-picker" mode="multiSelector"
+    </view>
+
+    <view class="form-row" wx:if="{{calendar === 'lunar'}}">
+      <view class="form-label">出生日期</view>
+      <picker class="form-picker" mode="multiSelector"
         range="{{lunarRange}}" value="{{lunarIndex}}"
         bindcolumnchange="onLunarColumnChange" bindchange="onLunarChange">
-        <view class="picker-value">{{lunarText}}<text class="arrow">›</text></view>
+        <view class="picker-value">{{lunarText}}</view>
       </picker>
     </view>
 
-    <view class="form-row">
+    <view class="pillar-pane" wx:if="{{calendar === 'pillar'}}">
+      <view class="direct-grid">
+        <view class="direct-field">
+          <text class="direct-label">年柱</text>
+          <input class="direct-input" placeholder="甲子" maxlength="2" value="{{pillarQuery.year}}" bindinput="onPillarQueryInput" data-key="year" />
+        </view>
+        <view class="direct-field">
+          <text class="direct-label">月柱</text>
+          <input class="direct-input" placeholder="丙寅" maxlength="2" value="{{pillarQuery.month}}" bindinput="onPillarQueryInput" data-key="month" />
+        </view>
+        <view class="direct-field">
+          <text class="direct-label">日柱</text>
+          <input class="direct-input" placeholder="戊辰" maxlength="2" value="{{pillarQuery.day}}" bindinput="onPillarQueryInput" data-key="day" />
+        </view>
+        <view class="direct-field">
+          <text class="direct-label">时柱</text>
+          <input class="direct-input" placeholder="庚午" maxlength="2" value="{{pillarQuery.hour}}" bindinput="onPillarQueryInput" data-key="hour" />
+        </view>
+      </view>
+      <view class="pillar-actions">
+        <text class="pillar-msg" wx:if="{{pillarYearMsg}}">{{pillarYearMsg}}</text>
+        <view class="pillar-btn" bindtap="onFindPillarYears">查找</view>
+      </view>
+      <view class="pillar-year-list" wx:if="{{pillarYearCandidates.length}}">
+        <view class="pillar-year" wx:for="{{pillarYearCandidates}}" wx:key="year" bindtap="onPickPillarYear" data-index="{{index}}">
+          <text class="pillar-year-main">{{item.year}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-row" wx:if="{{calendar !== 'pillar'}}">
+      <view class="form-label">知道出生时辰
+        <view class="form-note">{{unknownTime ? '未知 · 只排年月日三柱' : '已知 · 排全四柱'}}</view>
+      </view>
+      <switch checked="{{!unknownTime}}" color="#6D5DF6" bindchange="onKnowTimeChange" />
+    </view>
+
+    <view class="form-row" wx:if="{{calendar !== 'pillar' && !unknownTime}}">
       <view class="form-label">出生时间</view>
       <picker class="form-picker" mode="time" value="{{time}}" bindchange="onTimeChange">
-        <view class="picker-value">{{time}}<text class="arrow">›</text></view>
+        <view class="picker-value">{{time}}</view>
       </picker>
     </view>
 
-    <view class="form-row">
+    <view class="form-row" wx:if="{{calendar !== 'pillar'}}">
       <view class="form-label">出生地点</view>
       <picker class="form-picker" mode="multiSelector"
         range="{{regionRange}}" value="{{regionIndex}}"
         bindcolumnchange="onRegionColumnChange" bindchange="onRegionChange">
-        <view class="picker-value">{{regionText}}<text class="arrow">›</text></view>
+        <view class="picker-value">{{regionText}}</view>
       </picker>
     </view>
 
-    <view class="form-row no-line">
+    <view class="form-row no-line" wx:if="{{calendar !== 'pillar' && !unknownTime}}">
       <view class="form-label">
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>
@@ -102,38 +127,23 @@
       <switch checked="{{useTrueSolar}}" color="#6D5DF6" bindchange="onTrueSolarChange" />
     </view>
 
-    <button class="btn-primary btn-paipan" bindtap="onPaiPan">开始排盘</button>
-    <button class="btn-quick" bindtap="onQuickXiangPi">
-      <text class="btn-quick-main">一键详批</text>
-      <text class="btn-quick-sub">看不懂排盘？直接看性格 · 健康解读</text>
-    </button>
-  </view>
-
-  <!-- 配对模块入口 -->
-  <view class="mods">
-    <view class="mod card" hover-class="mod-hover" bindtap="goMatch" data-type="marriage">
-      <view class="mod-ico mod-ico-red serif">囍</view>
-      <view class="mod-body">
-        <view class="mod-title serif">婚配</view>
-        <view class="mod-sub">双盘合婚 · 姻缘相合</view>
-      </view>
-      <view class="mod-tag">即将上线</view>
-    </view>
-    <view class="mod card" hover-class="mod-hover" bindtap="goMatch" data-type="partner">
-      <view class="mod-ico mod-ico-gold serif">合</view>
-      <view class="mod-body">
-        <view class="mod-title serif">合作伙伴配</view>
-        <view class="mod-sub">事业相合 · 共谋发展</view>
-      </view>
-      <view class="mod-tag">即将上线</view>
-    </view>
+    <block wx:if="{{calendar !== 'pillar'}}">
+      <button class="btn-primary btn-paipan" bindtap="onPaiPan">
+        <image class="btn-paipan-bg" src="/images/btn-paipan-bg.jpg" mode="scaleToFill" />
+        <text class="btn-paipan-text">开始排盘</text>
+      </button>
+      <button class="btn-quick" bindtap="onQuickXiangPi">
+        <text class="btn-quick-main">获取性格画像</text>
+        <text class="btn-quick-sub">看不懂排盘？直接看你的性格与天赋</text>
+      </button>
+    </block>
   </view>
 
   <!-- 最近排盘 -->
   <view class="recent" wx:if="{{recent.length > 0}}">
     <view class="recent-head">
       <view class="recent-title serif">最近排盘</view>
-      <view class="recent-more" bindtap="goRecords">全部记录 ›</view>
+      <view class="recent-more" bindtap="goRecords">全部记录 &gt;</view>
     </view>
     <view class="recent-item card" wx:for="{{recent}}" wx:key="_id"
       hover-class="mod-hover" bindtap="goRecord" data-index="{{index}}">
@@ -148,7 +158,7 @@
     </view>
   </view>
 
-  <view class="footer">同乐八字 · 仅供传统文化研究参考</view>
+  <view class="footer">命盘仅供传统文化娱乐参考，不构成人生决策依据</view>
 
   <!-- 起盘过渡动画 -->
   <view class="cast-mask" wx:if="{{casting}}">

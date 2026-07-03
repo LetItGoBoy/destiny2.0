@@ -2,10 +2,11 @@ var bazi = require('../../utils/bazi.js');
 var cities = require('../../utils/cities.js');
 var store = require('../../utils/store.js');
 var prefs = require('../../utils/prefs.js');
-var daily = require('../../utils/daily.js');
 
-var THIS_YEAR = new Date().getFullYear();
-var START_YEAR = 1901;
+var START_YEAR = 1900;
+var END_YEAR = 2100;
+var GAN = '甲乙丙丁戊己庚辛壬癸';
+var ZHI = '子丑寅卯辰巳午未申酉戌亥';
 
 Page({
   data: {
@@ -13,8 +14,18 @@ Page({
     gender: 1,
     calendar: 'solar',
     solarDate: '1990-06-15',
-    maxDate: THIS_YEAR + '-12-31',
+    minDate: START_YEAR + '-01-01',
+    maxDate: END_YEAR + '-12-31',
+    pillarQuery: {
+      year: '',
+      month: '',
+      day: '',
+      hour: ''
+    },
+    pillarYearCandidates: [],
+    pillarYearMsg: '',
     time: '12:00',
+    unknownTime: true,           // 默认不知道出生时辰（不排时柱）
     // 农历选择器
     lunarRange: [[], [], []],
     lunarIndex: [0, 0, 0],
@@ -25,7 +36,6 @@ Page({
     regionText: '',
     useTrueSolar: true,
     recent: [],
-    daily: null,
     fs: 'std',
     casting: false,
     zhiRing: ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
@@ -34,7 +44,7 @@ Page({
   onLoad: function () {
     // 农历年列表
     this._lunarYears = [];
-    for (var y = START_YEAR; y <= THIS_YEAR; y++) this._lunarYears.push(y);
+    for (var y = START_YEAR; y <= END_YEAR; y++) this._lunarYears.push(y);
     this._lunarSel = [1990 - START_YEAR, 0, 0];
     this.rebuildLunarRange(true);
 
@@ -50,11 +60,9 @@ Page({
 
   onShow: function () {
     var that = this;
-    this._self = prefs.getSelf();
     this.setData({
       casting: false,
-      fs: prefs.getFontSize(),
-      daily: daily.getDaily(this._self)
+      fs: prefs.getFontSize()
     });
     store.listRecords().then(function (res) {
       var recent = res.list.slice(0, 3).map(function (r) {
@@ -70,16 +78,15 @@ Page({
     wx.navigateTo({ url: '/pages/astro/astro?now=1' });
   },
 
-  // 今日运势卡：已绑定 → 打开本人命盘；未绑定 → 引导去记录绑定
-  onTodayTap: function () {
-    if (this._self) {
-      wx.navigateTo({
-        url: '/pages/result/result?from=record&input=' + encodeURIComponent(JSON.stringify(this._self.input))
-      });
-    } else {
-      wx.switchTab({ url: '/pages/records/records' });
-      wx.showToast({ title: '长按一条记录设为本人命盘', icon: 'none', duration: 2500 });
-    }
+  // 长辈模式：一键把全站字号切到「特大」，再点切回「大」
+  toggleElder: function () {
+    var next = this.data.fs === 'xl' ? 'l' : 'xl';
+    prefs.setFontSize(next);
+    this.setData({ fs: next });
+    wx.showToast({
+      title: next === 'xl' ? '已开启长辈模式 · 字更大' : '已退出长辈模式',
+      icon: 'none'
+    });
   },
 
   onNameInput: function (e) {
@@ -91,7 +98,8 @@ Page({
   },
 
   onCalendarTap: function (e) {
-    this.setData({ calendar: e.currentTarget.dataset.calendar });
+    var calendar = e.currentTarget.dataset.calendar;
+    this.setData({ calendar: calendar });
   },
 
   onSolarDateChange: function (e) {
@@ -100,6 +108,11 @@ Page({
 
   onTimeChange: function (e) {
     this.setData({ time: e.detail.value });
+  },
+
+  // 是否知道出生时辰（开关：开=已知，关=未知）
+  onKnowTimeChange: function (e) {
+    this.setData({ unknownTime: !e.detail.value });
   },
 
   // ---- 农历选择器 ----
@@ -137,6 +150,77 @@ Page({
     this.setData({ lunarText: text });
   },
 
+  onPillarQueryInput: function (e) {
+    var key = e.currentTarget.dataset.key;
+    var value = String(e.detail.value || '').replace(/\s/g, '').slice(0, 2);
+    var patch = {};
+    patch['pillarQuery.' + key] = value;
+    var that = this;
+    this.setData(patch, function () {
+      that.updatePillarYearCandidates(false);
+    });
+  },
+
+  normalizePillar: function (value) {
+    var v = String(value || '').replace(/\s/g, '');
+    if (v.length !== 2) return '';
+    var gan = v.charAt(0);
+    var zhi = v.charAt(1);
+    if (GAN.indexOf(gan) < 0 || ZHI.indexOf(zhi) < 0) return '';
+    return gan + zhi;
+  },
+
+  updatePillarYearCandidates: function (showToast) {
+    var p = this.data.pillarQuery || {};
+    var yearPillar = this.normalizePillar(p.year);
+    var monthPillar = this.normalizePillar(p.month);
+    var dayPillar = this.normalizePillar(p.day);
+    var hourPillar = this.normalizePillar(p.hour);
+    var raw = [p.year, p.month, p.day, p.hour].join('');
+    if (raw.length < 8) {
+      this.setData({ pillarYearCandidates: [], pillarYearMsg: '' });
+      return;
+    }
+    if (!yearPillar || !monthPillar || !dayPillar || !hourPillar) {
+      this.setData({ pillarYearCandidates: [], pillarYearMsg: '请输入有效干支，如 甲子、丙寅。' });
+      if (showToast) wx.showToast({ title: '请输入有效四柱', icon: 'none' });
+      return;
+    }
+    var list = bazi.findSolarByBaZi(yearPillar, monthPillar, dayPillar, hourPillar, START_YEAR, END_YEAR);
+    var seen = {};
+    var candidates = [];
+    list.forEach(function (item) {
+      if (seen[item.year]) return;
+      seen[item.year] = true;
+      candidates.push(item);
+    });
+    this.setData({
+      pillarYearCandidates: candidates,
+      pillarYearMsg: candidates.length ? '选择对应年份后，会自动填入出生日期与时辰。' : '没有找到对应年份，请检查四柱。'
+    });
+    if (showToast && !candidates.length) {
+      wx.showToast({ title: '没有找到对应年份', icon: 'none' });
+    }
+  },
+
+  onFindPillarYears: function () {
+    this.updatePillarYearCandidates(true);
+  },
+
+  onPickPillarYear: function (e) {
+    var idx = Number(e.currentTarget.dataset.index);
+    var item = this.data.pillarYearCandidates[idx];
+    if (!item) return;
+    this.setData({
+      calendar: 'solar',
+      solarDate: item.date,
+      unknownTime: false,
+      time: item.time
+    }, function () {
+      wx.showToast({ title: '已填入 ' + item.year + ' 年', icon: 'none' });
+    });
+  },
+
   // ---- 出生地选择器 ----
   onRegionColumnChange: function (e) {
     if (e.detail.column === 0) {
@@ -164,14 +248,19 @@ Page({
   // 收集表单为排盘入参
   collectInput: function () {
     var d = this.data;
+    if (d.calendar === 'pillar') {
+      wx.showToast({ title: '请先选择对应年份', icon: 'none' });
+      return null;
+    }
     var time = d.time.split(':');
     var input = {
       name: d.name.trim(),
       gender: d.gender,
       calendar: d.calendar,
-      hour: Number(time[0]),
-      minute: Number(time[1]),
-      useTrueSolar: d.useTrueSolar
+      unknownTime: d.unknownTime,
+      hour: d.unknownTime ? null : Number(time[0]),
+      minute: d.unknownTime ? null : Number(time[1]),
+      useTrueSolar: d.unknownTime ? false : d.useTrueSolar
     };
     if (d.calendar === 'solar') {
       var sd = d.solarDate.split('-');
@@ -200,22 +289,24 @@ Page({
       wx.navigateTo({
         url: url,
         complete: function () {
-          setTimeout(function () { that.setData({ casting: false }); }, 400);
+          setTimeout(function () { that.setData({ casting: false }); }, 160);
         }
       });
-    }, 1300);
+    }, 720);
   },
 
   // ---- 排盘（进结果页）----
   onPaiPan: function () {
     var input = this.collectInput();
+    if (!input) return;
     this.castThenGo('/pages/result/result?input=' + encodeURIComponent(JSON.stringify(input)));
   },
 
-  // ---- 一键详批（跳过排盘，直达解读）----
+  // ---- 一键性格画像（跳过排盘，直达解读）----
   onQuickXiangPi: function () {
     var input = this.collectInput();
-    this.castThenGo('/pages/analysis/analysis?input=' + encodeURIComponent(JSON.stringify(input)));
+    if (!input) return;
+    this.castThenGo('/pages/portrait/portrait?input=' + encodeURIComponent(JSON.stringify(input)));
   },
 
   // ---- 模块入口 ----
@@ -228,7 +319,7 @@ Page({
     var input = {
       name: rec.name, gender: rec.gender, calendar: rec.calendar,
       year: rec.year, month: rec.month, day: rec.day,
-      hour: rec.hour, minute: rec.minute,
+      hour: rec.hour, minute: rec.minute, unknownTime: rec.unknownTime,
       province: rec.province, city: rec.city, lng: rec.lng,
       useTrueSolar: rec.useTrueSolar
     };

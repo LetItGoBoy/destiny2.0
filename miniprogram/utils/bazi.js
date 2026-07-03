@@ -77,18 +77,23 @@ function buildPillarView(ctx, gan, zhi, isDayPillar) {
  * }
  */
 function computeChart(input) {
+  // 0. 时辰未知：内部以正午起盘（仅用于年月日柱与大运推导），不显示时柱、不做真太阳修正
+  var noTime = !!input.unknownTime || input.hour == null;
+  var hh = noTime ? 12 : input.hour;
+  var mm = noTime ? 0 : input.minute;
+
   // 1. 统一换算为公历钟表时间
   var clockDate;
   if (input.calendar === 'lunar') {
-    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, input.hour, input.minute, 0);
+    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, hh, mm, 0);
     var sd = ld.getSolar();
-    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), input.hour, input.minute, 0);
+    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), hh, mm, 0);
   } else {
-    clockDate = new Date(input.year, input.month - 1, input.day, input.hour, input.minute, 0);
+    clockDate = new Date(input.year, input.month - 1, input.day, hh, mm, 0);
   }
 
-  // 2. 真太阳时修正
-  var useTrueSolar = !!(input.useTrueSolar && typeof input.lng === 'number');
+  // 2. 真太阳时修正（时辰未知时不修正）
+  var useTrueSolar = !noTime && !!(input.useTrueSolar && typeof input.lng === 'number');
   var chartDate = clockDate;
   var offsetMinutes = 0;
   if (useTrueSolar) {
@@ -117,13 +122,15 @@ function computeChart(input) {
   var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
   var pillars = [];
   var wuXingCount = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
-  for (var i = 0; i < 4; i++) {
+  var pillarN = noTime ? 3 : 4; // 时辰未知则只计年月日三柱
+  for (var i = 0; i < pillarN; i++) {
     var p = buildPillarView(ctx, gans[i], zhis[i], i === 2);
     p.label = labels[i];
     pillars.push(p);
     wuXingCount[p.gan.wx]++;
     wuXingCount[p.zhi.wx]++;
   }
+  if (noTime) pillars.push({ label: '时柱', sub: '未知', empty: true, unknown: true });
   var wuXingList = ['木', '火', '土', '金', '水'].map(function (wx) {
     return { wx: wx, cls: WX_CLS[wx], count: wuXingCount[wx] };
   });
@@ -187,12 +194,13 @@ function computeChart(input) {
     gender: input.gender ? 1 : 0,
     genderText: input.gender ? '男' : '女',
     shengXiao: lunar.getYearShengXiaoByLiChun(),
-    clockStr: formatDate(clockDate),
+    unknownTime: noTime,
+    clockStr: noTime ? formatDateOnly(clockDate) + ' 时辰未知' : formatDate(clockDate),
     chartStr: formatDate(chartDate),
     timestamp: chartDate.getTime(),
     chartTime: pad(chartDate.getHours()) + ':' + pad(chartDate.getMinutes()),
-    lunarStr: lunar.toString() + ' ' + timeZhiName,
-    lunarShort: lunar.getMonthInChinese() + '月' + lunar.getDayInChinese() + ' ' + timeZhiName,
+    lunarStr: lunar.toString() + (noTime ? '' : ' ' + timeZhiName),
+    lunarShort: lunar.getMonthInChinese() + '月' + lunar.getDayInChinese() + (noTime ? '' : ' ' + timeZhiName),
     useTrueSolar: useTrueSolar,
     offsetMinutes: offsetMinutes,
     location: (input.province || '') + (input.city && input.city !== input.province ? ' ' + input.city : ''),
@@ -207,13 +215,145 @@ function computeChart(input) {
     meta: meta,
     pillars: pillars,
     wuXing: wuXingList,
-    daYun: daYunList
+    daYun: daYunList,
+    ctx: ctx
   };
+}
+
+// 按需构建一柱完整视图（流月/流日列复用），ctx 来自 computeChart 返回
+function buildLuckPillar(ctx, ganZhi) {
+  if (!ganZhi || ganZhi.length < 2) return null;
+  return buildPillarView(ctx, ganZhi.charAt(0), ganZhi.charAt(1), false);
+}
+
+// 计算某流年中某节气月（以流月干支匹配）的所有流日（轻量列表，供平铺）
+function getLiuRi(ctx, liuYueGanZhi, year) {
+  if (!liuYueGanZhi || !year) return [];
+  var s = Solar.fromYmd(year, 1, 1);
+  var list = [];
+  var started = false;
+  for (var k = 0; k < 430; k++) {
+    var cur = s.next(k);
+    var lun = cur.getLunar();
+    if (lun.getMonthInGanZhi() === liuYueGanZhi) {
+      started = true;
+      var dgz = lun.getDayInGanZhi();
+      list.push({
+        index: list.length,
+        ganZhi: dgz,
+        gan: ganView(dgz.charAt(0)),
+        zhi: zhiView(dgz.charAt(1)),
+        shiShenGan: LunarUtil.SHI_SHEN[ctx.dayGan + dgz.charAt(0)],
+        label: cur.getMonth() + '/' + cur.getDay()
+      });
+    } else if (started) {
+      break;
+    }
+  }
+  return list;
+}
+
+// 仅计算四柱（名人库列表用，避免整盘大运流年的开销）
+function quickBaZi(input) {
+  var clockDate;
+  var hh = input.hour == null ? 12 : Number(input.hour);
+  var mm = input.minute == null ? 0 : Number(input.minute);
+  if (input.calendar === 'lunar') {
+    var ld = Lunar.fromYmdHms(input.year, input.month, input.day, hh, mm, 0);
+    var sd = ld.getSolar();
+    clockDate = new Date(sd.getYear(), sd.getMonth() - 1, sd.getDay(), hh, mm, 0);
+  } else {
+    clockDate = new Date(input.year, input.month - 1, input.day, hh, mm, 0);
+  }
+  var solar = Solar.fromDate(clockDate);
+  var lunar = solar.getLunar();
+  var ec = lunar.getEightChar();
+  ec.setSect(1);
+  var gans = [ec.getYearGan(), ec.getMonthGan(), ec.getDayGan(), ec.getTimeGan()];
+  var zhis = [ec.getYearZhi(), ec.getMonthZhi(), ec.getDayZhi(), ec.getTimeZhi()];
+  var baZi = gans[0] + zhis[0] + ' ' + gans[1] + zhis[1] + ' ' + gans[2] + zhis[2] + ' ' + gans[3] + zhis[3];
+  return { baZi: baZi, dayGan: gans[2] };
+}
+
+function solarToPillarCandidate(s) {
+  return {
+    year: s.getYear(),
+    month: s.getMonth(),
+    day: s.getDay(),
+    hour: s.getHour(),
+    minute: s.getMinute(),
+    date: s.toYmd(),
+    time: pad(s.getHour()) + ':' + pad(s.getMinute()),
+    label: s.getYear() + '年'
+  };
+}
+
+function findSolarByBaZi(yearGZ, monthGZ, dayGZ, timeGZ, startYear, endYear) {
+  startYear = Number(startYear) || 1900;
+  endYear = Number(endYear) || 2100;
+  if (endYear < startYear) return [];
+
+  var list = [];
+  var monthOffset = LunarUtil.index(monthGZ.substring(1), LunarUtil.ZHI, -1) - 2;
+  if (monthOffset < 0) monthOffset += 12;
+
+  var yearGanIndex = LunarUtil.index(yearGZ.substring(0, 1), LunarUtil.GAN, -1);
+  var monthGanIndex = LunarUtil.index(monthGZ.substring(0, 1), LunarUtil.GAN, -1);
+  if (yearGanIndex < 0 || monthGanIndex < 0) return [];
+  if (((yearGanIndex + 1) * 2 + monthOffset) % 10 !== monthGanIndex) return [];
+
+  var year = LunarUtil.getJiaZiIndex(yearGZ) - 57;
+  if (year < 0) year += 60;
+  year++;
+
+  var jieQiOffset = monthOffset * 2;
+  var hour = LunarUtil.index(timeGZ.substring(1), LunarUtil.ZHI, -1) * 2;
+  if (hour < 0) return [];
+  var searchStartYear = startYear - 1;
+
+  while (year <= endYear) {
+    if (year >= searchStartYear) {
+      var jieQiLunar = Lunar.fromYmd(year, 1, 1);
+      var jieQiList = jieQiLunar.getJieQiList();
+      var jieQiTable = jieQiLunar.getJieQiTable();
+      var solarTime = jieQiTable[jieQiList[4 + jieQiOffset]];
+      if (solarTime && solarTime.getYear() >= startYear) {
+        var dayOffset = LunarUtil.getJiaZiIndex(dayGZ) - LunarUtil.getJiaZiIndex(solarTime.getLunar().getDayInGanZhiExact2());
+        if (dayOffset < 0) dayOffset += 60;
+        if (dayOffset > 0) solarTime = solarTime.next(dayOffset);
+
+        var minute = 0;
+        var second = 0;
+        if (dayOffset === 0 && hour === solarTime.getHour()) {
+          minute = solarTime.getMinute();
+          second = solarTime.getSecond();
+        }
+
+        var solar = Solar.fromYmdHms(solarTime.getYear(), solarTime.getMonth(), solarTime.getDay(), hour, minute, second);
+        if (dayOffset === 30) solar = solar.nextHour(-1);
+        var lunar = solar.getLunar();
+        if (solar.getYear() <= endYear &&
+            lunar.getYearInGanZhiExact() === yearGZ &&
+            lunar.getMonthInGanZhiExact() === monthGZ &&
+            lunar.getDayInGanZhiExact() === dayGZ &&
+            lunar.getTimeInGanZhi() === timeGZ) {
+          list.push(solar);
+        }
+      }
+    }
+    year += 60;
+  }
+
+  return list.map(solarToPillarCandidate);
 }
 
 function formatDate(date) {
   return date.getFullYear() + '年' + pad(date.getMonth() + 1) + '月' + pad(date.getDate()) + '日 ' +
     pad(date.getHours()) + ':' + pad(date.getMinutes());
+}
+
+function formatDateOnly(date) {
+  return date.getFullYear() + '年' + pad(date.getMonth() + 1) + '月' + pad(date.getDate()) + '日';
 }
 
 // ---- 农历选择器辅助 ----
@@ -255,8 +395,12 @@ function colorizeBaZi(str) {
 
 module.exports = {
   computeChart: computeChart,
+  quickBaZi: quickBaZi,
+  buildLuckPillar: buildLuckPillar,
+  getLiuRi: getLiuRi,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
+  findSolarByBaZi: findSolarByBaZi,
   changSheng: changSheng,
   colorizeBaZi: colorizeBaZi
 };

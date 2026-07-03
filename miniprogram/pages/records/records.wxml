@@ -1,77 +1,111 @@
-<!-- 记录卡片模板 -->
+<!-- 记录卡片：左侧信息 + 右侧干支 + 头像 -->
 <template name="recCard">
   <view class="rec card" hover-class="rec-hover"
     bindtap="onItemTap" bindlongpress="onItemLongPress" data-id="{{_id}}">
-    <view class="rec-line1">
-      <text class="rec-name">{{name || '未署名'}}</text>
-      <text class="rec-gender {{gender === 1 ? 'g-m' : 'g-f'}}">{{gender === 1 ? '乾造' : '坤造'}}</text>
-      <text class="rec-self" wx:if="{{isSelf}}">本人</text>
-      <text class="rec-true" wx:if="{{useTrueSolar}}">真太阳时</text>
+    <view class="rec-left">
+      <view class="rec-line1">
+        <text class="rec-name">{{name || '未署名'}}</text>
+        <text class="rec-gender {{gender === 1 ? 'g-m' : 'g-f'}}">{{gender === 1 ? '男' : '女'}}</text>
+        <text class="rec-self" wx:if="{{isSelf}}">本人</text>
+        <text class="rec-true" wx:if="{{useTrueSolar}}">真太阳</text>
+      </view>
+      <view class="rec-date">{{solarStr}}</view>
     </view>
-    <view class="rec-bazi serif">
-      <text class="bz-pillar" wx:for="{{bz}}" wx:for-item="gz" wx:key="index"><text class="wx-{{gz[0].cls}}">{{gz[0].text}}</text><text class="wx-{{gz[1].cls}}">{{gz[1].text}}</text></text>
+    <view class="rec-right serif">
+      <view class="rec-gz-row">
+        <text class="rgz wx-{{gz[0].cls}}" wx:for="{{bz}}" wx:for-item="gz" wx:key="index">{{gz[0].text}}</text>
+      </view>
+      <view class="rec-gz-row">
+        <text class="rgz wx-{{gz[1].cls}}" wx:for="{{bz}}" wx:for-item="gz" wx:key="index">{{gz[1].text}}</text>
+      </view>
     </view>
-    <view class="rec-line3">
-      <text>{{solarStr}}</text>
-      <text class="rec-loc" wx:if="{{city}}">{{city}}</text>
-    </view>
+    <view class="rec-ava bg-{{dayCls}} serif">{{dayGan}}</view>
   </view>
 </template>
 
 <view class="page fs-{{fs}}">
+  <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
+
   <view class="head">
     <view class="head-title serif">八字记录</view>
-    <view class="head-sub">{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按设本人/改名/删除</view>
+    <view class="head-sub" wx:if="{{listTab === 'celeb'}}">国外名人命盘 · 共{{total}}位 · 点击查看（生时多不可考，按正午起盘）</view>
+    <view class="head-sub" wx:else>{{source === 'cloud' ? '云端同步' : '存储于本机'}} · 共{{total}}条 · 长按设本人/改名/删除</view>
   </view>
 
-  <!-- 搜索栏 -->
-  <view class="search card">
-    <text class="search-ico">⌕</text>
-    <input class="search-input" placeholder="搜索姓名，或输入干支聚合（如：庚午）"
-      placeholder-class="search-ph" confirm-type="search"
-      value="{{keyword}}" bindinput="onSearch" />
-    <text class="search-clear" wx:if="{{keyword}}" bindtap="onClear">✕</text>
+  <!-- 列表切换：用户列表 / 名人库 -->
+  <view class="list-tabs">
+    <view class="lt {{listTab === 'user' ? 'lt-on' : ''}}" bindtap="onListTab" data-t="user">用户列表</view>
+    <view class="lt {{listTab === 'celeb' ? 'lt-on' : ''}}" bindtap="onListTab" data-t="celeb">名人库</view>
   </view>
-  <!-- 干支模式：柱位筛选 -->
-  <view class="pillar-chips" wx:if="{{mode === 'ganzhi'}}">
-    <view class="p-chip {{pillarFilter === -1 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="-1">全部</view>
-    <view class="p-chip {{pillarFilter === 0 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="0">年柱</view>
-    <view class="p-chip {{pillarFilter === 1 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="1">月柱</view>
-    <view class="p-chip {{pillarFilter === 2 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="2">日柱</view>
-    <view class="p-chip {{pillarFilter === 3 ? 'p-chip-on' : ''}}" bindtap="onPillarFilter" data-pillar="3">时柱</view>
-  </view>
-  <view class="search-hint" wx:if="{{mode === 'ganzhi'}}">干支「{{keyword}}」{{pillarFilter === -1 ? '按柱位聚合' : '筛选' }} · 姓名按字母排序</view>
-  <view class="search-hint" wx:elif="{{!keyword && total > 0}}">按姓名字母排序</view>
 
-  <!-- 姓名模式：排序列表 -->
-  <block wx:if="{{mode === 'name'}}">
-    <block wx:for="{{shown}}" wx:key="_id">
-      <template is="recCard" data="{{...item}}" />
-    </block>
-    <view class="no-result" wx:if="{{keyword && shown.length === 0 && total > 0}}">
-      没有找到姓名含「{{keyword}}」的记录
+  <!-- 搜索 + 筛选 -->
+  <view class="search-row">
+    <view class="search card">
+      <text class="search-ico">⌕</text>
+      <input class="search-input" placeholder="搜索姓名"
+        placeholder-class="search-ph" confirm-type="search"
+        value="{{keyword}}" bindinput="onSearch" />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClear">✕</text>
     </view>
-  </block>
+    <view class="filter-btn {{showFilter || filterCount ? 'filter-on' : ''}}" bindtap="onToggleFilter">
+      筛选<text class="filter-badge" wx:if="{{filterCount}}">{{filterCount}}</text>
+    </view>
+  </view>
 
-  <!-- 干支模式：按柱位聚合 -->
-  <block wx:if="{{mode === 'ganzhi'}}">
-    <view class="group" wx:for="{{groups}}" wx:key="title" wx:for-item="grp">
-      <view class="group-head">
-        <text class="group-title serif">{{grp.title}}</text>
-        <text class="group-kw serif">{{grp.kw}}</text>
-        <text class="group-count">{{grp.count}}人</text>
+  <!-- 筛选面板 -->
+  <view class="filter-panel card" wx:if="{{showFilter}}">
+    <view class="fp-sec-t">性别</view>
+    <view class="gender-row">
+      <view class="g-chip {{genderFilter === 1 ? 'g-chip-on' : ''}}" bindtap="onGender" data-g="1">男</view>
+      <view class="g-chip {{genderFilter === 0 ? 'g-chip-on' : ''}}" bindtap="onGender" data-g="0">女</view>
+    </view>
+
+    <view class="fp-sec-t">干支<text class="fp-sec-note">{{activeSlot >= 0 ? '请在下方选择' : '先点四柱中的空位'}}</text></view>
+    <view class="gz-grid">
+      <text class="gz-ch wx-{{item.cls}}" wx:for="{{ganList}}" wx:key="ch"
+        data-ch="{{item.ch}}" bindtap="onGzTap">{{item.ch}}</text>
+    </view>
+    <view class="gz-grid">
+      <text class="gz-ch wx-{{item.cls}}" wx:for="{{zhiList}}" wx:key="ch"
+        data-ch="{{item.ch}}" bindtap="onGzTap">{{item.ch}}</text>
+    </view>
+
+    <view class="fp-sec-t">四柱<text class="fp-sec-note">点已填可清除</text></view>
+    <view class="four-pillars">
+      <view class="fp-col" wx:for="{{pillarLabels}}" wx:key="*this" wx:for-index="pi">
+        <view class="fp-label">{{item}}</view>
+        <view class="fp-slot {{activeSlot === pi*2 ? 'fp-on' : ''}} {{slots[pi*2] ? 'fp-filled' : ''}}"
+          data-slot="{{pi*2}}" bindtap="onSlotTap">{{slots[pi*2] || '—'}}</view>
+        <view class="fp-slot {{activeSlot === pi*2+1 ? 'fp-on' : ''}} {{slots[pi*2+1] ? 'fp-filled' : ''}}"
+          data-slot="{{pi*2+1}}" bindtap="onSlotTap">{{slots[pi*2+1] || '—'}}</view>
       </view>
-      <block wx:for="{{grp.items}}" wx:key="_id">
-        <template is="recCard" data="{{...item}}" />
-      </block>
     </view>
-    <view class="no-result" wx:if="{{groups.length === 0}}">
-      没有找到八字含「{{keyword}}」的记录
+
+    <view class="fp-actions">
+      <view class="fp-reset" bindtap="onReset">重置</view>
+      <view class="fp-done" bindtap="onToggleFilter">完成</view>
     </view>
+  </view>
+
+  <!-- 排序 -->
+  <view class="sort-row" wx:if="{{total > 0}}">
+    <text class="sort-hint">{{filterCount ? '筛选命中 ' + shown.length + ' 条' : (sortMode === 'time' ? '按排盘时间排序' : '按姓名字母排序')}}</text>
+    <view class="sort-seg">
+      <text class="sort-opt {{sortMode === 'name' ? 'sort-on' : ''}}" bindtap="onSortMode" data-m="name">字母</text>
+      <text class="sort-opt {{sortMode === 'time' ? 'sort-on' : ''}}" bindtap="onSortMode" data-m="time">排盘时间</text>
+    </view>
+  </view>
+
+  <!-- 列表 -->
+  <block wx:for="{{shown}}" wx:key="_id">
+    <template is="recCard" data="{{...item}}" />
   </block>
+  <view class="no-result" wx:if="{{(keyword || filterCount) && shown.length === 0 && total > 0}}">
+    没有符合条件的记录
+  </view>
 
   <!-- 空状态 -->
-  <view class="empty" wx:if="{{!loading && total === 0}}">
+  <view class="empty" wx:if="{{!loading && total === 0 && listTab === 'user'}}">
     <view class="empty-seal seal serif">命</view>
     <view class="empty-text">还没有保存的八字记录</view>
     <view class="empty-sub">排盘后点击「保存」即可留存</view>

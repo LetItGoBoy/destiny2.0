@@ -8,17 +8,71 @@ var BODY_COLOR = {
   水星: '#6FB6FF', 金星: '#F0D078', 火星: '#FF8A70', 木星: '#5ECC8F', 土星: '#D9A05B'
 };
 var BODY_SIZE = { 水星: 3.4, 金星: 5, 地球: 5, 火星: 4.2, 木星: 9, 土星: 7.6 };
+var DAY_MS = 86400000;
+
+function pad2(n) {
+  return (n < 10 ? '0' : '') + n;
+}
+
+function dateValue(ts) {
+  var d = new Date(ts);
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+
+function timeValue(ts) {
+  var d = new Date(ts);
+  return pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+
+function formatViewLabel(ts) {
+  var d = new Date(ts);
+  return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+
+function tsFromPicker(dateStr, timeStr) {
+  var date = String(dateStr || '').split('-');
+  var time = String(timeStr || '12:00').split(':');
+  return new Date(
+    Number(date[0]),
+    Number(date[1]) - 1,
+    Number(date[2]),
+    Number(time[0]) || 0,
+    Number(time[1]) || 0,
+    0
+  ).getTime();
+}
+
+function baZiInputFromTs(ts) {
+  var d = new Date(ts);
+  return {
+    calendar: 'solar',
+    year: d.getFullYear(),
+    month: d.getMonth() + 1,
+    day: d.getDate(),
+    hour: d.getHours(),
+    minute: d.getMinutes()
+  };
+}
 
 Page({
   data: {
     loaded: false,
     fs: 'std',
+    isNow: false,
     meta: {},
     baZiStr: '',
+    baZiView: [],
     list: [],
     selected: null,
     flowing: false,
-    flowLabel: ''
+    paused: false,
+    flowLabel: '',
+    flowDisplayLabel: '',
+    viewDate: '',
+    viewTime: '',
+    viewLabel: '',
+    minDate: '1900-01-01',
+    maxDate: '2100-12-31'
   },
 
   onLoad: function (options) {
@@ -29,20 +83,17 @@ Page({
       this._birthTs = Date.now();
       this._simTs = this._birthTs;
       this._sky = astro.compute(this._birthTs);
-      var d = new Date(this._birthTs);
-      this.setData({
+      this.setData(Object.assign({
         loaded: true,
         isNow: true,
         meta: {
           name: '此刻星象',
           genderText: '',
           lunarShort: '',
-          chartStr: d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 ' +
-            (d.getHours() < 10 ? '0' : '') + d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes()
+          chartStr: formatViewLabel(this._birthTs)
         },
-        baZiStr: '',
-        list: this._sky.list
-      });
+        baZiStr: ''
+      }, this.buildViewPatch(this._birthTs)));
       this._theta = -0.6;
       this._elev = 0.42;
       this._lastTouchAt = 0;
@@ -76,8 +127,12 @@ Page({
     this.setData({
       loaded: true,
       meta: chart.meta,
+      list: this._sky.list,
       baZiStr: chart.pillars.map(function (p) { return p.ganZhi; }).join('　'),
-      list: this._sky.list
+      baZiView: bazi.colorizeBaZi(chart.pillars.map(function (p) { return p.ganZhi; }).join(' ')),
+      viewDate: dateValue(this._birthTs),
+      viewTime: timeValue(this._birthTs),
+      viewLabel: formatViewLabel(this._birthTs)
     });
 
     // 相机与交互状态
@@ -99,6 +154,46 @@ Page({
       this._stopped = false;
       this.loop();
     }
+  },
+
+  buildViewPatch: function (ts) {
+    var baZiStr = '';
+    var baZiView = [];
+    try {
+      baZiStr = bazi.quickBaZi(baZiInputFromTs(ts)).baZi;
+      baZiView = bazi.colorizeBaZi(baZiStr);
+    } catch (e) { /* keep empty */ }
+    return {
+      list: this._sky ? this._sky.list : [],
+      baZiStr: baZiStr.replace(/ /g, '　'),
+      baZiView: baZiView,
+      viewDate: dateValue(ts),
+      viewTime: timeValue(ts),
+      viewLabel: formatViewLabel(ts)
+    };
+  },
+
+  buildFlowLabel: function (ts) {
+    var days = Math.round((ts - this._birthTs) / DAY_MS);
+    var absDays = Math.abs(days);
+    var span = absDays >= 365 ? (absDays / 365.25).toFixed(1) + ' 年' : absDays + ' 天';
+    var prefix = this.data.isNow ? '起点后 ' : (days >= 0 ? '出生后 ' : '出生前 ');
+    return formatViewLabel(ts) + ' · ' + prefix + span;
+  },
+
+  buildFlowDisplayLabel: function (ts, paused) {
+    var label = this.buildFlowLabel(ts);
+    return paused ? '已暂停 · ' + label : label;
+  },
+
+  setSkyTime: function (ts, extra) {
+    this._simTs = ts;
+    this._sky = astro.compute(ts);
+    var patch = this.buildViewPatch(ts);
+    if (extra) {
+      for (var k in extra) patch[k] = extra[k];
+    }
+    this.setData(patch);
   },
 
   initCanvas: function () {
@@ -172,17 +267,15 @@ Page({
     // 默认静止：视角与星体均不动，仅手动拖动或时光流动时改变
 
     // 时光流动：行星按真实角速度运行（每帧约 1/3 天）
-    if (this.data.flowing) {
-      this._simTs += 0.34 * 86400000;
+    if (this.data.flowing && !this.data.paused) {
+      this._simTs += 0.34 * DAY_MS;
       this._sky = astro.compute(this._simTs);
       this._flowFrame = (this._flowFrame || 0) + 1;
       if (this._flowFrame % 12 === 1) {
-        var d = new Date(this._simTs);
-        var days = Math.round((this._simTs - this._birthTs) / 86400000);
-        var span = days >= 365 ? (days / 365.25).toFixed(1) + ' 年' : days + ' 天';
-        this.setData({
-          flowLabel: d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 · 出生后 ' + span
-        });
+        var patch = this.buildViewPatch(this._simTs);
+        patch.flowLabel = this.buildFlowLabel(this._simTs);
+        patch.flowDisplayLabel = patch.flowLabel;
+        this.setData(patch);
       }
     }
 
@@ -327,8 +420,8 @@ Page({
   onTouchEnd: function (e) {
     this._lastTouchAt = Date.now();
     if (this._moved || !e.changedTouches.length) return;
-    // 时光流动中星体位置随时间变化，与出生数据不对应，不响应点选
-    if (this.data.flowing) return;
+    // 时光流动中星体位置随时间变化，不响应点选；暂停后可查看当前位置。
+    if (this.data.flowing && !this.data.paused) return;
     // 点选星体
     var x = e.changedTouches[0].x;
     var y = e.changedTouches[0].y;
@@ -344,7 +437,7 @@ Page({
       return;
     }
     if (best === '地球') {
-      this.setData({ selected: { name: '地球', ancient: '坤舆', desc: '出生那一刻，我们在这里。', cls: '' } });
+      this.setData({ selected: { name: '地球', ancient: '坤舆', desc: '所选时刻，我们在这里。', cls: '' } });
       return;
     }
     var hit = null;
@@ -358,7 +451,7 @@ Page({
           ancient: hit.ancient,
           cls: hit.cls,
           desc: '古称「' + hit.ancient + '」' + (hit.wx !== '阳' && hit.wx !== '阴' ? '，五行属' + hit.wx : '') +
-            '。出生时位于黄经 ' + hit.lonText + '（' + hit.zodiac + '方位）。'
+            '。所选时刻位于黄经 ' + hit.lonText + '（' + hit.zodiac + '方位）。'
         }
       });
     }
@@ -368,15 +461,61 @@ Page({
     this.setData({ selected: null });
   },
 
-  // 时光流动开关：开启后行星按真实角速度运行；关闭即回到出生时刻
-  toggleFlow: function () {
-    if (this.data.flowing) {
-      this._simTs = this._birthTs;
-      this._sky = astro.compute(this._birthTs);
-      this.setData({ flowing: false, flowLabel: '' });
-    } else {
-      this._flowFrame = 0;
-      this.setData({ flowing: true, selected: null });
+  onDateChange: function (e) {
+    this.applyPickerTime(e.detail.value, this.data.viewTime);
+  },
+
+  onTimeChange: function (e) {
+    this.applyPickerTime(this.data.viewDate, e.detail.value);
+  },
+
+  applyPickerTime: function (dateStr, timeStr) {
+    var ts = tsFromPicker(dateStr, timeStr);
+    if (isNaN(ts)) {
+      wx.showToast({ title: '时间格式有误', icon: 'none' });
+      return;
     }
+    this._flowFrame = 0;
+    this.setSkyTime(ts, {
+      flowing: false,
+      paused: false,
+      flowLabel: '',
+      flowDisplayLabel: '',
+      selected: null
+    });
+  },
+
+  // 时光流动开关：开始、暂停、继续都停留在当前星象时刻。
+  toggleFlow: function () {
+    if (!this.data.flowing) {
+      this._flowFrame = 0;
+      this.setData({
+        flowing: true,
+        paused: false,
+        selected: null,
+        flowLabel: this.buildFlowLabel(this._simTs),
+        flowDisplayLabel: this.buildFlowDisplayLabel(this._simTs, false)
+      });
+      return;
+    }
+    var nextPaused = !this.data.paused;
+    this.setData({
+      paused: nextPaused,
+      flowLabel: this.buildFlowLabel(this._simTs),
+      flowDisplayLabel: this.buildFlowDisplayLabel(this._simTs, nextPaused)
+    });
+  },
+
+  resetTime: function () {
+    var ts = this.data.isNow ? Date.now() : this._birthTs;
+    if (this.data.isNow) this._birthTs = ts;
+    this._flowFrame = 0;
+    this.setSkyTime(ts, {
+      flowing: false,
+      paused: false,
+      flowLabel: '',
+      flowDisplayLabel: '',
+      selected: null
+    });
   }
 });

@@ -1,17 +1,17 @@
-/* 同乐八字 - 全局样式（浅色 · 未来星河风） */
-/* 主色：靛紫 #6D5DF6  电光青 #22D3EE  墨蓝近黑 #14152B  白底 #F5F6FB */
+/* 同乐八字 - 全局样式（中国风 · 宫墙红 + 米白） */
+/* 主色：宫墙红 #8A2B27  墨蓝近黑 #14152B  暖米白底 #F4EEE6  卡片白 #FFFFFF */
 
 page {
-  background: #F5F6FB;
-  background-image: linear-gradient(180deg, #EEF0FB 0%, #F5F6FB 420rpx);
+  background: #F4EEE6;
+  background-image: linear-gradient(180deg, #ECE0D0 0%, #F4EEE6 420rpx);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   color: #14152B;
   font-size: 28rpx;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
-  --primary: #6D5DF6;
-  --primary-deep: #4B3DD4;
+  --primary: #8A2B27;
+  --primary-deep: #6E1F1C;
   --cyan: #22D3EE;
   --pink: #EC5C8D;
   --gold: #C08A2B;
@@ -20,8 +20,32 @@ page {
   --ink-3: #9A9CB5;
   --card: #FFFFFF;
   --line: rgba(20, 21, 60, 0.08);
-  --fill: #F1F2FA;
-  --tint: rgba(109, 93, 246, 0.10);
+  --fill: #F3EDE4;
+  --tint: rgba(138, 43, 39, 0.10);
+}
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.page-bg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.72;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page > view:not(.ss-mask):not(.cast-mask):not(.panel-mask):not(.panel):not(.savebar):not(.timebar):not(.overlay),
+.page > scroll-view,
+.page > button {
+  position: relative;
+  z-index: 1;
 }
 
 /* 现代标题字（去衬线、去宋体，偏未来感） */
@@ -43,7 +67,7 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6D5DF6, #5B8DEF);
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
   color: #FFFFFF;
   border-radius: 20rpx;
   font-size: 34rpx;
@@ -51,7 +75,7 @@ page {
   letter-spacing: 6rpx;
   line-height: 1;
   padding: 0;
-  box-shadow: 0 12rpx 30rpx rgba(109, 93, 246, 0.32);
+  box-shadow: 0 12rpx 30rpx rgba(138, 43, 39, 0.32);
 }
 .btn-primary::after {
   border: none;
@@ -63,15 +87,15 @@ page {
 /* 五行配色（适配白底的深色版）：木火土金水 */
 .wx-mu { color: #16A971; }
 .wx-huo { color: #E85540; }
-.wx-tu { color: #C0872C; }
-.wx-jin { color: #B0851C; }
+.wx-tu { color: #8C5E2A; }
+.wx-jin { color: #D4A017; }
 .wx-shui { color: #2E86E6; }
 
 /* 五行实底（彩色圆点，配深字） */
 .bg-mu { background: #34C88A; }
 .bg-huo { background: #FF7A63; }
-.bg-tu { background: #E0A85A; }
-.bg-jin { background: #ECC64E; }
+.bg-tu { background: #B07C34; }
+.bg-jin { background: #E6B81F; }
 .bg-shui { background: #5AA6F2; }
 
 /* 文字辅助 */
@@ -84,9 +108,9 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #7B6BFF, #4B3DD4);
+  background: linear-gradient(135deg, #A3382F, #6E1F1C);
   color: #FFFFFF;
   border-radius: 22rpx;
-  box-shadow: 0 10rpx 26rpx rgba(75, 61, 212, 0.35);
+  box-shadow: 0 10rpx 26rpx rgba(138, 43, 39, 0.35);
   font-weight: 700;
 }
