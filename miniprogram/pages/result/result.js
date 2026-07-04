@@ -311,14 +311,39 @@ Page({
       };
     });
     this._lnYear = ln.year;
-    this.setData({
+    var patch = {
       lnIndex: lnIndex,
       liuYueBar: liuYueBar,
-      lyIndex: -1,        // 默认不挂流月柱
+      lyIndex: -1,        // 非当年流年不挂流月柱
       liuRiBar: [],
       lrIndex: -1
-    });
+    };
+    // 所选流年为当前年份时，默认定位到今天所在的流月与流日
+    var today = bazi.todayGanZhi();
+    if (ln.year === today.year) {
+      for (var y = 0; y < liuYueBar.length; y++) {
+        if (liuYueBar[y].ganZhi !== today.monthGZ) continue;
+        patch.lyIndex = y;
+        patch.liuRiBar = this.buildLiuRiBar(liuYueBar[y].ganZhi);
+        for (var r = 0; r < patch.liuRiBar.length; r++) {
+          if (patch.liuRiBar[r].label === today.label) { patch.lrIndex = r; break; }
+        }
+        break;
+      }
+    }
+    this.setData(patch);
     this.updateTable();
+  },
+
+  // 某流月的流日横条数据
+  buildLiuRiBar: function (lyGanZhi) {
+    var dayGan = this._dayGan, natal = this._natal;
+    return bazi.getLiuRi(this._ctx, lyGanZhi, this._lnYear).map(function (r) {
+      r.ganAbbr = shiShenAbbr(dayGan, r.gan.text);
+      r.zhiAbbr = shiShenAbbr(dayGan, BENQI[r.zhi.text]);
+      r.rels = relsOf(r.zhi.text, natal);
+      return r;
+    });
   },
 
   // 流月：点选生成流月柱，并展开该月流日
@@ -330,14 +355,7 @@ Page({
       return;
     }
     var ly = this.data.liuYueBar[idx];
-    var dayGan = this._dayGan, natal = this._natal;
-    var liuRiBar = bazi.getLiuRi(this._ctx, ly.ganZhi, this._lnYear).map(function (r) {
-      r.ganAbbr = shiShenAbbr(dayGan, r.gan.text);
-      r.zhiAbbr = shiShenAbbr(dayGan, BENQI[r.zhi.text]);
-      r.rels = relsOf(r.zhi.text, natal);
-      return r;
-    });
-    this.setData({ lyIndex: idx, liuRiBar: liuRiBar, lrIndex: -1 });
+    this.setData({ lyIndex: idx, liuRiBar: this.buildLiuRiBar(ly.ganZhi), lrIndex: -1 });
     this.updateTable();
   },
 

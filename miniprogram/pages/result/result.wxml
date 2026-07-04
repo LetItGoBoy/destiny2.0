@@ -148,9 +148,10 @@
 
       <view class="sy-row">
         <view class="sy-lab">大运</view>
-        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}"
+          scroll-into-view="dy{{dyIndex}}" scroll-with-animation>
           <view class="sy-strip">
-            <view class="sy-cell {{dyIndex === item.index ? 'sy-on' : ''}}"
+            <view class="sy-cell {{dyIndex === item.index ? 'sy-on' : ''}}" id="dy{{item.index}}"
               wx:for="{{daYunBar}}" wx:key="index" bindtap="onDaYunTap" data-index="{{item.index}}">
               <view wx:if="{{item.isQian}}" class="sy-qian serif">童限</view>
               <block wx:else>
@@ -167,9 +168,10 @@
 
       <view class="sy-row">
         <view class="sy-lab">流年</view>
-        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}"
+          scroll-into-view="ln{{lnIndex}}" scroll-with-animation>
           <view class="sy-strip">
-            <view class="sy-cell {{lnIndex === item.index ? 'sy-on' : ''}}"
+            <view class="sy-cell {{lnIndex === item.index ? 'sy-on' : ''}}" id="ln{{item.index}}"
               wx:for="{{liuNianBar}}" wx:key="index" bindtap="onLiuNianTap" data-index="{{item.index}}">
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
@@ -183,9 +185,10 @@
 
       <view class="sy-row sy-liuyue" wx:if="{{liuYueBar.length}}">
         <view class="sy-lab">流月</view>
-        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}"
+          scroll-into-view="ly{{lyIndex}}" scroll-with-animation>
           <view class="sy-strip">
-            <view class="sy-cell {{lyIndex === item.index ? 'sy-on' : ''}}"
+            <view class="sy-cell {{lyIndex === item.index ? 'sy-on' : ''}}" id="ly{{item.index}}"
               wx:for="{{liuYueBar}}" wx:key="index" bindtap="onLiuYueTap" data-index="{{item.index}}">
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
@@ -199,9 +202,10 @@
 
       <view class="sy-row sy-liuyue" wx:if="{{liuRiBar.length}}">
         <view class="sy-lab">流日</view>
-        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}">
+        <scroll-view class="sy-scroll" scroll-x show-scrollbar="{{false}}"
+          scroll-into-view="lr{{lrIndex}}" scroll-with-animation>
           <view class="sy-strip">
-            <view class="sy-cell {{lrIndex === item.index ? 'sy-on' : ''}}"
+            <view class="sy-cell {{lrIndex === item.index ? 'sy-on' : ''}}" id="lr{{item.index}}"
               wx:for="{{liuRiBar}}" wx:key="index" bindtap="onLiuRiTap" data-index="{{item.index}}">
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>

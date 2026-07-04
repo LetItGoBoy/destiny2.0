@@ -253,6 +253,18 @@ function getLiuRi(ctx, liuYueGanZhi, year) {
   return list;
 }
 
+// 今天的流月/流日干支（节气月口径），供详盘默认定位到当天
+function todayGanZhi() {
+  var solar = Solar.fromDate(new Date());
+  var lun = solar.getLunar();
+  return {
+    year: solar.getYear(),
+    monthGZ: lun.getMonthInGanZhi(),
+    dayGZ: lun.getDayInGanZhi(),
+    label: solar.getMonth() + '/' + solar.getDay()
+  };
+}
+
 // 仅计算四柱（名人库列表用，避免整盘大运流年的开销）
 function quickBaZi(input) {
   var clockDate;
@@ -398,6 +410,7 @@ module.exports = {
   quickBaZi: quickBaZi,
   buildLuckPillar: buildLuckPillar,
   getLiuRi: getLiuRi,
+  todayGanZhi: todayGanZhi,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
   findSolarByBaZi: findSolarByBaZi,
