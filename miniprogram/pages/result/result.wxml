@@ -62,10 +62,10 @@
     <view class="chart-row gan-zhi-row">
       <view class="cell label-cell">天干</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <block wx:if="{{!item.empty}}">
+        <view class="gz-line" wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.gan.cls}}">{{item.gan.text}}</view>
           <view class="wx-mark wx-{{item.gan.cls}}"><view class="el-ico el-{{item.gan.cls}}"></view><text>{{item.gan.wx}}</text></view>
-        </block>
+        </view>
         <text wx:else class="dim">*</text>
       </view>
     </view>
@@ -73,10 +73,10 @@
     <view class="chart-row gan-zhi-row">
       <view class="cell label-cell">地支</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <block wx:if="{{!item.empty}}">
+        <view class="gz-line" wx:if="{{!item.empty}}">
           <view class="big-char serif wx-{{item.zhi.cls}}">{{item.zhi.text}}</view>
           <view class="wx-mark wx-{{item.zhi.cls}}"><view class="el-ico el-{{item.zhi.cls}}"></view><text>{{item.zhi.wx}}</text></view>
-        </block>
+        </view>
         <text wx:else class="dim">*</text>
       </view>
     </view>
