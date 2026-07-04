@@ -451,5 +451,14 @@ Page({
       title: (meta.name || '八字') + ' · ' + this._chart.pillars.filter(function (p) { return !p.empty; }).map(function (p) { return p.ganZhi; }).join(' '),
       path: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(this._input))
     };
+  },
+
+  onShareTimeline: function () {
+    if (!this._input || !this._chart) return { title: '同乐八字 · 四柱八字排盘' };
+    var meta = this.data.meta;
+    return {
+      title: (meta.name || '八字') + ' · ' + this._chart.pillars.filter(function (p) { return !p.empty; }).map(function (p) { return p.ganZhi; }).join(' '),
+      query: 'input=' + encodeURIComponent(JSON.stringify(this._input))
+    };
   }
 });

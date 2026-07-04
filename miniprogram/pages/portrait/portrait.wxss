@@ -226,6 +226,16 @@
 }
 .pol-zheng { background: linear-gradient(135deg, #5BB58C, #2E8C63); }
 .pol-pian { background: linear-gradient(135deg, #9D78F8, #6C4BD9); }
+.pol-verdict {
+  margin-top: 16rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 12rpx;
+  background: var(--tint);
+  border-left: 6rpx solid var(--primary);
+  font-size: 24rpx;
+  line-height: 1.65;
+  color: var(--ink);
+}
 .pol-explain {
   display: flex;
   gap: 12rpx;

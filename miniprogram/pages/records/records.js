@@ -326,5 +326,13 @@ Page({
 
   goIndex: function () {
     wx.switchTab({ url: '/pages/index/index' });
+  },
+
+  onShareAppMessage: function () {
+    return { title: '同乐八字 · 名人命盘库', path: '/pages/records/records' };
+  },
+
+  onShareTimeline: function () {
+    return { title: '同乐八字 · 名人命盘库' };
   }
 });

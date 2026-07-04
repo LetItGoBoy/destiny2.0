@@ -13,6 +13,13 @@ var STAGE_RANGES = [
   { key: 'life8', start: 57, end: 120 }
 ];
 
+// 守正/求变配比 → 个性化判词（>=58 守正主导，<=42 求变主导，其余均衡）
+function polVerdictOf(zheng) {
+  if (zheng >= 58) return '你更偏「守正」：遇事先求稳、讲规则、重积累，可靠是你的默认姿态；变化来临时习惯先想清楚再动。';
+  if (zheng <= 42) return '你更偏「求变」：不安于重复，天然想突破、想表达，机会感比稳定感更让你安心；顺境里冲劲十足。';
+  return '你在守正与求变之间较为均衡：能稳能闯，会按场合切换姿态，既守得住基本盘，也接得住新机会。';
+}
+
 // 命局特殊结构一句话解读（检测逻辑见 utils/analyze/portrait.js detectTraitPattern）
 var PATTERN_NOTES = {
   食神制杀: '温和的输出与强悍的压力势均力敌、互相制衡：能把危机感转成章法，是很有张力的组合。',
@@ -263,6 +270,7 @@ Page({
         : null,
       zhengNow: p.zhengNow,
       pianNow: p.pianNow,
+      polVerdict: polVerdictOf(p.zhengNow),
       hasTime: p.hasTime,
       stagePortraits: p.stagePortraits || [],
       luckYear: luckYear,
@@ -273,5 +281,25 @@ Page({
     });
   },
 
-  noop: function () {}
+  noop: function () {},
+
+  onShareAppMessage: function () {
+    if (!this._input) return { title: '同乐八字 · 性格画像', path: '/pages/index/index' };
+    var meta = this.data.meta || {};
+    var core = this.data.core || {};
+    return {
+      title: (meta.name || '我') + '的性格画像' + (core.title ? ' · ' + core.title : ''),
+      path: '/pages/portrait/portrait?input=' + encodeURIComponent(JSON.stringify(this._input))
+    };
+  },
+
+  onShareTimeline: function () {
+    if (!this._input) return { title: '同乐八字 · 性格画像' };
+    var meta = this.data.meta || {};
+    var core = this.data.core || {};
+    return {
+      title: (meta.name || '我') + '的性格画像' + (core.title ? ' · ' + core.title : ''),
+      query: 'input=' + encodeURIComponent(JSON.stringify(this._input))
+    };
+  }
 });

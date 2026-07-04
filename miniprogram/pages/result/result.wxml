@@ -6,7 +6,7 @@
     <view class="tab serif {{tab === 'base' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="base">基础盘</view>
     <view class="tab serif {{tab === 'detail' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="detail">详盘</view>
     <view class="tab serif {{tab === 'info' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="info">基本信息</view>
-    <view class="tab tab-energy serif {{tab === 'energy' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="energy">能量盘<text class="tab-free">免费</text></view>
+    <view class="tab tab-energy serif {{tab === 'energy' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="energy">能量盘</view>
   </view>
 
   <!-- 出生星图入口（基础盘内，默认静止，进入后可时光流动）-->

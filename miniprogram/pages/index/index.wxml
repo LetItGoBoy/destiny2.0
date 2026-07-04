@@ -100,7 +100,7 @@
       <view class="form-label">知道出生时辰
         <view class="form-note">{{unknownTime ? '未知 · 只排年月日三柱' : '已知 · 排全四柱'}}</view>
       </view>
-      <switch checked="{{!unknownTime}}" color="#6D5DF6" bindchange="onKnowTimeChange" />
+      <switch checked="{{!unknownTime}}" color="#8A2B27" bindchange="onKnowTimeChange" />
     </view>
 
     <view class="form-row" wx:if="{{calendar !== 'pillar' && !unknownTime}}">
@@ -124,7 +124,7 @@
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>
       </view>
-      <switch checked="{{useTrueSolar}}" color="#6D5DF6" bindchange="onTrueSolarChange" />
+      <switch checked="{{useTrueSolar}}" color="#8A2B27" bindchange="onTrueSolarChange" />
     </view>
 
     <block wx:if="{{calendar !== 'pillar'}}">

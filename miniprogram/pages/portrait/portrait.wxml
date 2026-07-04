@@ -26,6 +26,7 @@
       <view class="pol-zheng" style="width:{{zhengNow}}%"><text wx:if="{{zhengNow >= 14}}">{{zhengNow}}%</text></view>
       <view class="pol-pian" style="width:{{pianNow}}%"><text wx:if="{{pianNow >= 14}}">{{pianNow}}%</text></view>
     </view>
+    <view class="pol-verdict" wx:if="{{polVerdict}}">{{polVerdict}}</view>
     <view class="pol-explain">
       <view class="pol-explain-item pol-explain-zheng">
         <text class="pol-explain-k">守正</text>

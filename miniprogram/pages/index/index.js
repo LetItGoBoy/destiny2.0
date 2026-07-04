@@ -330,5 +330,13 @@ Page({
 
   goRecords: function () {
     wx.switchTab({ url: '/pages/records/records' });
+  },
+
+  onShareAppMessage: function () {
+    return { title: '同乐八字 · 四柱八字排盘（真太阳时）', path: '/pages/index/index' };
+  },
+
+  onShareTimeline: function () {
+    return { title: '同乐八字 · 四柱八字排盘（真太阳时）' };
   }
 });

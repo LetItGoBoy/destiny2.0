@@ -27,28 +27,15 @@
   font-weight: 700;
   box-shadow: 0 4rpx 16rpx rgba(138, 43, 39, 0.32);
 }
-/* 能量盘：醒目 + 免费 */
+/* 能量盘：金色点缀 */
 .tab-energy {
   color: #C0872C;
   font-weight: 700;
 }
 .tab-energy.tab-on {
-  background: linear-gradient(135deg, #F0A93B, #EC5C8D);
+  background: linear-gradient(135deg, #C08A2B, #A3382F);
   color: #FFFFFF;
-  box-shadow: 0 4rpx 16rpx rgba(236, 92, 141, 0.36);
-}
-.tab-free {
-  position: absolute;
-  top: -10rpx;
-  right: 2rpx;
-  font-size: 16rpx;
-  font-weight: 700;
-  letter-spacing: 0;
-  color: #FFFFFF;
-  background: #EC5C8D;
-  border-radius: 8rpx 8rpx 8rpx 0;
-  padding: 1rpx 8rpx;
-  line-height: 1.4;
+  box-shadow: 0 4rpx 16rpx rgba(192, 138, 43, 0.36);
 }
 
 /* 精简生日条（盘面页顶部） */
@@ -536,7 +523,7 @@
   line-height: 1;
   background: linear-gradient(135deg, #8A2B27, #A3382F);
   border-radius: 20rpx;
-  box-shadow: 0 8rpx 28rpx rgba(64, 120, 230, 0.4);
+  box-shadow: 0 8rpx 28rpx rgba(138, 43, 39, 0.36);
   color: #FFFFFF;
   font-size: 32rpx;
   font-weight: 800;
@@ -800,7 +787,7 @@
 }
 .ws-same {
   height: 100%; border-radius: 10rpx 0 0 10rpx;
-  background: linear-gradient(90deg,#6C4BD9,#9D78F8);
+  background: linear-gradient(90deg,#6E1F1C,#A3382F);
   transition: width .8s cubic-bezier(.2,.7,.2,1);
 }
 .ws-legend { display: flex; align-items: center; margin-top: 12rpx; font-size: 22rpx; }
@@ -844,7 +831,7 @@
   border-radius: 14rpx; padding: 8rpx 2rpx; text-align: center;
   background: #f7f7fb; border: 2rpx solid transparent;
 }
-.sy-on { background: #efeaff; border-color: #8A2B27; }
+.sy-on { background: var(--tint); border-color: #8A2B27; }
 .sy-line { display: flex; align-items: center; justify-content: center; gap: 3rpx; line-height: 1.3; }
 .sy-c { font-size: 30rpx; font-weight: 700; }
 .sy-g { font-size: 18rpx; color: #2a2640; }
