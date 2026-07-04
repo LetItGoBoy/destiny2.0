@@ -439,5 +439,13 @@ Page({
       try { this._rainSource.stop(); } catch (e) { /* 已停止 */ }
       this._rainSource = null;
     }
+  },
+
+  onShareAppMessage: function () {
+    return { title: '疗愈空间 · 木鱼抄经，慢下来给心一点空隙', path: '/pages/healing/healing' };
+  },
+
+  onShareTimeline: function () {
+    return { title: '疗愈空间 · 木鱼抄经，慢下来给心一点空隙' };
   }
 });

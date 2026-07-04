@@ -100,7 +100,7 @@
       <view class="form-label">知道出生时辰
         <view class="form-note">{{unknownTime ? '未知 · 只排年月日三柱' : '已知 · 排全四柱'}}</view>
       </view>
-      <switch checked="{{!unknownTime}}" color="#6D5DF6" bindchange="onKnowTimeChange" />
+      <switch checked="{{!unknownTime}}" color="#8A2B27" bindchange="onKnowTimeChange" />
     </view>
 
     <view class="form-row" wx:if="{{calendar !== 'pillar' && !unknownTime}}">
@@ -124,7 +124,7 @@
         真太阳时
         <view class="form-note">按出生地经度与均时差修正</view>
       </view>
-      <switch checked="{{useTrueSolar}}" color="#6D5DF6" bindchange="onTrueSolarChange" />
+      <switch checked="{{useTrueSolar}}" color="#8A2B27" bindchange="onTrueSolarChange" />
     </view>
 
     <block wx:if="{{calendar !== 'pillar'}}">
@@ -156,6 +156,16 @@
       </view>
       <view class="recent-line2">{{item.solarStr}}</view>
     </view>
+  </view>
+
+  <!-- 名人库钩子：还没有自己的记录时，先看看名人的命盘 -->
+  <view class="celeb-hook card" wx:if="{{recent.length === 0}}" hover-class="mod-hover" bindtap="goCelebs">
+    <view class="celeb-hook-seal seal serif">名</view>
+    <view class="celeb-hook-main">
+      <view class="celeb-hook-title serif">名人命盘库</view>
+      <view class="celeb-hook-sub">爱因斯坦、莫扎特、乔布斯…看看他们的八字长什么样</view>
+    </view>
+    <view class="celeb-hook-cta">去看看 ›</view>
   </view>
 
   <view class="footer">命盘仅供传统文化娱乐参考，不构成人生决策依据</view>

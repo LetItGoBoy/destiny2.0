@@ -2,86 +2,13 @@
   padding: 28rpx 28rpx 60rpx;
 }
 
-/* 盘面 */
-.pan {
-  display: flex;
-  padding: 24rpx 16rpx;
-  margin-bottom: 18rpx;
-}
-.pan-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.pan-day {
-  background: var(--tint);
-  border-radius: 14rpx;
-}
-.pan-label {
-  font-size: 22rpx;
-  color: var(--ink-3);
-  margin-bottom: 8rpx;
-}
-.pan-god {
-  font-size: 21rpx;
-  color: var(--ink-2);
-  margin-bottom: 6rpx;
-}
-.pan-gz {
-  font-size: 46rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-  display: flex;
-  gap: 2rpx;
-}
-
-/* 模块分段切换 */
-.seg {
-  display: flex;
-  gap: 8rpx;
-  margin-bottom: 18rpx;
-  padding: 8rpx;
-  background: var(--fill);
-  border-radius: 20rpx;
-}
-.seg-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16rpx 0;
-  border-radius: 16rpx;
-  transition: all 0.25s ease;
-}
-.seg-item.on {
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
-  box-shadow: 0 6rpx 18rpx rgba(138, 43, 39, 0.28);
-}
-.seg-t {
-  font-size: 30rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-  color: var(--ink-2);
-}
-.seg-item.on .seg-t {
-  color: #fff;
-}
-.seg-sub {
-  margin-top: 4rpx;
-  font-size: 20rpx;
-  color: var(--ink-3);
-}
-.seg-item.on .seg-sub {
-  color: rgba(255, 255, 255, 0.85);
-}
-
 /* 外在底色 */
 .core {
   display: flex;
   align-items: center;
   padding: 30rpx 30rpx;
 }
+
 .core-seal {
   flex-shrink: 0;
   width: 96rpx;
@@ -99,15 +26,18 @@
   line-height: 1;
   text-shadow: 0 3rpx 10rpx rgba(61, 7, 5, 0.42);
 }
+
 .core-body {
   flex: 1;
   min-width: 0;
 }
+
 .core-title {
   font-size: 36rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
 }
+
 .core-text {
   margin-top: 10rpx;
   font-size: 25rpx;
@@ -115,42 +45,67 @@
   color: var(--ink-2);
 }
 
-/* 框架说明 */
-.intro {
-  padding: 18rpx 14rpx 4rpx;
-  font-size: 24rpx;
-  line-height: 1.7;
-  color: var(--ink-2);
-}
-.intro .em {
-  color: var(--primary);
-  font-weight: 600;
-}
-.intro-note {
-  display: block;
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: var(--ink-3);
-}
-
 .life-lead {
   margin-top: 22rpx;
   padding: 0 8rpx;
 }
+
 .life-title {
   font-size: 34rpx;
   font-weight: 800;
   color: var(--ink);
 }
+
 .life-note {
   margin-top: 6rpx;
   font-size: 23rpx;
   line-height: 1.65;
   color: var(--ink-2);
 }
+
 .luck-guide {
   margin-top: 28rpx;
   padding-top: 4rpx;
+}
+
+/* 命局结构（食神制杀 / 羊刃驾杀 / 身杀两停） */
+.pattern {
+  display: flex;
+  align-items: center;
+  margin-top: 18rpx;
+  padding: 24rpx 30rpx;
+}
+
+.pattern-badge {
+  flex: none;
+  font-size: 30rpx;
+  font-weight: 800;
+  letter-spacing: 3rpx;
+  color: #8A5E12;
+  background: rgba(201, 162, 39, 0.14);
+  border: 1rpx solid rgba(201, 162, 39, 0.36);
+  border-radius: 14rpx;
+  padding: 14rpx 20rpx;
+  margin-right: 22rpx;
+  writing-mode: vertical-rl;
+}
+
+.pattern-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pattern-k {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--ink-3);
+  margin-bottom: 6rpx;
+}
+
+.pattern-t {
+  font-size: 24rpx;
+  line-height: 1.65;
+  color: var(--ink-2);
 }
 
 /* 两种底色：守正 / 求变 */
@@ -158,20 +113,24 @@
   margin-top: 18rpx;
   padding: 28rpx 30rpx;
 }
+
 .pol-head {
   display: flex;
   align-items: baseline;
   margin-bottom: 18rpx;
 }
+
 .pol-t {
   font-size: 30rpx;
   font-weight: 700;
 }
+
 .pol-sub {
   margin-left: 14rpx;
   font-size: 22rpx;
   color: var(--ink-3);
 }
+
 .pol-bar {
   display: flex;
   height: 52rpx;
@@ -179,6 +138,7 @@
   overflow: hidden;
   background: var(--fill);
 }
+
 .pol-zheng, .pol-pian {
   display: flex;
   align-items: center;
@@ -188,13 +148,28 @@
   font-weight: 600;
   transition: width 0.4s ease;
 }
+
 .pol-zheng { background: linear-gradient(135deg, #5BB58C, #2E8C63); }
+
 .pol-pian { background: linear-gradient(135deg, #9D78F8, #6C4BD9); }
+
+.pol-verdict {
+  margin-top: 16rpx;
+  padding: 14rpx 18rpx;
+  border-radius: 12rpx;
+  background: var(--tint);
+  border-left: 6rpx solid var(--primary);
+  font-size: 24rpx;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
 .pol-explain {
   display: flex;
   gap: 12rpx;
   margin-top: 18rpx;
 }
+
 .pol-explain-item {
   flex: 1;
   min-width: 0;
@@ -202,35 +177,44 @@
   border-radius: 16rpx;
   border: 1rpx solid transparent;
 }
+
 .pol-explain-zheng {
   background: rgba(91, 181, 140, 0.12);
   border-color: rgba(46, 140, 99, 0.22);
 }
+
 .pol-explain-pian {
   background: rgba(108, 75, 217, 0.11);
   border-color: rgba(108, 75, 217, 0.22);
 }
+
 .pol-explain-k {
   display: block;
   font-size: 23rpx;
   font-weight: 800;
   margin-bottom: 4rpx;
 }
+
 .pol-explain-t {
   display: block;
   font-size: 21rpx;
   line-height: 1.45;
   color: var(--ink-2);
 }
+
 .pol-explain-zheng .pol-explain-k { color: #2E8C63; }
+
 .pol-explain-pian .pol-explain-k { color: #6C4BD9; }
+
 .pol-legend {
   display: flex;
   justify-content: space-between;
   margin-top: 14rpx;
   font-size: 22rpx;
 }
+
 .lg-zheng { color: #2E8C63; }
+
 .lg-pian { color: #6C4BD9; }
 
 /* 心性构成 */
@@ -238,20 +222,24 @@
   margin-top: 18rpx;
   padding: 28rpx 30rpx 12rpx;
 }
+
 .comp-head {
   display: flex;
   align-items: baseline;
   margin-bottom: 8rpx;
 }
+
 .comp-t {
   font-size: 30rpx;
   font-weight: 700;
 }
+
 .comp-sub {
   margin-left: 14rpx;
   font-size: 22rpx;
   color: var(--ink-3);
 }
+
 .comp-tip {
   margin: 12rpx 0 6rpx;
   padding: 16rpx 20rpx;
@@ -261,39 +249,18 @@
   line-height: 1.7;
   color: var(--ink-2);
 }
-/* 当前显示状态说明（本命 / 大运 / 流年） */
-.now-note {
-  margin: 14rpx 0 4rpx;
-  padding: 16rpx 20rpx;
-  background: var(--primary-soft, rgba(138, 43, 39, 0.10));
-  border-left: 6rpx solid var(--primary);
-  border-radius: 10rpx;
-  font-size: 24rpx;
-  line-height: 1.7;
-  color: var(--ink-1, #333);
-}
-.fs-l .now-note { font-size: 27rpx; }
-.fs-xl .now-note { font-size: 30rpx; }
-.comp-tip .tip-l { color: var(--primary); font-weight: 600; }
-.comp-tip .tip-r { color: #2C6BB0; font-weight: 600; }
-.comp-tip .tip-luck { color: #9A6B12; font-weight: 600; }
 
-.trait {
-  padding: 22rpx 0;
-  border-bottom: 1rpx solid var(--line);
-}
-.trait:last-child {
-  border-bottom: none;
-}
 .trait-line {
   display: flex;
   align-items: center;
   margin-bottom: 12rpx;
 }
+
 .trait-name {
   font-size: 32rpx;
   font-weight: 700;
 }
+
 .trait-main {
   margin-left: 12rpx;
   font-size: 18rpx;
@@ -304,26 +271,7 @@
   padding: 3rpx 14rpx;
   border-radius: 100rpx;
 }
-.trait-energy {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-}
-.te-dot {
-  width: 12rpx;
-  height: 12rpx;
-  border-radius: 50%;
-  background: var(--fill);
-}
-.te-dot.on {
-  background: var(--primary);
-}
-.trait-god {
-  margin-left: 12rpx;
-  font-size: 22rpx;
-  color: var(--ink-3);
-}
+
 /* 滑标轴 */
 .slider-row {
   display: flex;
@@ -331,13 +279,17 @@
   margin: 10rpx 0 6rpx;
   gap: 12rpx;
 }
+
 .sl-lbl {
   font-size: 20rpx;
   flex-shrink: 0;
   max-width: 160rpx;
 }
+
 .sl-lbl-l { color: var(--primary); text-align: right; }
+
 .sl-lbl-r { color: #2C6BB0; text-align: left; }
+
 .sl-track {
   flex: 1;
   height: 10rpx;
@@ -345,6 +297,20 @@
   border-radius: 100rpx;
   position: relative;
 }
+
+/* 中点刻度：偏离中线多少一眼可见 */
+.sl-track::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rpx;
+  height: 18rpx;
+  background: rgba(20, 21, 60, 0.22);
+  border-radius: 2rpx;
+}
+
 .sl-thumb {
   position: absolute;
   top: 50%;
@@ -357,22 +323,55 @@
   transition: left 0.4s ease;
 }
 
+/* 气泡星团图例（颜色与 traitcluster 组件保持一致） */
+.tc-legend {
+  display: flex;
+  justify-content: center;
+  gap: 28rpx;
+  margin: 2rpx 0 6rpx;
+}
+
+.tcl {
+  display: flex;
+  align-items: center;
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+
+.tcl::before {
+  content: '';
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-right: 8rpx;
+}
+
+.tcl-pro::before { background: #F7DCD9; border: 1rpx solid #E6A89F; }
+
+.tcl-con::before { background: #DCE8F7; border: 1rpx solid #9CBEE6; }
+
+.tcl-luck::before { background: #F3E2BC; border: 1rpx solid #D9B45A; }
+
 .trait-pc {
   margin-top: 12rpx;
 }
+
 .pc {
   font-size: 23rpx;
   line-height: 1.6;
   color: var(--ink-3);
   margin-top: 4rpx;
 }
+
 .pc-on {
   color: var(--ink-2);
 }
+
 /* 优点 / 缺点：缺点另起一段 */
 .pc-con {
   margin-top: 12rpx;
 }
+
 .pc-key {
   display: inline-block;
   margin-right: 10rpx;
@@ -382,14 +381,17 @@
   font-weight: 600;
   vertical-align: 1rpx;
 }
+
 .pc-key-pro {
   color: var(--primary, #8A2B27);
   background: var(--primary-soft, rgba(138, 43, 39, 0.10));
 }
+
 .pc-key-con {
   color: #2C6BB0;
   background: rgba(44, 107, 176, 0.10);
 }
+
 .comp-empty {
   padding: 30rpx 0;
   text-align: center;
@@ -401,6 +403,7 @@
 .stage-acc {
   margin-top: 18rpx;
 }
+
 .acc-card {
   margin-top: 18rpx;
   overflow: hidden;
@@ -409,12 +412,14 @@
   box-shadow: var(--shadow);
   border: 1rpx solid var(--line);
 }
+
 .acc-head {
   min-height: 116rpx;
   display: flex;
   align-items: center;
   padding: 22rpx 26rpx;
 }
+
 .acc-index {
   flex: none;
   width: 62rpx;
@@ -430,20 +435,24 @@
   margin-right: 20rpx;
   box-shadow: 0 8rpx 18rpx rgba(138, 43, 39, 0.22);
 }
+
 .luck-index {
   color: #FFF7E4;
   background: linear-gradient(135deg, #8A2B27, #A3382F);
 }
+
 .acc-copy {
   flex: 1;
   min-width: 0;
 }
+
 .acc-action {
   flex: none;
   display: flex;
   align-items: center;
   margin-left: 14rpx;
 }
+
 .acc-plus {
   width: 34rpx;
   text-align: center;
@@ -452,18 +461,21 @@
   font-weight: 600;
   line-height: 1;
 }
+
 .acc-title {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 12rpx;
 }
+
 .acc-name {
   font-size: 34rpx;
   font-weight: 800;
   color: var(--ink);
   letter-spacing: 1rpx;
 }
+
 .acc-age {
   flex: none;
   font-size: 20rpx;
@@ -475,6 +487,7 @@
   padding: 6rpx 12rpx;
   border-radius: 100rpx;
 }
+
 .acc-sub {
   flex: none;
   font-size: 20rpx;
@@ -486,12 +499,71 @@
   padding: 6rpx 12rpx;
   border-radius: 100rpx;
 }
+
+.acc-now {
+  flex: none;
+  font-size: 19rpx;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  background: linear-gradient(135deg, #8A2B27, #A3382F);
+  padding: 6rpx 12rpx;
+  border-radius: 100rpx;
+  letter-spacing: 1rpx;
+}
+
 .acc-stage-meta {
   display: flex;
   align-items: center;
   min-width: 0;
   margin-top: 10rpx;
 }
+
+/* 卡头个性化：该阶段的心性名 + 来源干支字 */
+.acc-trait-line {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-top: 10rpx;
+  gap: 10rpx;
+}
+
+.acc-trait-char {
+  flex: none;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  font-size: 26rpx;
+  font-weight: 800;
+  background: var(--fill);
+  border: 1rpx solid var(--line);
+  border-radius: 10rpx;
+}
+
+.acc-trait-name {
+  flex: none;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 1rpx;
+}
+
+.acc-trait-lbl {
+  flex: 1;
+  min-width: 0;
+  font-size: 20rpx;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.acc-trait-need {
+  font-size: 21rpx;
+  color: var(--ink-3);
+}
+
 .acc-phase {
   flex: none;
   min-width: 34rpx;
@@ -505,6 +577,7 @@
   font-weight: 800;
   margin-right: 12rpx;
 }
+
 .acc-theme {
   flex: 1;
   min-width: 0;
@@ -512,12 +585,14 @@
   line-height: 1.35;
   color: var(--ink-2);
 }
+
 .acc-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
   margin-top: 8rpx;
 }
+
 .acc-pill {
   font-size: 20rpx;
   color: var(--ink-2);
@@ -526,22 +601,26 @@
   padding: 3rpx 12rpx;
   border-radius: 100rpx;
 }
+
 .luck-pill {
   color: #9A6B12;
   background: rgba(201, 162, 39, 0.12);
   border-color: rgba(201, 162, 39, 0.28);
 }
+
 .acc-body {
   padding: 24rpx 26rpx 26rpx;
   border-top: 1rpx solid var(--line);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.52));
 }
+
 .stage-note {
   font-size: 24rpx;
   line-height: 1.7;
   color: var(--ink-2);
   margin-bottom: 20rpx;
 }
+
 .layer-card {
   margin-top: 18rpx;
   padding: 24rpx 22rpx 18rpx;
@@ -549,13 +628,16 @@
   border-radius: 18rpx;
   background: rgba(255, 255, 255, 0.72);
 }
+
 .stage-layer {
   background: rgba(255, 255, 255, 0.78);
   border-color: rgba(20, 21, 60, 0.10);
 }
+
 .layer-card:first-of-type {
   margin-top: 0;
 }
+
 .layer-head {
   display: flex;
   align-items: flex-start;
@@ -563,6 +645,7 @@
   gap: 16rpx;
   margin-bottom: 12rpx;
 }
+
 .trait-cat-wrap {
   flex: none;
   width: 216rpx;
@@ -575,18 +658,22 @@
   border-radius: 18rpx;
   overflow: visible;
 }
+
 .trait-cat {
   width: 206rpx;
   height: 206rpx;
   display: block;
 }
+
 .layer-copy {
   flex: 1;
   min-width: 0;
 }
+
 .layer-body {
   padding-top: 2rpx;
 }
+
 .layer-k {
   display: inline-flex;
   align-items: center;
@@ -599,11 +686,7 @@
   padding: 5rpx 14rpx;
   margin-bottom: 8rpx;
 }
-.layer-k-inner {
-  color: #08746F;
-  background: rgba(8, 116, 111, 0.13);
-  border-color: rgba(8, 116, 111, 0.34);
-}
+
 .layer-help {
   font-size: 22rpx;
   line-height: 1.5;
@@ -611,23 +694,20 @@
   margin-bottom: 10rpx;
   color: var(--ink-2);
 }
-.layer-help-outer {
-  color: #B86B00;
-}
-.layer-help-inner {
-  color: #08746F;
-}
-.flow-slider .sl-lbl-l,
-.flow-slider .sl-lbl-r {
+
+.flow-slider .sl-lbl-l, .flow-slider .sl-lbl-r {
   color: #9A6B12;
 }
+
 .flow-slider .sl-track {
   background: rgba(201, 162, 39, 0.22);
 }
+
 .luck-thumb {
   background: #C9A227;
   box-shadow: 0 2rpx 8rpx rgba(154, 107, 18, 0.35);
 }
+
 .luck-controls {
   margin-top: 18rpx;
   padding: 20rpx;
@@ -635,17 +715,20 @@
   background: var(--fill);
   border: 1rpx solid var(--line);
 }
+
 .luck-control-title {
   font-size: 22rpx;
   font-weight: 700;
   color: var(--ink-2);
   margin-bottom: 14rpx;
 }
+
 .luck-stage-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
 }
+
 .luck-stage {
   padding: 10rpx 22rpx;
   border-radius: 100rpx;
@@ -654,17 +737,20 @@
   border: 1rpx solid var(--line);
   font-size: 24rpx;
 }
+
 .luck-stage.on {
   color: #fff;
   background: #1D2638;
   border-color: #1D2638;
 }
+
 .luck-step {
   display: flex;
   align-items: center;
   gap: 14rpx;
   margin-bottom: 14rpx;
 }
+
 .luck-step-btn {
   flex: none;
   width: 58rpx;
@@ -679,6 +765,7 @@
   font-size: 38rpx;
   line-height: 1;
 }
+
 .luck-year-main {
   flex: 1;
   text-align: center;
@@ -691,13 +778,16 @@
   font-size: 28rpx;
   font-weight: 800;
 }
+
 .luck-year-scroll {
   white-space: nowrap;
 }
+
 .luck-year-strip {
   display: inline-flex;
   gap: 12rpx;
 }
+
 .luck-year {
   width: 116rpx;
   padding: 12rpx 0;
@@ -706,16 +796,19 @@
   border: 1rpx solid var(--line);
   text-align: center;
 }
+
 .luck-year.on {
   background: rgba(201, 162, 39, 0.14);
   border-color: #C9A227;
 }
+
 .luck-y {
   display: block;
   font-size: 24rpx;
   font-weight: 800;
   color: var(--ink);
 }
+
 .luck-a {
   display: block;
   margin-top: 2rpx;
@@ -728,14 +821,17 @@
   padding: 20rpx 0;
   border-bottom: 1rpx solid var(--line);
 }
+
 .rel:last-child {
   border-bottom: none;
 }
+
 .rel-head-line {
   display: flex;
   align-items: center;
   margin-bottom: 10rpx;
 }
+
 .rel-badge {
   flex-shrink: 0;
   width: 44rpx;
@@ -748,15 +844,21 @@
   align-items: center;
   justify-content: center;
 }
+
 .rel-he { background: #5BD08A; }
+
 .rel-chong { background: #FF4D4D; }
+
 .rel-xing { background: #B47BF0; }
+
 .rel-hai { background: #FF7A33; }
+
 .rel-tag {
   margin-left: 16rpx;
   font-size: 22rpx;
   color: var(--ink-2);
 }
+
 .rel-luck {
   margin-left: auto;
   flex-shrink: 0;
@@ -766,295 +868,26 @@
   padding: 3rpx 14rpx;
   border-radius: 100rpx;
 }
+
 .rel-zhis-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8rpx;
   margin-bottom: 10rpx;
 }
+
 .rel-zhis {
   font-size: 30rpx;
   font-weight: 700;
   letter-spacing: 4rpx;
   color: var(--ink);
 }
+
 .rel-zhis-luck {
   font-size: 18rpx;
   color: var(--primary);
   font-weight: 400;
   letter-spacing: 0;
-}
-
-/* 人生四季 */
-.stage {
-  padding: 22rpx 0;
-  border-bottom: 1rpx solid var(--line);
-}
-.stage:last-child {
-  border-bottom: none;
-}
-.stage-head {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12rpx;
-}
-.stage-badge {
-  flex-shrink: 0;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
-  padding: 6rpx 18rpx;
-  border-radius: 100rpx;
-}
-.stage-sub {
-  margin-left: 14rpx;
-  font-size: 22rpx;
-  color: var(--ink-3);
-}
-.stage-gz {
-  margin-left: auto;
-  font-size: 38rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-}
-.stage-theme {
-  display: flex;
-  align-items: baseline;
-  margin-bottom: 6rpx;
-}
-.stage-key {
-  flex-shrink: 0;
-  font-size: 20rpx;
-  color: var(--primary);
-  background: var(--tint);
-  padding: 3rpx 12rpx;
-  border-radius: 6rpx;
-}
-.stage-key-in {
-  color: var(--ink-2);
-  background: var(--fill);
-}
-.stage-theme-name {
-  margin-left: 12rpx;
-  font-size: 30rpx;
-  font-weight: 700;
-}
-.stage-god {
-  margin-left: 10rpx;
-  font-size: 22rpx;
-  color: var(--ink-3);
-}
-.stage-inner {
-  display: flex;
-  align-items: baseline;
-  margin-top: 10rpx;
-}
-.stage-inner-name {
-  margin-left: 12rpx;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-.stage-inner-txt {
-  margin-left: 10rpx;
-  font-size: 23rpx;
-  color: var(--ink-3);
-}
-
-/* 底部时光条占位 */
-.bar-holder {
-  height: 120rpx;
-}
-
-/* 底部常驻时光条 */
-.timebar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  padding: 14rpx 24rpx calc(14rpx + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 -2rpx 16rpx rgba(0, 0, 0, 0.06);
-}
-.tb-natal {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 20rpx;
-  color: var(--primary);
-  padding: 4rpx 10rpx;
-}
-.tb-natal-ic {
-  font-size: 30rpx;
-  line-height: 1;
-}
-.tb-dim {
-  color: var(--ink-3);
-}
-.tb-step {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 12rpx;
-}
-.tb-arrow {
-  flex-shrink: 0;
-  width: 60rpx;
-  height: 60rpx;
-  line-height: 56rpx;
-  text-align: center;
-  font-size: 44rpx;
-  color: var(--primary);
-  background: var(--tint);
-  border-radius: 50%;
-}
-.tb-mid {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 0;
-}
-.tb-year {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: var(--ink-3);
-  letter-spacing: 1rpx;
-}
-.tb-year.on {
-  color: var(--primary);
-}
-.tb-gz {
-  font-size: 21rpx;
-  color: var(--ink-2);
-  margin-top: 2rpx;
-}
-.tb-hint {
-  color: var(--ink-3);
-}
-.tb-expand {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 4rpx;
-  font-size: 24rpx;
-  color: #fff;
-  background: linear-gradient(135deg, #9D78F8, #6C4BD9);
-  padding: 12rpx 22rpx;
-  border-radius: 100rpx;
-}
-.tb-expand-ic {
-  font-size: 20rpx;
-}
-
-/* 滑出选择面板 */
-.panel-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  background: rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.25s ease;
-}
-.panel-mask.show {
-  opacity: 1;
-  visibility: visible;
-}
-.panel {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 80;
-  padding: 24rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
-  background: var(--card);
-  border-radius: 28rpx 28rpx 0 0;
-  box-shadow: 0 -6rpx 30rpx rgba(0, 0, 0, 0.16);
-  transform: translateY(110%);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.panel.show {
-  transform: translateY(0);
-}
-.panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18rpx;
-}
-.panel-cur {
-  font-size: 24rpx;
-  color: var(--primary);
-  background: var(--tint);
-  border-radius: 10rpx;
-  padding: 10rpx 18rpx;
-}
-.panel-close {
-  flex-shrink: 0;
-  font-size: 24rpx;
-  color: var(--ink-3);
-  padding: 8rpx 16rpx;
-}
-.section-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-  margin: 8rpx 0 16rpx;
-}
-.section-note {
-  font-size: 22rpx;
-  color: var(--ink-3);
-  font-weight: 400;
-  margin-left: 12rpx;
-}
-.yun-scroll {
-  white-space: nowrap;
-  margin-bottom: 8rpx;
-}
-.yun-strip {
-  display: inline-flex;
-}
-.yun-cell {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 14rpx 0;
-  width: 124rpx;
-  margin-right: 12rpx;
-  border-radius: 16rpx;
-  border: 1rpx solid var(--line);
-  background: var(--fill);
-}
-.yun-on {
-  background: var(--tint);
-  border-color: var(--primary);
-  box-shadow: 0 4rpx 16rpx rgba(138, 43, 39, 0.3);
-}
-.yun-ss {
-  font-size: 20rpx;
-  color: var(--ink-3);
-}
-.yun-gz {
-  font-size: 36rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-  margin: 4rpx 0;
-}
-.yun-year {
-  font-size: 22rpx;
-  color: var(--ink-2);
-}
-.yun-age {
-  font-size: 20rpx;
-  color: var(--ink-3);
 }
 
 .foot {
@@ -1066,44 +899,30 @@
 }
 
 /* 字号档位 */
-.fs-l .core-text, .fs-l .pc, .fs-l .intro { font-size: 26rpx; }
-.fs-xl .core-text, .fs-xl .pc, .fs-xl .intro { font-size: 29rpx; }
+.fs-l .core-text, .fs-l .pc { font-size: 26rpx; }
 
-/* 气泡星团 · 顺偏滑标 */
-.lean-row {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin: 8rpx 6rpx 4rpx;
-}
-.lean-slider { flex: 1; }
-.lean-end {
-  font-size: 24rpx;
-  font-weight: 700;
-  flex: none;
-  width: 86rpx;
-  text-align: center;
-}
-.lean-end.l { color: #2C6BB0; }
-.lean-end.r { color: #B23A2E; }
+.fs-xl .core-text, .fs-xl .pc { font-size: 29rpx; }
 
 /* 今年心性（流年/大运叠加）· 气泡与主心性细读之间，无特殊卡框 */
 .luck-block {
   padding: 18rpx 0 6rpx;
   border-bottom: 1rpx solid var(--line);
 }
+
 .luck-head {
   display: flex;
   align-items: center;
   gap: 14rpx;
   margin-bottom: 10rpx;
 }
+
 .luck-cat {
   flex: none;
   width: 64rpx;
   height: 64rpx;
   margin-right: -2rpx;
 }
+
 .luck-badge {
   font-size: 22rpx;
   font-weight: 700;
@@ -1112,27 +931,33 @@
   border-radius: 8rpx;
   padding: 3rpx 14rpx;
 }
+
 .luck-name {
   font-size: 34rpx;
   font-weight: 700;
   color: #9A6B12;
   letter-spacing: 2rpx;
 }
+
 .luck-lbls {
   margin-left: auto;
   font-size: 22rpx;
   color: #B08A2E;
 }
+
 .luck-lead {
   font-size: 28rpx;
   font-weight: 600;
   color: #8A5E12;
   margin-bottom: 10rpx;
 }
+
 .luck-desc {
   font-size: 25rpx;
   line-height: 1.7;
   color: var(--ink-2);
 }
+
 .fs-l .luck-desc { font-size: 27rpx; }
+
 .fs-xl .luck-desc { font-size: 30rpx; }

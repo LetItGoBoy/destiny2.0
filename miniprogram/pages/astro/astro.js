@@ -517,5 +517,13 @@ Page({
       flowDisplayLabel: '',
       selected: null
     });
+  },
+
+  onShareAppMessage: function () {
+    return { title: '此刻星象 · 日月五星的真实位置', path: '/pages/astro/astro?now=1' };
+  },
+
+  onShareTimeline: function () {
+    return { title: '此刻星象 · 日月五星的真实位置', query: 'now=1' };
   }
 });

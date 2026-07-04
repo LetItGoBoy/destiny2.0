@@ -130,7 +130,7 @@ Page({
       months.map(function (m) { return m.label; }),
       days.map(function (d) { return d.label; })
     ];
-    var text = year + '年 ' + months[sel[1]].label + months[sel[2]].label;
+    var text = year + '年 ' + months[sel[1]].label + days[sel[2]].label;
     this.setData({
       lunarRange: range,
       lunarIndex: sel.slice(0),
@@ -330,5 +330,19 @@ Page({
 
   goRecords: function () {
     wx.switchTab({ url: '/pages/records/records' });
+  },
+
+  // 名人库入口：switchTab 不能带参数，用 storage 标记让记录页直接切到名人库
+  goCelebs: function () {
+    try { wx.setStorageSync('open_celeb_tab', 1); } catch (e) {}
+    wx.switchTab({ url: '/pages/records/records' });
+  },
+
+  onShareAppMessage: function () {
+    return { title: '同乐八字 · 四柱八字排盘（真太阳时）', path: '/pages/index/index' };
+  },
+
+  onShareTimeline: function () {
+    return { title: '同乐八字 · 四柱八字排盘（真太阳时）' };
   }
 });
