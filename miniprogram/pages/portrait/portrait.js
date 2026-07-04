@@ -73,6 +73,15 @@ Page({
     this._chart = chart;
     this._birthYear = new Date(chart.meta.timestamp).getFullYear();
 
+    // 一键画像也是一次排盘，记入「最近排盘」历史
+    prefs.pushHistory({
+      input: input,
+      name: chart.meta.name,
+      gender: chart.meta.gender,
+      baZi: chart.pillars.filter(function (p) { return !p.empty; }).map(function (p) { return p.ganZhi; }).join(' '),
+      dateStr: chart.meta.clockStr
+    });
+
     this._dy = (chart.daYun || []).filter(function (d) {
       return d.ganZhi && !d.isQian;
     }).map(function (d, i) {

@@ -411,7 +411,7 @@
   position: absolute;
   width: 268rpx;
   height: 268rpx;
-  border: 2rpx dashed rgba(255, 216, 107, 0.42);
+  border: 2rpx solid rgba(255, 216, 107, 0.42);
   border-radius: 50%;
   animation: castSpinBack 11s linear infinite;
 }
