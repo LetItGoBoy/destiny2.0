@@ -63,7 +63,6 @@
             <text class="acc-theme">{{stage.theme}}</text>
           </view>
           <view class="acc-trait-line" wx:if="{{!stage.empty && stage.layer}}">
-            <text class="acc-trait-char serif wx-{{stage.layer.cls}}" wx:if="{{stage.layer.sourceChar}}">{{stage.layer.sourceChar}}</text>
             <text class="acc-trait-name">{{stage.layer.name}}</text>
             <text class="acc-trait-lbl" wx:if="{{stage.layer.lbl}}">{{stage.layer.lbl}} · {{stage.layer.rbl}}</text>
           </view>
@@ -72,6 +71,7 @@
           </view>
         </view>
         <view class="acc-action">
+          <text class="acc-action-tip">{{openStageKey === stage.key ? '收起' : '查看'}}</text>
           <text class="acc-plus">{{openStageKey === stage.key ? '−' : '+'}}</text>
         </view>
       </view>
@@ -148,6 +148,7 @@
           </view>
         </view>
         <view class="acc-action">
+          <text class="acc-action-tip">{{openStageKey === 'luck' ? '收起' : '查看'}}</text>
           <text class="acc-plus">{{openStageKey === 'luck' ? '−' : '+'}}</text>
         </view>
       </view>
