@@ -62,6 +62,16 @@ Page({
 
   onShow: function () {
     this.setData({ fs: prefs.getFontSize() });
+    // 其他页面（如首页名人库入口）通过 storage 标记请求直接打开名人库 tab
+    var wantCeleb = false;
+    try {
+      wantCeleb = wx.getStorageSync('open_celeb_tab');
+      if (wantCeleb) wx.removeStorageSync('open_celeb_tab');
+    } catch (e) {}
+    if (wantCeleb && this.data.listTab !== 'celeb') {
+      this.buildCelebs();
+      this.setData({ listTab: 'celeb' });
+    }
     this.load();
   },
 

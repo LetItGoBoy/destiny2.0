@@ -541,3 +541,41 @@
   --ink-2: #F6E7C8;
   --primary: #FFD86B;
 }
+
+/* 名人库钩子（无记录时展示） */
+.celeb-hook {
+  display: flex;
+  align-items: center;
+  margin-top: 40rpx;
+  padding: 26rpx 28rpx;
+}
+.celeb-hook-seal {
+  flex: none;
+  width: 76rpx;
+  height: 76rpx;
+  font-size: 38rpx;
+  margin-right: 22rpx;
+}
+.celeb-hook-main {
+  flex: 1;
+  min-width: 0;
+}
+.celeb-hook-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+.celeb-hook-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.celeb-hook-cta {
+  flex: none;
+  margin-left: 14rpx;
+  font-size: 24rpx;
+  color: var(--primary);
+  font-weight: 600;
+}

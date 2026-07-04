@@ -82,6 +82,7 @@ Page({
     baZiStr: '',
     fs: 'std',
     showSubRows: false,
+    showInfo: false,
     // 能量盘
     qMode: 'fill',
     qDaYunList: [],
@@ -98,6 +99,10 @@ Page({
 
   onToggleSubRows: function () {
     this.setData({ showSubRows: !this.data.showSubRows });
+  },
+
+  toggleInfo: function () {
+    this.setData({ showInfo: !this.data.showInfo });
   },
 
   onLoad: function (options) {

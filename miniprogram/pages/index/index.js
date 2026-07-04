@@ -332,6 +332,12 @@ Page({
     wx.switchTab({ url: '/pages/records/records' });
   },
 
+  // 名人库入口：switchTab 不能带参数，用 storage 标记让记录页直接切到名人库
+  goCelebs: function () {
+    try { wx.setStorageSync('open_celeb_tab', 1); } catch (e) {}
+    wx.switchTab({ url: '/pages/records/records' });
+  },
+
   onShareAppMessage: function () {
     return { title: '同乐八字 · 四柱八字排盘（真太阳时）', path: '/pages/index/index' };
   },

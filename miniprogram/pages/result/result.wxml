@@ -5,8 +5,28 @@
   <view class="tabs">
     <view class="tab serif {{tab === 'base' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="base">基础盘</view>
     <view class="tab serif {{tab === 'detail' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="detail">详盘</view>
-    <view class="tab serif {{tab === 'info' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="info">基本信息</view>
     <view class="tab tab-energy serif {{tab === 'energy' ? 'tab-on' : ''}}" bindtap="onTab" data-tab="energy">能量盘</view>
+  </view>
+
+  <!-- 命主信息（基础盘顶部，默认折叠，点击展开全部） -->
+  <view class="card info" wx:if="{{tab === 'base'}}">
+    <view class="info-head {{showInfo ? '' : 'info-head-plain'}}" bindtap="toggleInfo">
+      <text class="info-name serif">{{meta.name || '未署名'}}</text>
+      <text class="info-tag {{meta.gender === 1 ? 'tag-m' : 'tag-f'}}">{{meta.gender === 1 ? '乾造' : '坤造'}}</text>
+      <text class="info-sx">属{{meta.shengXiao}}</text>
+      <text class="info-fold">{{showInfo ? '收起' : '详情'}}<text class="info-fold-arrow {{showInfo ? 'info-fold-up' : ''}}">▾</text></text>
+    </view>
+    <block wx:if="{{showInfo}}">
+      <view class="info-row"><text class="info-label">公　历</text><text>{{meta.clockStr}}</text></view>
+      <view class="info-row"><text class="info-label">农　历</text><text>{{meta.lunarStr}}</text></view>
+      <view class="info-row" wx:if="{{meta.useTrueSolar}}">
+        <text class="info-label">真太阳时</text>
+        <text>{{meta.chartStr}}<text class="info-note">（修正{{meta.offsetMinutes >= 0 ? '+' : ''}}{{meta.offsetMinutes}}分）</text></text>
+      </view>
+      <view class="info-row" wx:if="{{meta.location}}"><text class="info-label">出生地</text><text>{{meta.location}}</text></view>
+      <view class="info-row"><text class="info-label">八　字</text><text class="serif info-bazi">{{baZiStr}}</text></view>
+      <view class="info-row"><text class="info-label">起　运</text><text>{{meta.qiYun}}<text class="info-note">（{{meta.qiYunDate}} 交运）</text></text></view>
+    </block>
   </view>
 
   <!-- 出生星图入口（基础盘内，默认静止，进入后可时光流动）-->
@@ -18,24 +38,6 @@
       <view class="astro-sub">你出生那一刻，日月五星的真实位置</view>
       <view class="astro-cta">进入 3D 星图 ›</view>
     </view>
-  </view>
-
-  <!-- 基本信息页 -->
-  <view class="card info" wx:if="{{tab === 'info'}}">
-    <view class="info-head">
-      <text class="info-name serif">{{meta.name || '未署名'}}</text>
-      <text class="info-tag {{meta.gender === 1 ? 'tag-m' : 'tag-f'}}">{{meta.gender === 1 ? '乾造' : '坤造'}}</text>
-      <text class="info-sx">属{{meta.shengXiao}}</text>
-    </view>
-    <view class="info-row"><text class="info-label">公　历</text><text>{{meta.clockStr}}</text></view>
-    <view class="info-row"><text class="info-label">农　历</text><text>{{meta.lunarStr}}</text></view>
-    <view class="info-row" wx:if="{{meta.useTrueSolar}}">
-      <text class="info-label">真太阳时</text>
-      <text>{{meta.chartStr}}<text class="info-note">（修正{{meta.offsetMinutes >= 0 ? '+' : ''}}{{meta.offsetMinutes}}分）</text></text>
-    </view>
-    <view class="info-row" wx:if="{{meta.location}}"><text class="info-label">出生地</text><text>{{meta.location}}</text></view>
-    <view class="info-row"><text class="info-label">八　字</text><text class="serif info-bazi">{{baZiStr}}</text></view>
-    <view class="info-row"><text class="info-label">起　运</text><text>{{meta.qiYun}}<text class="info-note">（{{meta.qiYunDate}} 交运）</text></text></view>
   </view>
 
   <!-- 命盘表：基础盘四柱 / 详盘六柱（大运、流年在左） -->
@@ -53,7 +55,7 @@
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
         <text wx:elif="{{item.shiShenGan === '日主'}}" class="rizhu">日主</text>
-        <text wx:else class="shishen" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
+        <text wx:else class="shishen term" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
       </view>
     </view>
 
@@ -85,7 +87,7 @@
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text"
           bindtap="onTermTap" data-term="{{hg.shiShen}}">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
-          <text class="hg-ss">{{hg.shiShen}}</text>
+          <text class="hg-ss term">{{hg.shiShen}}</text>
         </view>
         <text wx:if="{{item.empty}}" class="dim">*</text>
       </view>
@@ -100,7 +102,7 @@
       <view class="cell label-cell">星运</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
-        <text wx:else class="plain" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.xingYun}}</text>
+        <text wx:else class="plain term" bindtap="onTermTap" data-term="{{item.xingYun}}">{{item.xingYun}}</text>
       </view>
     </view>
 
@@ -108,7 +110,7 @@
       <view class="cell label-cell">自坐</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
-        <text wx:else class="plain" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.ziZuo}}</text>
+        <text wx:else class="plain term" bindtap="onTermTap" data-term="{{item.ziZuo}}">{{item.ziZuo}}</text>
       </view>
     </view>
 
@@ -124,14 +126,14 @@
       <view class="cell label-cell">纳音</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
-        <text wx:else class="plain naying" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.naYin}}</text>
+        <text wx:else class="plain naying term" bindtap="onTermTap" data-term="{{item.naYin}}">{{item.naYin}}</text>
       </view>
     </view>
 
     <view class="chart-row no-line shensha-row">
       <view class="cell label-cell">神煞</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="ss-item" wx:if="{{!item.empty && item.shenSha.length}}"
+        <text class="ss-item term" wx:if="{{!item.empty && item.shenSha.length}}"
           bindtap="onTermTap" data-term="{{item.shenSha[0]}}">{{item.shenSha[0]}}</text>
         <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">*</text>
       </view>
@@ -224,6 +226,7 @@
       <view class="mode {{qMode === 'fill' ? 'on' : ''}}" bindtap="onQMode" data-mode="fill">充能水位</view>
       <view class="mode {{qMode === 'size' ? 'on' : ''}}" bindtap="onQMode" data-mode="size">字号大小</view>
     </view>
+    <view class="q-hint">字越大 / 水位越高，该字（十神）能量越强 · 岁运令原局逐字升降</view>
 
     <view class="card disk">
       <view class="cols">
@@ -291,7 +294,6 @@
       </scroll-view>
     </view>
 
-    <view class="q-foot">字越大 / 水位越高，该字（十神）能量越强 · 岁运令原局逐字升降</view>
   </block>
 
   <!-- 五行 -->

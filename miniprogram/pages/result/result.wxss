@@ -11,6 +11,7 @@
   padding: 6rpx;
   margin-bottom: 24rpx;
 }
+
 .tab {
   position: relative;
   flex: 1;
@@ -21,39 +22,24 @@
   color: var(--ink-2);
   border-radius: 14rpx;
 }
+
 .tab-on {
   background: linear-gradient(135deg, #8A2B27, #A3382F);
   color: #FFFFFF;
   font-weight: 700;
   box-shadow: 0 4rpx 16rpx rgba(138, 43, 39, 0.32);
 }
+
 /* 能量盘：金色点缀 */
 .tab-energy {
   color: #C0872C;
   font-weight: 700;
 }
+
 .tab-energy.tab-on {
   background: linear-gradient(135deg, #C08A2B, #A3382F);
   color: #FFFFFF;
   box-shadow: 0 4rpx 16rpx rgba(192, 138, 43, 0.36);
-}
-
-/* 精简生日条（盘面页顶部） */
-.birth-strip {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 28rpx;
-  margin-bottom: 24rpx;
-}
-.birth-main {
-  margin-left: 16rpx;
-  font-size: 27rpx;
-  color: var(--ink);
-}
-.birth-lunar {
-  margin-left: auto;
-  font-size: 24rpx;
-  color: var(--ink-3);
 }
 
 /* 命主信息（基本信息页） */
@@ -61,11 +47,13 @@
   padding: 28rpx 32rpx;
   margin-bottom: 24rpx;
 }
+
 .info-bazi {
   color: var(--primary);
   font-weight: 700;
   letter-spacing: 2rpx;
 }
+
 .info-head {
   display: flex;
   align-items: center;
@@ -73,10 +61,37 @@
   border-bottom: 1rpx dashed var(--line);
   margin-bottom: 16rpx;
 }
+
+/* 折叠态：只剩一行摘要，不留分隔线 */
+.info-head-plain {
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.info-fold {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 22rpx;
+  color: var(--ink-3);
+}
+
+.info-fold-arrow {
+  display: inline-block;
+  margin-left: 4rpx;
+  font-size: 20rpx;
+  transition: transform 0.2s;
+}
+
+.info-fold-up {
+  transform: rotate(180deg);
+}
+
 .info-name {
   font-size: 38rpx;
   font-weight: 700;
 }
+
 .info-tag {
   font-size: 22rpx;
   color: #1A142E;
@@ -85,24 +100,30 @@
   margin-left: 16rpx;
   font-weight: 600;
 }
+
 .tag-m { background: #6FB6FF; }
+
 .tag-f { background: #F2A7C3; }
+
 .info-sx {
   margin-left: auto;
   font-size: 26rpx;
   color: var(--gold);
 }
+
 .info-row {
   display: flex;
   font-size: 26rpx;
   padding: 6rpx 0;
   color: var(--ink);
 }
+
 .info-label {
   width: 150rpx;
   color: var(--ink-3);
   flex-shrink: 0;
 }
+
 .info-note {
   color: var(--ink-3);
   font-size: 24rpx;
@@ -113,11 +134,13 @@
   padding: 20rpx 12rpx;
   margin-bottom: 24rpx;
 }
+
 .chart-row {
   display: flex;
   align-items: stretch;
   padding: 14rpx 0;
 }
+
 .cell {
   flex: 1;
   display: flex;
@@ -126,40 +149,55 @@
   justify-content: center;
   min-width: 0;
 }
+
 /* 大运/流年扩展柱：紫晕底色突出 */
 .cell-extra {
   background: transparent;
 }
+
 /* 大运 | 年柱 分界：竖虚线仅出现在天干、地支两行 */
 .gan-zhi-row .cell-divide {
   border-left: 2rpx dashed var(--ink-3);
 }
+
 .label-cell {
   flex: 0 0 76rpx;
   font-size: 22rpx;
   color: var(--ink-3);
   justify-content: center;
 }
+
 .head-row {
   padding: 6rpx 0 12rpx;
 }
+
 .head-name {
   font-size: 28rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
   color: var(--ink);
 }
+
 .cell-extra .head-name {
   color: var(--primary);
 }
+
 .head-sub {
   font-size: 18rpx;
   color: var(--ink-3);
 }
+
 .shishen {
   font-size: 24rpx;
   color: var(--ink-2);
 }
+
+/* 可点击词条暗示：点击弹出解读卡的字都带一条淡虚线 */
+.term {
+  border-bottom: 1rpx dashed rgba(20, 21, 60, 0.30);
+  padding-bottom: 2rpx;
+}
+
 .rizhu {
   font-size: 22rpx;
   color: var(--pink);
@@ -167,11 +205,13 @@
   border-radius: 8rpx;
   padding: 2rpx 10rpx;
 }
+
 .big-char {
   font-size: 44rpx;
   font-weight: 700;
   line-height: 1.2;
 }
+
 .wx-mark {
   display: flex;
   align-items: center;
@@ -189,21 +229,27 @@
   background-position: center;
   background-size: contain;
 }
+
 .el-mu {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%235ECC8F' d='M4 20C4 10 10 4 20 4c0 10-6 16-16 16zm2.5-2.5C8 13 11 9.5 16 7c-5 1.5-8.5 5.5-9.5 10.5z'/%3E%3C/svg%3E");
 }
+
 .el-huo {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23FF8A70' d='M12 2c1.5 4.5 6 6.2 6 11a6 6 0 0 1-12 0c0-2.4 1.1-4 2.4-5.2-.2 2 .7 3.2 1.9 3.2C9.6 8.4 11 5.4 12 2z'/%3E%3C/svg%3E");
 }
+
 .el-tu {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23D9A05B' d='M3 19L9 7l4.2 7.4L16 10l5 9z'/%3E%3C/svg%3E");
 }
+
 .el-jin {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23F0D078' d='M12 2.5L21 10l-9 11.5L3 10z M12 6L7 10.4l5 6.4 5-6.4z' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
+
 .el-shui {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236FB6FF' d='M12 2C12 2 5 10.6 5 15.4a7 7 0 0 0 14 0C19 10.6 12 2 12 2z'/%3E%3C/svg%3E");
 }
+
 .hide-gan {
   display: flex;
   align-items: baseline;
@@ -211,35 +257,43 @@
   white-space: nowrap;
   padding: 2rpx 0;
 }
+
 .hg-char {
   font-size: 26rpx;
   font-weight: 600;
 }
+
 .hg-ss {
   font-size: 20rpx;
   color: var(--ink);
   margin-left: 6rpx;
 }
+
 .plain {
   font-size: 24rpx;
   color: var(--ink);
 }
+
 .naying {
   font-size: 20rpx;
   text-align: center;
 }
+
 .dim {
   color: var(--ink-3);
 }
+
 .shensha-row .cell {
   justify-content: flex-start;
 }
+
 .ss-item {
   font-size: 20rpx;
   color: var(--ink);
   padding: 2rpx 0;
   text-align: center;
 }
+
 .ss-none {
   font-size: 20rpx;
   color: var(--ink-3);
@@ -250,28 +304,33 @@
   padding: 24rpx 32rpx 28rpx;
   margin-bottom: 24rpx;
 }
+
 .section-title {
   font-size: 32rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
   margin-bottom: 18rpx;
 }
+
 .section-note {
   font-size: 22rpx;
   color: var(--ink-3);
   font-weight: 400;
   margin-left: 12rpx;
 }
+
 .wx-bar {
   display: flex;
   justify-content: space-between;
   padding: 0 12rpx;
 }
+
 .wx-item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .wx-dot {
   width: 72rpx;
   height: 72rpx;
@@ -283,11 +342,13 @@
   font-size: 32rpx;
   font-weight: 700;
 }
+
 .wx-count {
   margin-top: 8rpx;
   font-size: 26rpx;
   color: var(--ink-2);
 }
+
 .wx-lack {
   color: var(--pink);
   font-weight: 700;
@@ -298,12 +359,15 @@
   padding: 24rpx 24rpx 28rpx;
   margin-bottom: 24rpx;
 }
+
 .yun-scroll {
   white-space: nowrap;
 }
+
 .yun-strip {
   display: inline-flex;
 }
+
 .yun-cell {
   display: inline-flex;
   flex-direction: column;
@@ -316,92 +380,40 @@
   background: var(--fill);
   flex-shrink: 0;
 }
+
 .yun-on {
   background: var(--tint);
   border-color: var(--primary);
   box-shadow: 0 4rpx 16rpx rgba(138, 43, 39, 0.3);
 }
+
 .yun-ss {
   font-size: 20rpx;
   color: var(--ink);
 }
+
 .yun-gz {
   font-size: 36rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
   margin: 4rpx 0;
 }
+
 .yun-year {
   font-size: 22rpx;
   color: var(--ink-2);
 }
+
 .yun-age {
   font-size: 20rpx;
   color: var(--ink-3);
-}
-
-/* 流月 */
-.liuyue-grid {
-  display: flex;
-  flex-wrap: wrap;
-}
-.liuyue-cell {
-  width: 25%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 14rpx 0;
-  box-sizing: border-box;
-}
-.ly-name {
-  font-size: 22rpx;
-  color: var(--ink-3);
-}
-.ly-gz {
-  font-size: 32rpx;
-  font-weight: 700;
-  margin: 2rpx 0;
-}
-.ly-ss {
-  font-size: 20rpx;
-  color: var(--ink-2);
-}
-
-/* 流日平铺 */
-.liuri-grid {
-  display: flex;
-  flex-wrap: wrap;
-}
-.liuri-cell {
-  width: 16.66%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12rpx 0;
-  box-sizing: border-box;
-  border-radius: 12rpx;
-}
-.lr-on {
-  background: var(--tint);
-}
-.lr-date {
-  font-size: 19rpx;
-  color: var(--ink-3);
-}
-.lr-gz {
-  font-size: 28rpx;
-  font-weight: 700;
-  margin: 2rpx 0;
-}
-.lr-ss {
-  font-size: 18rpx;
-  color: var(--ink-2);
 }
 
 /* 底部操作栏：保存 + 记录 + 性格画像 */
 .bottom-space {
   height: 20rpx;
 }
+
 /* 详盘二级信息折叠开关 */
 .sub-toggle {
   display: flex;
@@ -412,17 +424,20 @@
   padding: 14rpx 0;
   border-top: 1rpx dashed var(--line);
 }
+
 .sub-toggle-t {
   font-size: 22rpx;
   color: var(--ink-3);
   letter-spacing: 1rpx;
 }
+
 .sub-arrow {
   font-size: 20rpx;
   color: var(--ink-3);
   display: inline-block;
   transition: transform 0.2s;
 }
+
 .sub-arrow-up {
   transform: rotate(180deg);
 }
@@ -440,6 +455,7 @@
   box-shadow: 0 -6rpx 24rpx rgba(20, 21, 60, 0.06);
   backdrop-filter: blur(20rpx);
 }
+
 .btn-save {
   flex: 0.9;
   display: flex;
@@ -458,13 +474,16 @@
   letter-spacing: 3rpx;
   text-indent: 3rpx;
 }
+
 .btn-save::after {
   border: none;
 }
+
 .btn-saved {
   border-color: var(--line);
   color: var(--ink-3);
 }
+
 .btn-record {
   flex: 0.9;
   display: flex;
@@ -483,33 +502,14 @@
   letter-spacing: 3rpx;
   text-indent: 3rpx;
 }
+
 .btn-record::after {
   border: none;
 }
+
 .btn-record.button-hover {
   opacity: 0.88;
 }
-/* 量化：青色描边 */
-.btn-quant {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 96rpx;
-  margin: 0;
-  padding: 0;
-  line-height: 1;
-  background: var(--fill);
-  border: 1rpx solid var(--cyan);
-  border-radius: 20rpx;
-  color: #128FA6;
-  font-size: 32rpx;
-  font-weight: 600;
-  letter-spacing: 6rpx;
-  text-indent: 6rpx;
-}
-.btn-quant::after { border: none; }
-.btn-quant.button-hover { opacity: 0.88; }
 
 /* 详批：靛紫→电光青渐变，全局最醒目 */
 .btn-xiangpi {
@@ -530,9 +530,11 @@
   letter-spacing: 4rpx;
   text-indent: 4rpx;
 }
+
 .btn-xiangpi::after {
   border: none;
 }
+
 .btn-xiangpi.button-hover {
   opacity: 0.88;
 }
@@ -550,61 +552,74 @@
   flex-direction: column;
   justify-content: flex-end;
 }
+
 .ss-sheet {
   border-radius: 32rpx 32rpx 0 0;
   padding: 40rpx 40rpx calc(28rpx + env(safe-area-inset-bottom));
   max-height: 75vh;
   overflow-y: auto;
 }
+
 .ss-sheet-head {
   display: flex;
   align-items: baseline;
   margin-bottom: 24rpx;
 }
+
 .ss-sheet-name {
   font-size: 46rpx;
   font-weight: 700;
   letter-spacing: 4rpx;
   color: var(--primary);
 }
+
 .ss-sheet-brief {
   margin-left: 20rpx;
   font-size: 24rpx;
   color: var(--ink-3);
 }
+
 .ss-block {
   border-radius: 18rpx;
   padding: 22rpx 26rpx;
   margin-bottom: 20rpx;
 }
+
 .ss-block-xi {
   background: rgba(94, 204, 143, 0.1);
   border: 1rpx solid rgba(94, 204, 143, 0.25);
 }
+
 .ss-block-ji {
   background: rgba(242, 167, 195, 0.08);
   border: 1rpx solid rgba(242, 167, 195, 0.25);
 }
+
 .ss-block-plain {
   background: var(--fill);
   border: 1rpx solid var(--line);
 }
+
 .ss-block-title {
   font-size: 26rpx;
   font-weight: 700;
   margin-bottom: 8rpx;
 }
+
 .ss-block-xi .ss-block-title {
   color: #16A971;
 }
+
 .ss-block-ji .ss-block-title {
   color: var(--pink);
 }
+
 .ss-block-text {
   font-size: 26rpx;
   color: var(--ink-2);
   line-height: 1.8;
 }
+
 .ss-sheet-close {
   text-align: center;
   padding: 20rpx 0 8rpx;
@@ -615,42 +630,64 @@
 
 /* 字号档位：大（普通详盘也用此档，八字适度收小） */
 .fs-l .big-char { font-size: 48rpx; }
+
 .fs-l .plain, .fs-l .shishen { font-size: 26rpx; }
+
 .fs-l .rizhu { font-size: 24rpx; }
+
 .fs-l .hg-char { font-size: 28rpx; }
+
 .fs-l .hg-ss { font-size: 23rpx; }
+
 .fs-l .ss-item, .fs-l .ss-none { font-size: 23rpx; }
+
 .fs-l .naying { font-size: 22rpx; }
+
 .fs-l .label-cell { font-size: 24rpx; }
+
 .fs-l .head-name { font-size: 31rpx; }
-.fs-l .info-row, .fs-l .birth-main { font-size: 29rpx; }
-.fs-l .birth-lunar { font-size: 26rpx; }
+
+.fs-l .info-row { font-size: 29rpx; }
+
 .fs-l .wx-mark { font-size: 22rpx; }
+
 .fs-l .yun-gz { font-size: 40rpx; }
+
 .fs-l .yun-year, .fs-l .yun-ss { font-size: 24rpx; }
-.fs-l .ly-gz { font-size: 36rpx; }
-.fs-l .ly-name, .fs-l .ly-ss { font-size: 24rpx; }
+
 .fs-l .ss-block-text { font-size: 29rpx; }
+
 .fs-l .section-note { font-size: 24rpx; }
 
 /* 字号档位：特大 */
 .fs-xl .big-char { font-size: 66rpx; }
+
 .fs-xl .plain, .fs-xl .shishen { font-size: 31rpx; }
+
 .fs-xl .rizhu { font-size: 28rpx; }
+
 .fs-xl .hg-char { font-size: 33rpx; }
+
 .fs-xl .hg-ss { font-size: 26rpx; }
+
 .fs-xl .ss-item, .fs-xl .ss-none { font-size: 26rpx; }
+
 .fs-xl .naying { font-size: 24rpx; }
+
 .fs-xl .label-cell { font-size: 26rpx; }
+
 .fs-xl .head-name { font-size: 33rpx; }
-.fs-xl .info-row, .fs-xl .birth-main { font-size: 32rpx; }
-.fs-xl .birth-lunar { font-size: 28rpx; }
+
+.fs-xl .info-row { font-size: 32rpx; }
+
 .fs-xl .wx-mark { font-size: 24rpx; }
+
 .fs-xl .yun-gz { font-size: 44rpx; }
+
 .fs-xl .yun-year, .fs-xl .yun-ss { font-size: 26rpx; }
-.fs-xl .ly-gz { font-size: 40rpx; }
-.fs-xl .ly-name, .fs-xl .ly-ss { font-size: 26rpx; }
+
 .fs-xl .ss-block-text { font-size: 32rpx; }
+
 .fs-xl .section-note { font-size: 26rpx; }
 
 /* 出生星图入口（深色星河面板，程序亮点） */
@@ -666,9 +703,11 @@
   border: 1rpx solid rgba(138, 43, 39, 0.4);
   box-shadow: 0 12rpx 32rpx rgba(30, 35, 90, 0.22);
 }
+
 .astro-entry-hover {
   opacity: 0.92;
 }
+
 .astro-preview {
   width: 200rpx;
   height: 200rpx;
@@ -676,11 +715,13 @@
   order: 2;
   margin-left: 12rpx;
 }
+
 .astro-body {
   flex: 1;
   min-width: 0;
   order: 1;
 }
+
 .astro-tag {
   display: inline-block;
   font-size: 19rpx;
@@ -690,6 +731,7 @@
   border-radius: 100rpx;
   padding: 3rpx 16rpx;
 }
+
 .astro-title {
   margin-top: 12rpx;
   font-size: 36rpx;
@@ -697,12 +739,14 @@
   color: #FFFFFF;
   letter-spacing: 2rpx;
 }
+
 .astro-sub {
   margin-top: 6rpx;
   font-size: 22rpx;
   color: rgba(220, 226, 255, 0.82);
   line-height: 1.5;
 }
+
 .astro-cta {
   margin-top: 14rpx;
   font-size: 24rpx;
@@ -718,6 +762,7 @@
   padding: 18rpx 28rpx;
   margin-bottom: 18rpx;
 }
+
 .q-cur {
   font-size: 24rpx;
   color: var(--primary);
@@ -725,6 +770,7 @@
   padding: 6rpx 18rpx;
   border-radius: 999rpx;
 }
+
 .q-tip { font-size: 24rpx; color: var(--ink-3); }
 
 .modes {
@@ -735,6 +781,7 @@
   padding: 6rpx;
   border-radius: 18rpx;
 }
+
 .mode {
   flex: 1;
   text-align: center;
@@ -743,6 +790,7 @@
   color: var(--ink-2);
   border-radius: 14rpx;
 }
+
 .mode.on {
   background: #fff;
   color: var(--primary);
@@ -751,10 +799,15 @@
 }
 
 .disk { padding: 26rpx 22rpx 30rpx; margin-bottom: 22rpx; }
+
 .cols, .cells { display: flex; }
+
 .ch-col { flex: 1; text-align: center; }
+
 .pos { font-size: 22rpx; color: var(--ink-3); }
+
 .cells { margin-top: 10rpx; }
+
 .q-cell { flex: 1; display: flex; flex-direction: column; align-items: center; }
 
 .fillbox {
@@ -762,94 +815,122 @@
   background: var(--fill); border: 1rpx solid var(--line); overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
+
 .fillbox.is-day { border: 2rpx solid var(--gold); }
+
 .fill {
   position: absolute; left: 0; right: 0; bottom: 0; width: 100%;
   opacity: .82; transition: height .8s cubic-bezier(.2,.7,.2,1);
 }
+
 .fill-ch {
   position: relative; z-index: 2; font-size: 52rpx; font-weight: 800;
   color: var(--ink); line-height: 1;
 }
+
 .sizebox {
   width: 118rpx; height: 150rpx; border-radius: 20rpx; background: var(--fill);
   border: 1rpx solid var(--line); display: flex; align-items: center; justify-content: center;
 }
+
 .sizebox.is-day { border: 2rpx solid var(--gold); }
+
 .size-ch { font-weight: 800; line-height: 1; transition: font-size .8s cubic-bezier(.2,.7,.2,1); }
 
 .qgod { margin-top: 10rpx; font-size: 21rpx; color: var(--ink-2); }
 
 .ws { margin-top: 28rpx; padding-top: 22rpx; border-top: 1rpx solid var(--line); }
+
 .ws-bar {
   height: 18rpx; border-radius: 10rpx; overflow: hidden;
   background: linear-gradient(90deg,#C9508A,#F285AE);
 }
+
 .ws-same {
   height: 100%; border-radius: 10rpx 0 0 10rpx;
   background: linear-gradient(90deg,#6E1F1C,#A3382F);
   transition: width .8s cubic-bezier(.2,.7,.2,1);
 }
+
 .ws-legend { display: flex; align-items: center; margin-top: 12rpx; font-size: 22rpx; }
+
 .lg-same { color: var(--primary); }
+
 .lg-diff { margin-left: auto; color: var(--pink); }
+
 .lg-delta { margin: 0 auto; font-size: 20rpx; color: var(--ink-3); }
 
-.q-foot {
+/* 能量盘玩法说明（置于模式切换下方，先懂再看） */
+.q-hint {
   text-align: center; font-size: 21rpx; color: var(--ink-3);
-  letter-spacing: 1rpx; margin-top: 8rpx; line-height: 1.6;
-}
-
-/* 页脚免责声明 */
-.page-footer {
-  text-align: center;
-  font-size: 21rpx;
-  color: var(--ink-3);
-  letter-spacing: 1rpx;
-  line-height: 1.6;
-  padding: 30rpx 30rpx 16rpx;
+  letter-spacing: 1rpx; margin: -8rpx 0 16rpx; line-height: 1.6;
 }
 
 /* ── 详盘 · 岁运密集表 ── */
 .sy-card { padding: 16rpx 12rpx 10rpx; }
+
 .sy-row {
   display: flex; align-items: stretch;
   margin-bottom: 14rpx; padding-bottom: 12rpx;
   border-bottom: 1rpx solid #f1eff6;
 }
+
 .sy-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+
 .sy-lab {
   flex: none; width: 38rpx; display: flex; align-items: center; justify-content: center;
   color: #7a7690; font-size: 22rpx; font-weight: 600;
   writing-mode: vertical-lr; letter-spacing: 3rpx;
 }
+
 .sy-scroll { flex: 1; min-width: 0; white-space: nowrap; }
+
 .sy-strip { display: inline-flex; gap: 8rpx; padding: 2rpx 0 4rpx; }
+
 .sy-cell {
   flex: none; width: 70rpx; min-height: 118rpx; box-sizing: border-box;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   border-radius: 14rpx; padding: 8rpx 2rpx; text-align: center;
   background: #f7f7fb; border: 2rpx solid transparent;
 }
+
 .sy-on { background: var(--tint); border-color: #8A2B27; }
+
 .sy-line { display: flex; align-items: center; justify-content: center; gap: 3rpx; line-height: 1.3; }
+
 .sy-c { font-size: 30rpx; font-weight: 700; }
+
 .sy-g { font-size: 18rpx; color: #2a2640; }
+
 .sy-qian { font-size: 26rpx; color: #b5b1c8; margin: auto 0; writing-mode: vertical-rl; letter-spacing: 2rpx; }
+
 .sy-rels { display: flex; flex-wrap: nowrap; justify-content: center; gap: 2rpx; margin-top: auto; padding-top: 5rpx; height: 24rpx; overflow: hidden; }
+
 .sy-rel { flex: none; width: 20rpx; height: 20rpx; border-radius: 5rpx; color: #fff; font-size: 14rpx; line-height: 20rpx; text-align: center; }
+
 .sy-rel-he { background: #16A971; }
+
 .sy-rel-hui { background: #129AA8; }
+
 .sy-rel-chong { background: #E85540; }
+
 .sy-rel-xing { background: #E0822A; }
+
 .sy-rel-hai { background: #8E7BC4; }
+
 .sy-rel-po { background: #7E8896; }
 
 /* 长辈模式（特大字）：岁运放大，隐藏流月/流日，更清爽 */
 .fs-xl .sy-liuyue { display: none; }
+
 .fs-xl .sy-cell { width: 104rpx; min-height: 150rpx; padding: 12rpx 4rpx; }
+
 .fs-xl .sy-c { font-size: 46rpx; }
+
 .fs-xl .sy-g { font-size: 26rpx; }
+
 .fs-xl .sy-lab { font-size: 28rpx; }
+
 .fs-xl .sy-rels { height: 34rpx; }
+
 .fs-xl .sy-rel { width: 30rpx; height: 30rpx; font-size: 20rpx; line-height: 30rpx; }
