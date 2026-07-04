@@ -129,6 +129,15 @@ Page({
     this._chart = chart;
     this._ctx = chart.ctx;
     this._dayGan = chart.meta.dayGan;
+
+    // 记入「最近排盘」历史（不论是否保存）
+    prefs.pushHistory({
+      input: input,
+      name: chart.meta.name,
+      gender: chart.meta.gender,
+      baZi: chart.pillars.filter(function (p) { return !p.empty; }).map(function (p) { return p.ganZhi; }).join(' '),
+      dateStr: chart.meta.clockStr
+    });
     this._natal = chart.pillars.filter(function (p) { return !p.empty && p.zhi; })
       .map(function (p) { return p.zhi.text; });
 

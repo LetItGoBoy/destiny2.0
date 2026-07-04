@@ -1,6 +1,5 @@
 var bazi = require('../../utils/bazi.js');
 var cities = require('../../utils/cities.js');
-var store = require('../../utils/store.js');
 var prefs = require('../../utils/prefs.js');
 
 var START_YEAR = 1900;
@@ -59,18 +58,16 @@ Page({
   },
 
   onShow: function () {
-    var that = this;
     this.setData({
       casting: false,
       fs: prefs.getFontSize()
     });
-    store.listRecords().then(function (res) {
-      var recent = res.list.slice(0, 3).map(function (r) {
-        r.bz = bazi.colorizeBaZi(r.baZi);
-        return r;
-      });
-      that.setData({ recent: recent });
+    // 最近排盘 = 最近实际排过的盘（本地历史，不要求保存）
+    var recent = prefs.getHistory().slice(0, 3).map(function (r) {
+      r.bz = bazi.colorizeBaZi(r.baZi);
+      return r;
     });
+    this.setData({ recent: recent });
   },
 
   // 此刻星象 → 打开当前时刻星图
@@ -316,15 +313,9 @@ Page({
 
   goRecord: function (e) {
     var rec = this.data.recent[e.currentTarget.dataset.index];
-    var input = {
-      name: rec.name, gender: rec.gender, calendar: rec.calendar,
-      year: rec.year, month: rec.month, day: rec.day,
-      hour: rec.hour, minute: rec.minute, unknownTime: rec.unknownTime,
-      province: rec.province, city: rec.city, lng: rec.lng,
-      useTrueSolar: rec.useTrueSolar
-    };
+    if (!rec || !rec.input) return;
     wx.navigateTo({
-      url: '/pages/result/result?from=record&input=' + encodeURIComponent(JSON.stringify(input))
+      url: '/pages/result/result?input=' + encodeURIComponent(JSON.stringify(rec.input))
     });
   },
 
