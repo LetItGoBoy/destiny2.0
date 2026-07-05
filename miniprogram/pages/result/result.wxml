@@ -55,7 +55,7 @@
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
         <text wx:elif="{{item.shiShenGan === '日主'}}" class="rizhu">日主</text>
-        <text wx:else class="shishen party-{{item.shiShenGanParty}}" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
+        <text wx:else class="shishen" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
       </view>
     </view>
 
@@ -87,7 +87,7 @@
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text"
           bindtap="onTermTap" data-term="{{hg.shiShen}}">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
-          <text class="hg-ss party-{{hg.party}}">{{hg.shiShen}}</text>
+          <text class="hg-ss">{{hg.shiShen}}</text>
         </view>
         <text wx:if="{{item.empty}}" class="dim">*</text>
       </view>

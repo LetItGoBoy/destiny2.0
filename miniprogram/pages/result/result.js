@@ -446,7 +446,7 @@ Page({
       sub: sub,
       extra: true,
       ganZhi: p.ganZhi, gan: p.gan, zhi: p.zhi,
-      shiShenGan: p.shiShenGan, shiShenGanParty: p.shiShenGanParty, hideGans: p.hideGans,
+      shiShenGan: p.shiShenGan, hideGans: p.hideGans,
       xingYun: p.xingYun, ziZuo: p.ziZuo,
       xunKong: p.xunKong, naYin: p.naYin, shenSha: p.shenSha
     };

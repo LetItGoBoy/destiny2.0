@@ -274,12 +274,6 @@
   margin-left: 6rpx;
 }
 
-/* 十神党羽着色：生扶（比劫/印星）与克泄耗（食伤/财星/官杀）一眼区分，
-   配色与能量盘图例（生扶/克泄耗）保持一致 */
-.party-same { color: var(--primary); font-weight: 600; }
-
-.party-diff { color: var(--pink); font-weight: 600; }
-
 .plain {
   font-size: 24rpx;
   color: var(--ink);
