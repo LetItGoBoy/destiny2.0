@@ -173,7 +173,7 @@ function computeChart(input) {
         var ly = liuYueRaw[m];
         var ygz = ly.getGanZhi();
         liuYueList.push({
-          name: ly.getMonthInChinese() + '月',
+          name: ygz.charAt(1) + '月',
           ganZhi: ygz,
           gan: ganView(ygz.charAt(0)),
           zhi: zhiView(ygz.charAt(1)),
