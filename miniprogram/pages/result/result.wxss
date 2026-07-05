@@ -173,13 +173,8 @@
 
 .head-name {
   font-size: 28rpx;
-  font-weight: 700;
   letter-spacing: 2rpx;
-  color: var(--ink);
-}
-
-.cell-extra .head-name {
-  color: var(--primary);
+  color: var(--ink-3);
 }
 
 .head-sub {
@@ -229,7 +224,6 @@
 .el-ico {
   width: 20rpx;
   height: 20rpx;
-  margin-bottom: 2rpx;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -889,7 +883,7 @@
 
 .sy-lab {
   flex: none; width: 38rpx; display: flex; align-items: center; justify-content: center;
-  color: #7a7690; font-size: 22rpx; font-weight: 600;
+  color: var(--ink-3); font-size: 22rpx;
   writing-mode: vertical-lr; letter-spacing: 3rpx;
 }
 
