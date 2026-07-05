@@ -41,24 +41,33 @@ function zhiView(zhi) {
 }
 
 // 地支藏干及其十神
+// 十神党羽：比劫/印星为「生扶」我，食伤/财星/官杀为「克泄耗」我
+var GOD_PARTY = {
+  比肩: 'same', 劫财: 'same', 偏印: 'same', 正印: 'same',
+  食神: 'diff', 伤官: 'diff', 偏财: 'diff', 正财: 'diff', 七杀: 'diff', 正官: 'diff'
+};
+
 function hideGanViews(dayGan, zhi) {
   var gans = LunarUtil.ZHI_HIDE_GAN[zhi];
   var list = [];
   for (var i = 0; i < gans.length; i++) {
     var g = gans[i];
     var wx = LunarUtil.WU_XING_GAN[g];
-    list.push({ text: g, wx: wx, cls: WX_CLS[wx], shiShen: LunarUtil.SHI_SHEN[dayGan + g] });
+    var ss = LunarUtil.SHI_SHEN[dayGan + g];
+    list.push({ text: g, wx: wx, cls: WX_CLS[wx], shiShen: ss, party: GOD_PARTY[ss] || '' });
   }
   return list;
 }
 
 // 构建一柱通用视图（大运、流年也复用）
 function buildPillarView(ctx, gan, zhi, isDayPillar) {
+  var shiShenGan = isDayPillar ? '日主' : LunarUtil.SHI_SHEN[ctx.dayGan + gan];
   return {
     gan: ganView(gan),
     zhi: zhiView(zhi),
     ganZhi: gan + zhi,
-    shiShenGan: isDayPillar ? '日主' : LunarUtil.SHI_SHEN[ctx.dayGan + gan],
+    shiShenGan: shiShenGan,
+    shiShenGanParty: GOD_PARTY[shiShenGan] || '',
     hideGans: hideGanViews(ctx.dayGan, zhi),
     xingYun: changSheng(ctx.dayGan, zhi),
     ziZuo: changSheng(gan, zhi),

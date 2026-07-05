@@ -274,6 +274,12 @@
   margin-left: 6rpx;
 }
 
+/* 十神党羽着色：生扶（比劫/印星）与克泄耗（食伤/财星/官杀）一眼区分，
+   配色与能量盘图例（生扶/克泄耗）保持一致 */
+.party-same { color: var(--primary); font-weight: 600; }
+
+.party-diff { color: var(--pink); font-weight: 600; }
+
 .plain {
   font-size: 24rpx;
   color: var(--ink);
@@ -297,6 +303,11 @@
   color: var(--ink);
   padding: 2rpx 0;
   text-align: center;
+  width: 100%;
+}
+
+.ss-item:not(:last-child) {
+  margin-bottom: 4rpx;
 }
 
 .ss-none {
@@ -893,13 +904,21 @@
 .sy-strip { display: inline-flex; gap: 8rpx; padding: 2rpx 0 4rpx; }
 
 .sy-cell {
-  flex: none; width: 70rpx; min-height: 118rpx; box-sizing: border-box;
+  flex: none; width: 70rpx; min-height: 132rpx; box-sizing: border-box;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   border-radius: 14rpx; padding: 8rpx 2rpx; text-align: center;
   background: #f7f7fb; border: 2rpx solid transparent;
 }
 
 .sy-on { background: var(--tint); border-color: #8A2B27; }
+
+/* 每格顶部时间坐标：大运岁段 / 流年年份 / 流月月名 / 流日日期 */
+.sy-tag {
+  font-size: 16rpx; line-height: 1.2; color: var(--ink-3);
+  white-space: nowrap; margin-bottom: 3rpx;
+}
+
+.sy-on .sy-tag { color: #8A2B27; font-weight: 600; }
 
 .sy-line { display: flex; align-items: center; justify-content: center; gap: 3rpx; line-height: 1.3; }
 
@@ -928,7 +947,9 @@
 /* 长辈模式（特大字）：岁运放大，隐藏流月/流日，更清爽 */
 .fs-xl .sy-liuyue { display: none; }
 
-.fs-xl .sy-cell { width: 104rpx; min-height: 150rpx; padding: 12rpx 4rpx; }
+.fs-xl .sy-cell { width: 104rpx; min-height: 164rpx; padding: 12rpx 4rpx; }
+
+.fs-xl .sy-tag { font-size: 20rpx; }
 
 .fs-xl .sy-c { font-size: 46rpx; }
 

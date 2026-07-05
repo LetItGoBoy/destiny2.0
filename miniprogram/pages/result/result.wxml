@@ -55,7 +55,7 @@
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
         <text wx:if="{{item.empty}}" class="dim">*</text>
         <text wx:elif="{{item.shiShenGan === '日主'}}" class="rizhu">日主</text>
-        <text wx:else class="shishen" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
+        <text wx:else class="shishen party-{{item.shiShenGanParty}}" bindtap="onTermTap" data-term="{{item.shiShenGan}}">{{item.shiShenGan}}</text>
       </view>
     </view>
 
@@ -87,7 +87,7 @@
         <view class="hide-gan" wx:for="{{item.hideGans}}" wx:for-item="hg" wx:key="text"
           bindtap="onTermTap" data-term="{{hg.shiShen}}">
           <text class="hg-char wx-{{hg.cls}}">{{hg.text}}</text>
-          <text class="hg-ss">{{hg.shiShen}}</text>
+          <text class="hg-ss party-{{hg.party}}">{{hg.shiShen}}</text>
         </view>
         <text wx:if="{{item.empty}}" class="dim">*</text>
       </view>
@@ -133,8 +133,8 @@
     <view class="chart-row no-line shensha-row">
       <view class="cell label-cell">神煞</view>
       <view class="cell {{item.extra || item.empty ? 'cell-extra' : ''}}{{item.divide ? ' cell-divide' : ''}}" wx:for="{{tablePillars}}" wx:key="label">
-        <text class="ss-item" wx:if="{{!item.empty && item.shenSha.length}}"
-          bindtap="onTermTap" data-term="{{item.shenSha[0]}}">{{item.shenSha[0]}}</text>
+        <view class="ss-item" wx:if="{{!item.empty}}" wx:for="{{item.shenSha}}" wx:for-item="ss" wx:key="*this"
+          bindtap="onTermTap" data-term="{{ss}}">{{ss}}</view>
         <text class="ss-none" wx:if="{{item.empty || item.shenSha.length === 0}}">*</text>
       </view>
     </view>
@@ -155,6 +155,7 @@
               wx:for="{{daYunBar}}" wx:key="index" bindtap="onDaYunTap" data-index="{{item.index}}">
               <view wx:if="{{item.isQian}}" class="sy-qian serif">童限</view>
               <block wx:else>
+                <view class="sy-tag">{{item.tag}}</view>
                 <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
                 <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
                 <view class="sy-rels">
@@ -173,6 +174,7 @@
           <view class="sy-strip">
             <view class="sy-cell {{lnIndex === item.index ? 'sy-on' : ''}}" id="ln{{item.index}}"
               wx:for="{{liuNianBar}}" wx:key="index" bindtap="onLiuNianTap" data-index="{{item.index}}">
+              <view class="sy-tag">{{item.tag}}</view>
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
               <view class="sy-rels">
@@ -190,6 +192,7 @@
           <view class="sy-strip">
             <view class="sy-cell {{lyIndex === item.index ? 'sy-on' : ''}}" id="ly{{item.index}}"
               wx:for="{{liuYueBar}}" wx:key="index" bindtap="onLiuYueTap" data-index="{{item.index}}">
+              <view class="sy-tag">{{item.tag}}</view>
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
               <view class="sy-rels">
@@ -207,6 +210,7 @@
           <view class="sy-strip">
             <view class="sy-cell {{lrIndex === item.index ? 'sy-on' : ''}}" id="lr{{item.index}}"
               wx:for="{{liuRiBar}}" wx:key="index" bindtap="onLiuRiTap" data-index="{{item.index}}">
+              <view class="sy-tag">{{item.tag}}</view>
               <view class="sy-line"><text class="sy-c wx-{{item.gan.cls}}">{{item.gan.text}}</text><text class="sy-g">{{item.ganAbbr}}</text></view>
               <view class="sy-line"><text class="sy-c wx-{{item.zhi.cls}}">{{item.zhi.text}}</text><text class="sy-g">{{item.zhiAbbr}}</text></view>
               <view class="sy-rels">

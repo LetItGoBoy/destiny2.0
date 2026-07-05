@@ -162,7 +162,8 @@ Page({
         ganZhi: d.ganZhi,
         gan: d.gan,
         zhi: d.zhi,
-        shiShenGan: d.shiShenGan
+        shiShenGan: d.shiShenGan,
+        tag: d.isQian ? '' : (d.startAge + '-' + d.endAge)
       };
       if (!d.isQian && d.gan && d.zhi) {
         o.ganAbbr = shiShenAbbr(dayGan, d.gan.text);
@@ -269,7 +270,7 @@ Page({
     var dayGan = this._dayGan, natal = this._natal;
     var liuNianBar = dy.liuNian.map(function (n) {
       return {
-        index: n.index, year: n.year, age: n.age,
+        index: n.index, year: n.year, age: n.age, tag: n.year + '',
         ganZhi: n.ganZhi, gan: n.gan, zhi: n.zhi, shiShenGan: n.shiShenGan,
         ganAbbr: shiShenAbbr(dayGan, n.gan.text),
         zhiAbbr: shiShenAbbr(dayGan, BENQI[n.zhi.text]),
@@ -304,7 +305,7 @@ Page({
     var dayGan = this._dayGan, natal = this._natal;
     var liuYueBar = (ln.liuYue || []).map(function (m, i) {
       return {
-        index: i, name: m.name, ganZhi: m.ganZhi, gan: m.gan, zhi: m.zhi, shiShenGan: m.shiShenGan,
+        index: i, name: m.name, tag: m.name, ganZhi: m.ganZhi, gan: m.gan, zhi: m.zhi, shiShenGan: m.shiShenGan,
         ganAbbr: shiShenAbbr(dayGan, m.gan.text),
         zhiAbbr: shiShenAbbr(dayGan, BENQI[m.zhi.text]),
         rels: relsOf(m.zhi.text, natal)
@@ -339,6 +340,7 @@ Page({
   buildLiuRiBar: function (lyGanZhi) {
     var dayGan = this._dayGan, natal = this._natal;
     return bazi.getLiuRi(this._ctx, lyGanZhi, this._lnYear).map(function (r) {
+      r.tag = r.label;
       r.ganAbbr = shiShenAbbr(dayGan, r.gan.text);
       r.zhiAbbr = shiShenAbbr(dayGan, BENQI[r.zhi.text]);
       r.rels = relsOf(r.zhi.text, natal);
@@ -444,7 +446,7 @@ Page({
       sub: sub,
       extra: true,
       ganZhi: p.ganZhi, gan: p.gan, zhi: p.zhi,
-      shiShenGan: p.shiShenGan, hideGans: p.hideGans,
+      shiShenGan: p.shiShenGan, shiShenGanParty: p.shiShenGanParty, hideGans: p.hideGans,
       xingYun: p.xingYun, ziZuo: p.ziZuo,
       xunKong: p.xunKong, naYin: p.naYin, shenSha: p.shenSha
     };
