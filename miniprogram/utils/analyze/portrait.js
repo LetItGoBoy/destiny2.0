@@ -684,17 +684,20 @@ function build(chart, opts) {
       bubbles: []
     };
   }
-  function stageLayer(sm) {
-    if (sm.sourceKind === 'dayMaster') return layerFromDayMaster();
-    if (sm.sourceKind === 'monthLing') return layerFromMonthLing(sm);
-    if (sm.sourceKind === 'zhiMain') return layerFromZhi(sm.pillar);
-    return layerFromGan(sm.pillar, sm.pos);
-  }
-  function decorateLayer(stage, layer, luck) {
+  // 人前（天干/日主）与人后（地支）两面装饰
+  function decorateSide(layer, side, luck) {
     if (!layer) return null;
-    layer.title = stage.layerTitle;
-    layer.help = stage.help;
-    layer.bubbles = buildTraitBubbles(layer.sourceKind === 'dayMaster' ? [] : (layer.bubbleTraits || [layer]), luck, layer.copyKind || stage.copyKind || 'outer');
+    layer.side = side;
+    if (side === 'outer') {
+      layer.title = '人前 · 社交形象';
+      layer.help = layer.sourceKind === 'dayMaster'
+        ? '日主是你的本色：外人第一眼感受到的气场，贯穿一生。'
+        : '社交场合、初见与共事时，你自然拿出来的姿态。';
+    } else {
+      layer.title = '人后 · 亲近之人';
+      layer.help = '在家人、伴侣和至交面前，卸下防备后流露的心性。';
+    }
+    layer.bubbles = buildTraitBubbles(layer.sourceKind === 'dayMaster' ? [] : (layer.bubbleTraits || [layer]), luck, layer.copyKind || 'outer');
     if (luck) {
       layer.luckName = luck.name;
       layer.luckSlider = luck.slider;
@@ -703,31 +706,41 @@ function build(chart, opts) {
     }
     return layer;
   }
+  // 四段人生：一柱一段（正统宫位分限），每段人前（天干）/人后（地支）两面
   var stageMetaList = [
-    { key: 'life1', label: '幼年', age: '1-8岁', phase: '初', theme: '先天底色 · 贯穿一生', sub: '初光', note: '幼年看最早被世界看见的那层气质。它不只属于小时候，也会像底色一样贯穿一生。', pillar: 0, pos: '年', sourceKind: 'gan', copyKind: 'outer', layerTitle: '先天底色', help: '最先露出来的气质、反应速度和面对外界时的自然姿态。' },
-    { key: 'life2', label: '少时', age: '8-16岁', phase: '根', theme: '安全感 · 本能反应', sub: '藏根', note: '少时看内在反应怎么长出来：安全感、依赖方式、遇事先紧还是先松，都在这里开始成形。', pillar: 0, sourceKind: 'zhiMain', copyKind: 'inner', layerTitle: '本能底色', help: '更靠里的情绪底盘和安全感来源，会影响之后很多选择。' },
-    { key: 'life3', label: '青春', age: '17-24岁', phase: '萌', theme: '求学试声 · 初入人群', sub: '试声', note: '青春看一个人怎样向外试探边界：想被怎样看见，也会用什么方式证明自己。', pillar: 1, pos: '月', sourceKind: 'gan', copyKind: 'outer', layerTitle: '入世姿态', help: '走向人群时更容易拿出来的表达方式、竞争方式和做事姿态。' },
-    { key: 'life4', label: '青年', age: '25-32岁', phase: '令', theme: '月令承接 · 事业起步', sub: '承势', note: '青年看月支这层月令底色：本气一定表达，中气/余气只有透到天干时才加入阶段心性。', pillar: 1, sourceKind: 'monthLing', copyKind: 'inner', layerTitle: '月令底色', help: '月支像长期气候；透出的藏干会变成可见心性，直接混入这一段的气泡。' },
-    { key: 'life5', label: '立身', age: '33-40岁', phase: '立', theme: '月令成势 · 立身选择', sub: '成势', note: '立身沿用月支心性，看月令底色如何在自我选择、事业方向和长期关系里真正成势。', pillar: 1, sourceKind: 'monthLing', copyKind: 'inner', layerTitle: '月令成势', help: '这一段继续看月支本气；若月令中气/余气透出，也会作为成势心性进入气泡。' },
-    { key: 'life6', label: '成事', age: '41-48岁', phase: '成', theme: '亲密关系 · 长期成果', sub: '定心', note: '成事阶段看长期关系和稳定成果里的真实反应：亲密、合作、家庭与事业如何互相牵动。', pillar: 2, sourceKind: 'zhiMain', copyKind: 'inner', layerTitle: '关系底色', help: '更靠近亲密关系、长期承诺和日常相处里的真实反应。' },
-    { key: 'life7', label: '远行', age: '49-56岁', phase: '远', theme: '后程规划 · 经验输出', sub: '远望', note: '远行阶段看后半程怎样重新安排生活，也看经验、资源和影响力怎样被表达出来。', pillar: 3, pos: '时', sourceKind: 'gan', copyKind: 'outer', layerTitle: '后程姿态', help: '后半程更容易显出来的处事方式、表达风格和安排能力。' },
-    { key: 'life8', label: '归心', age: '57岁以后', phase: '归', theme: '归宿享福 · 自在晚景', sub: '归处', note: '归心阶段看最终更想回到什么生活状态：怎样享受、怎样放下，也怎样和后辈及世界相处。', pillar: 3, sourceKind: 'zhiMain', copyKind: 'inner', layerTitle: '晚境底色', help: '晚年更自然流露的内在状态，关系到舒适感、归属感和生活节奏。' }
+    { key: 'life1', label: '少年', age: '1-16岁', phase: '根', theme: '出身底子 · 最早被看见', sub: '年柱', pillar: 0,
+      note: '年柱管人生第一程：家庭出身给你的底子，最早的圈子怎样认识你。这层气质不只属于小时候，也会像底色一样跟着走。',
+      outer: { sourceKind: 'gan', pos: '年' }, inner: { sourceKind: 'zhiMain' } },
+    { key: 'life2', label: '青年', age: '17-32岁', phase: '立', theme: '求学立业 · 走进社会', sub: '月柱', pillar: 1,
+      note: '月柱管青年一程：求学、立业、闯荡社会时的姿态与底气。月令是全局气候，透出的藏干也会加入人后的心性。',
+      outer: { sourceKind: 'gan', pos: '月' }, inner: { sourceKind: 'monthLing' } },
+    { key: 'life3', label: '中年', age: '33-48岁', phase: '成', theme: '活出本色 · 婚姻家庭', sub: '日柱', pillar: 2,
+      note: '日柱就是你自己：人生正午怎样活出本色，婚姻与最亲密的关系里露出怎样的真实反应。',
+      outer: { sourceKind: 'dayMaster' }, inner: { sourceKind: 'zhiMain' } },
+    { key: 'life4', label: '晚年', age: '49岁后', phase: '归', theme: '经验输出 · 归宿传承', sub: '时柱', pillar: 3,
+      note: '时柱管后半程：经验与资源怎样输出，晚景怎样安顿，与子女后辈怎样相处。',
+      outer: { sourceKind: 'gan', pos: '时' }, inner: { sourceKind: 'zhiMain' } }
   ];
+  function sideLayer(sm, spec) {
+    if (spec.sourceKind === 'dayMaster') return layerFromDayMaster();
+    if (spec.sourceKind === 'monthLing') return layerFromMonthLing(sm);
+    if (spec.sourceKind === 'zhiMain') return layerFromZhi(sm.pillar);
+    return layerFromGan(sm.pillar, spec.pos);
+  }
   var stagePortraits = stageMetaList.map(function (sm, idx) {
     var pp = chart.pillars[sm.pillar];
-    if (!pp || pp.empty || !pp.gan || !pp.zhi) {
-      return {
-        key: sm.key, label: sm.label, age: sm.age, phase: sm.phase, theme: sm.theme,
-        sub: sm.sub, note: sm.note, index: idx + 1, indexText: idx < 9 ? '0' + (idx + 1) : String(idx + 1), empty: true
-      };
-    }
-    var layer = stageLayer(sm);
-    var luckForLayer = (sm.sourceKind === 'zhiMain' || sm.sourceKind === 'monthLing') ? luckInnerTrait : luckTrait;
-    return {
+    var item = {
       key: sm.key, label: sm.label, age: sm.age, phase: sm.phase, theme: sm.theme,
-      sub: sm.sub, note: sm.note, index: idx + 1, indexText: idx < 9 ? '0' + (idx + 1) : String(idx + 1), empty: false,
-      layer: decorateLayer(sm, layer, luckForLayer)
+      sub: sm.sub, note: sm.note, index: idx + 1, indexText: '0' + (idx + 1)
     };
+    if (!pp || pp.empty || !pp.gan || !pp.zhi) {
+      item.empty = true;
+      return item;
+    }
+    item.empty = false;
+    item.outerLayer = decorateSide(sideLayer(sm, sm.outer), 'outer', luckTrait);
+    item.innerLayer = decorateSide(sideLayer(sm, sm.inner), 'inner', luckInnerTrait);
+    return item;
   });
 
   // —— 内在心性（branchList）——

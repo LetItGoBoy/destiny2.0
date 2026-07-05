@@ -3,14 +3,10 @@ var portrait = require('../../utils/analyze/portrait.js');
 var prefs = require('../../utils/prefs.js');
 
 var STAGE_RANGES = [
-  { key: 'life1', start: 0, end: 7 },
-  { key: 'life2', start: 8, end: 16 },
-  { key: 'life3', start: 17, end: 24 },
-  { key: 'life4', start: 25, end: 32 },
-  { key: 'life5', start: 33, end: 40 },
-  { key: 'life6', start: 41, end: 48 },
-  { key: 'life7', start: 49, end: 56 },
-  { key: 'life8', start: 57, end: 120 }
+  { key: 'life1', start: 0, end: 16 },
+  { key: 'life2', start: 17, end: 32 },
+  { key: 'life3', start: 33, end: 48 },
+  { key: 'life4', start: 49, end: 120 }
 ];
 
 // 守正/求变配比 → 个性化判词（>=58 守正主导，<=42 求变主导，其余均衡）
@@ -134,12 +130,13 @@ Page({
 
   applyLayerOpen: function (stages, luckPortrait) {
     var self = this;
-    (stages || []).forEach(function (stage) {
-      if (stage.layer) stage.layer.open = self.layerOpen(stage.key, 'main');
-    });
-    if (luckPortrait) {
-      if (luckPortrait.layer) luckPortrait.layer.open = this.layerOpen('luck', 'main');
+    function setOpen(st, key) {
+      if (!st) return;
+      if (st.outerLayer) st.outerLayer.open = self.layerOpen(key, 'outer');
+      if (st.innerLayer) st.innerLayer.open = self.layerOpen(key, 'inner');
     }
+    (stages || []).forEach(function (stage) { setOpen(stage, stage.key); });
+    setOpen(luckPortrait, 'luck');
   },
 
   toggleStage: function (e) {

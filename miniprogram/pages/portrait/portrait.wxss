@@ -250,28 +250,6 @@
   color: var(--ink-2);
 }
 
-.trait-line {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12rpx;
-}
-
-.trait-name {
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-.trait-main {
-  margin-left: 12rpx;
-  font-size: 18rpx;
-  font-weight: 600;
-  color: #9A6B12;
-  background: rgba(201, 162, 39, 0.14);
-  border: 1rpx solid rgba(201, 162, 39, 0.28);
-  padding: 3rpx 14rpx;
-  border-radius: 100rpx;
-}
-
 /* 滑标轴 */
 .slider-row {
   display: flex;
@@ -545,14 +523,30 @@
   letter-spacing: 1rpx;
 }
 
-.acc-trait-lbl {
+/* 折叠态最后一个心性名（月令可能是「从容 + 锋芒」较长）可省略 */
+.acc-trait-name-last {
   flex: 1;
   min-width: 0;
-  font-size: 20rpx;
-  color: var(--ink-3);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* 人前/人后小标 */
+.acc-side-k {
+  flex: none;
+  font-size: 18rpx;
+  font-weight: 700;
+  line-height: 1;
+  color: #B86B00;
+  background: rgba(255, 184, 56, 0.16);
+  border-radius: 6rpx;
+  padding: 4rpx 8rpx;
+}
+
+.acc-side-in {
+  color: #08746F;
+  background: rgba(8, 116, 111, 0.10);
 }
 
 .acc-trait-need {
@@ -639,6 +633,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16rpx;
+  margin-top: 14rpx;
   margin-bottom: 12rpx;
 }
 
@@ -670,6 +665,48 @@
   padding-top: 2rpx;
 }
 
+/* 人前/人后卡头：整行可点，展开收起 */
+.layer-tap {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 0;
+}
+
+.layer-tap-name {
+  flex: none;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 1rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 40%;
+}
+
+.layer-tap-luck {
+  flex: none;
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #9A6B12;
+  background: rgba(201, 162, 39, 0.14);
+  border: 1rpx solid rgba(201, 162, 39, 0.28);
+  padding: 3rpx 12rpx;
+  border-radius: 100rpx;
+}
+
+.layer-arrow {
+  margin-left: auto;
+  font-size: 22rpx;
+  color: var(--ink-3);
+  transition: transform 0.2s;
+}
+
+.layer-arrow-up {
+  transform: rotate(180deg);
+}
+
 .layer-k {
   display: inline-flex;
   align-items: center;
@@ -680,7 +717,13 @@
   border: 1rpx solid rgba(255, 184, 56, 0.42);
   border-radius: 100rpx;
   padding: 5rpx 14rpx;
-  margin-bottom: 8rpx;
+}
+
+/* 人后：青绿系，与人前的暖橙区分 */
+.layer-k-inner {
+  color: #08746F;
+  background: rgba(8, 116, 111, 0.12);
+  border-color: rgba(8, 116, 111, 0.32);
 }
 
 .layer-help {
@@ -689,6 +732,10 @@
   font-weight: 600;
   margin-bottom: 10rpx;
   color: var(--ink-2);
+}
+
+.layer-help-inner {
+  color: #0A5F5B;
 }
 
 .flow-slider .sl-lbl-l, .flow-slider .sl-lbl-r {
@@ -901,23 +948,7 @@
    避免有的字特大、有的字还是原来的小字，看起来乱。
    结构性单字徽标（日主印章、阶段序号、阶段圈号、刑冲合害圆标、
    加减号、翻页箭头）不在此列，保持原有尺寸以免撑坏固定容器。 */
-.fs-xl .core-title, .fs-xl .core-text,
-.fs-xl .life-title, .fs-xl .life-note,
-.fs-xl .pattern-badge, .fs-xl .pattern-k, .fs-xl .pattern-t,
-.fs-xl .pol-t, .fs-xl .pol-sub, .fs-xl .pol-zheng, .fs-xl .pol-pian,
-.fs-xl .pol-verdict, .fs-xl .pol-explain-k, .fs-xl .pol-explain-t, .fs-xl .pol-legend,
-.fs-xl .comp-t, .fs-xl .comp-sub, .fs-xl .comp-tip,
-.fs-xl .trait-name, .fs-xl .trait-main,
-.fs-xl .sl-lbl, .fs-xl .tcl, .fs-xl .pc, .fs-xl .pc-key, .fs-xl .comp-empty,
-.fs-xl .acc-name, .fs-xl .acc-age, .fs-xl .acc-sub, .fs-xl .acc-now,
-.fs-xl .acc-trait-name, .fs-xl .acc-trait-lbl, .fs-xl .acc-trait-need,
-.fs-xl .acc-theme, .fs-xl .acc-pill, .fs-xl .acc-action-tip,
-.fs-xl .stage-note, .fs-xl .layer-k, .fs-xl .layer-help,
-.fs-xl .luck-control-title, .fs-xl .luck-stage, .fs-xl .luck-year-main,
-.fs-xl .luck-y, .fs-xl .luck-a,
-.fs-xl .rel-tag, .fs-xl .rel-luck, .fs-xl .rel-zhis, .fs-xl .rel-zhis-luck,
-.fs-xl .foot, .fs-xl .luck-badge, .fs-xl .luck-name,
-.fs-xl .luck-lbls, .fs-xl .luck-lead, .fs-xl .luck-desc {
+.fs-xl .core-title, .fs-xl .core-text, .fs-xl .life-title, .fs-xl .life-note, .fs-xl .pattern-badge, .fs-xl .pattern-k, .fs-xl .pattern-t, .fs-xl .pol-t, .fs-xl .pol-sub, .fs-xl .pol-zheng, .fs-xl .pol-pian, .fs-xl .pol-verdict, .fs-xl .pol-explain-k, .fs-xl .pol-explain-t, .fs-xl .pol-legend, .fs-xl .comp-t, .fs-xl .comp-sub, .fs-xl .comp-tip, .fs-xl .sl-lbl, .fs-xl .tcl, .fs-xl .pc, .fs-xl .pc-key, .fs-xl .comp-empty, .fs-xl .acc-name, .fs-xl .acc-age, .fs-xl .acc-sub, .fs-xl .acc-now, .fs-xl .acc-side-k, .fs-xl .acc-trait-name, .fs-xl .acc-trait-need, .fs-xl .acc-theme, .fs-xl .acc-pill, .fs-xl .acc-action-tip, .fs-xl .stage-note, .fs-xl .layer-k, .fs-xl .layer-tap-name, .fs-xl .layer-tap-luck, .fs-xl .layer-help, .fs-xl .luck-control-title, .fs-xl .luck-stage, .fs-xl .luck-year-main, .fs-xl .luck-y, .fs-xl .luck-a, .fs-xl .rel-tag, .fs-xl .rel-luck, .fs-xl .rel-zhis, .fs-xl .rel-zhis-luck, .fs-xl .foot, .fs-xl .luck-badge, .fs-xl .luck-name, .fs-xl .luck-lbls, .fs-xl .luck-lead, .fs-xl .luck-desc {
   font-size: 30rpx;
   font-weight: 700;
 }

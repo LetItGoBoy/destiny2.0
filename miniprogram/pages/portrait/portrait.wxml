@@ -1,3 +1,51 @@
+<!-- 人前/人后 心性卡：stage 与岁运两处复用（sk 阶段键 / lk outer|inner） -->
+<template name="layerCard">
+  <view class="layer-card stage-layer">
+    <view class="layer-tap" bindtap="toggleLayer" data-stage="{{sk}}" data-layer="{{lk}}">
+      <text class="layer-k {{layer.side === 'inner' ? 'layer-k-inner' : ''}}">{{layer.title}}</text>
+      <text class="layer-tap-name serif">{{layer.name}}</text>
+      <text class="layer-tap-luck" wx:if="{{layer.luckName}}">{{layer.luckName}}</text>
+      <text class="layer-arrow {{layer.open ? 'layer-arrow-up' : ''}}">▾</text>
+    </view>
+    <block wx:if="{{layer.open}}">
+      <view class="layer-head">
+        <view class="layer-copy">
+          <view class="layer-help {{layer.side === 'inner' ? 'layer-help-inner' : ''}}">{{layer.help}}</view>
+        </view>
+        <view class="trait-cat-wrap" wx:if="{{layer.catImage}}">
+          <image class="trait-cat" src="{{layer.catImage}}" mode="aspectFit" />
+        </view>
+      </view>
+      <view class="layer-body">
+        <view class="slider-row" wx:if="{{layer.lbl && layer.rbl}}">
+          <text class="sl-lbl sl-lbl-l">{{layer.lbl}}</text>
+          <view class="sl-track">
+            <view class="sl-thumb" style="left:{{layer.slider}}%"></view>
+          </view>
+          <text class="sl-lbl sl-lbl-r">{{layer.rbl}}</text>
+        </view>
+        <view class="slider-row flow-slider" wx:if="{{layer.luckName}}">
+          <text class="sl-lbl sl-lbl-l">{{layer.luckLbl}}</text>
+          <view class="sl-track">
+            <view class="sl-thumb luck-thumb" style="left:{{layer.luckSlider}}%"></view>
+          </view>
+          <text class="sl-lbl sl-lbl-r">{{layer.luckRbl}}</text>
+        </view>
+        <traitcluster wx:if="{{layer.bubbles.length}}" bubbles="{{layer.bubbles}}" />
+        <view class="tc-legend" wx:if="{{layer.bubbles.length}}">
+          <text class="tcl tcl-pro">顺的一面</text>
+          <text class="tcl tcl-con">偏的一面</text>
+          <text class="tcl tcl-luck" wx:if="{{layer.luckName}}">当年激活</text>
+        </view>
+        <view class="trait-pc">
+          <view class="pc pc-on"><text class="pc-key pc-key-pro">{{layer.descLabel}}</text>{{layer.desc}}</view>
+          <view class="pc pc-on pc-con" wx:if="{{layer.con}}"><text class="pc-key pc-key-con">{{layer.conLabel}}</text>{{layer.con}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+</template>
+
 <view class="page fs-{{fs}}" wx:if="{{loaded}}">
   <image class="page-bg" src="/images/home-mystic-bg.jpg" mode="aspectFill" />
 
@@ -44,7 +92,8 @@
   </view>
 
   <view class="life-lead">
-    <view class="life-title serif">八段人生</view>
+    <view class="life-title serif">四段人生</view>
+    <view class="life-note">一柱一段。每段两面：人前的社交形象，与人后在亲近之人面前的真实心性。</view>
   </view>
 
   <view class="stage-acc">
@@ -62,9 +111,11 @@
             <text class="acc-phase">{{stage.phase}}</text>
             <text class="acc-theme">{{stage.theme}}</text>
           </view>
-          <view class="acc-trait-line" wx:if="{{!stage.empty && stage.layer}}">
-            <text class="acc-trait-name">{{stage.layer.name}}</text>
-            <text class="acc-trait-lbl" wx:if="{{stage.layer.lbl}}">{{stage.layer.lbl}} · {{stage.layer.rbl}}</text>
+          <view class="acc-trait-line" wx:if="{{!stage.empty}}">
+            <text class="acc-side-k">人前</text>
+            <text class="acc-trait-name">{{stage.outerLayer.name}}</text>
+            <text class="acc-side-k acc-side-in">人后</text>
+            <text class="acc-trait-name acc-trait-name-last">{{stage.innerLayer.name}}</text>
           </view>
           <view class="acc-trait-line" wx:if="{{stage.empty}}">
             <text class="acc-trait-need">需出生时辰后可见</text>
@@ -79,52 +130,12 @@
       <view class="acc-body" wx:if="{{openStageKey === stage.key}}">
         <view class="stage-note">{{stage.note}}</view>
         <block wx:if="{{stage.empty}}">
-          <view class="comp-empty">这一阶段需要出生时辰，当前暂不可见。</view>
+          <view class="comp-empty">这一段需要出生时辰，当前暂不可见。</view>
         </block>
-        <block wx:elif="{{stage.layer}}">
-          <view class="layer-card stage-layer">
-            <view class="layer-head">
-              <view class="layer-copy">
-                <view class="layer-k">{{stage.layer.title}}</view>
-                <view class="layer-help">{{stage.layer.help}}</view>
-                <view class="trait-line">
-                  <text class="trait-name serif">{{stage.layer.name}}</text>
-                  <text class="trait-main" wx:if="{{stage.layer.luckName}}">{{stage.layer.luckName}}</text>
-                </view>
-              </view>
-              <view class="trait-cat-wrap" wx:if="{{stage.layer.catImage}}">
-                <image class="trait-cat" src="{{stage.layer.catImage}}" mode="aspectFit" />
-              </view>
-            </view>
-            <view class="layer-body">
-              <view class="slider-row" wx:if="{{stage.layer.lbl && stage.layer.rbl}}">
-                <text class="sl-lbl sl-lbl-l">{{stage.layer.lbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb" style="left:{{stage.layer.slider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{stage.layer.rbl}}</text>
-              </view>
-              <view class="slider-row flow-slider" wx:if="{{stage.layer.luckName}}">
-                <text class="sl-lbl sl-lbl-l">{{stage.layer.luckLbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb luck-thumb" style="left:{{stage.layer.luckSlider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{stage.layer.luckRbl}}</text>
-              </view>
-              <traitcluster wx:if="{{stage.layer.bubbles.length}}" bubbles="{{stage.layer.bubbles}}" />
-              <view class="tc-legend" wx:if="{{stage.layer.bubbles.length}}">
-                <text class="tcl tcl-pro">顺的一面</text>
-                <text class="tcl tcl-con">偏的一面</text>
-                <text class="tcl tcl-luck" wx:if="{{stage.layer.luckName}}">当年激活</text>
-              </view>
-              <view class="trait-pc">
-                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{stage.layer.descLabel}}</text>{{stage.layer.desc}}</view>
-                <view class="pc pc-on pc-con" wx:if="{{stage.layer.con}}"><text class="pc-key pc-key-con">{{stage.layer.conLabel}}</text>{{stage.layer.con}}</view>
-              </view>
-            </view>
-          </view>
+        <block wx:else>
+          <template is="layerCard" data="{{ layer: stage.outerLayer, sk: stage.key, lk: 'outer' }}" />
+          <template is="layerCard" data="{{ layer: stage.innerLayer, sk: stage.key, lk: 'inner' }}" />
         </block>
-        <view class="comp-empty" wx:else>这一阶段暂无可展示的心性信息。</view>
       </view>
     </view>
 
@@ -198,50 +209,11 @@
           <view class="luck-desc">{{luckFlow.desc}}</view>
         </view>
 
-        <block wx:if="{{luckPortrait && !luckPortrait.empty && luckPortrait.layer}}">
-          <view class="layer-card stage-layer">
-            <view class="layer-head">
-              <view class="layer-copy">
-                <view class="layer-k">{{luckPortrait.layer.title}}</view>
-                <view class="layer-help">{{luckPortrait.layer.help}}</view>
-                <view class="trait-line">
-                  <text class="trait-name serif">{{luckPortrait.layer.name}}</text>
-                  <text class="trait-main" wx:if="{{luckPortrait.layer.luckName}}">{{luckPortrait.layer.luckName}}</text>
-                </view>
-              </view>
-              <view class="trait-cat-wrap" wx:if="{{luckPortrait.layer.catImage}}">
-                <image class="trait-cat" src="{{luckPortrait.layer.catImage}}" mode="aspectFit" />
-              </view>
-            </view>
-            <view class="layer-body">
-              <view class="slider-row" wx:if="{{luckPortrait.layer.lbl && luckPortrait.layer.rbl}}">
-                <text class="sl-lbl sl-lbl-l">{{luckPortrait.layer.lbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb" style="left:{{luckPortrait.layer.slider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{luckPortrait.layer.rbl}}</text>
-              </view>
-              <view class="slider-row flow-slider" wx:if="{{luckPortrait.layer.luckName}}">
-                <text class="sl-lbl sl-lbl-l">{{luckPortrait.layer.luckLbl}}</text>
-                <view class="sl-track">
-                  <view class="sl-thumb luck-thumb" style="left:{{luckPortrait.layer.luckSlider}}%"></view>
-                </view>
-                <text class="sl-lbl sl-lbl-r">{{luckPortrait.layer.luckRbl}}</text>
-              </view>
-              <traitcluster wx:if="{{luckPortrait.layer.bubbles.length}}" bubbles="{{luckPortrait.layer.bubbles}}" />
-              <view class="tc-legend" wx:if="{{luckPortrait.layer.bubbles.length}}">
-                <text class="tcl tcl-pro">顺的一面</text>
-                <text class="tcl tcl-con">偏的一面</text>
-                <text class="tcl tcl-luck" wx:if="{{luckPortrait.layer.luckName}}">当年激活</text>
-              </view>
-              <view class="trait-pc">
-                <view class="pc pc-on"><text class="pc-key pc-key-pro">{{luckPortrait.layer.descLabel}}</text>{{luckPortrait.layer.desc}}</view>
-                <view class="pc pc-on pc-con" wx:if="{{luckPortrait.layer.con}}"><text class="pc-key pc-key-con">{{luckPortrait.layer.conLabel}}</text>{{luckPortrait.layer.con}}</view>
-              </view>
-            </view>
-          </view>
+        <block wx:if="{{luckPortrait && !luckPortrait.empty}}">
+          <template is="layerCard" data="{{ layer: luckPortrait.outerLayer, sk: 'luck', lk: 'outer' }}" />
+          <template is="layerCard" data="{{ layer: luckPortrait.innerLayer, sk: 'luck', lk: 'inner' }}" />
         </block>
-        <view class="comp-empty" wx:if="{{luckPortrait && luckPortrait.empty}}">这一阶段需要出生时辰，当前暂不可见。</view>
+        <view class="comp-empty" wx:if="{{luckPortrait && luckPortrait.empty}}">这一段需要出生时辰，当前暂不可见。</view>
       </view>
     </view>
   </view>
