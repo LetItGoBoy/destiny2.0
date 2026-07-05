@@ -92,33 +92,28 @@
   </view>
 
   <view class="life-lead">
-    <view class="life-title serif">四段人生</view>
-    <view class="life-note">一柱一段。每段两面：人前的社交形象，与人后在亲近之人面前的真实心性。</view>
+    <view class="life-title serif">大运人生</view>
+    <view class="life-note">每一步大运一段。天干管人前的社交形象，地支管人后在亲近之人面前的真实心性；心性滑标由这步大运在你原局中的喜忌决定。点开某段可叠加当年流年。</view>
   </view>
 
   <view class="stage-acc">
     <view class="acc-card {{openStageKey === stage.key ? 'open' : ''}}" wx:for="{{stagePortraits}}" wx:for-item="stage" wx:key="key">
       <view class="acc-head" bindtap="toggleStage" data-key="{{stage.key}}">
-        <view class="acc-index">{{stage.indexText}}</view>
+        <view class="acc-gz serif">
+          <text class="acc-gz-c wx-{{stage.ganCls}}">{{stage.ganText}}</text>
+          <text class="acc-gz-c wx-{{stage.zhiCls}}">{{stage.zhiText}}</text>
+        </view>
         <view class="acc-copy">
           <view class="acc-title">
             <text class="acc-name serif">{{stage.label}}</text>
             <text class="acc-now" wx:if="{{stage.key === currentStageKey}}">当前</text>
             <text class="acc-age">{{stage.age}}</text>
-            <text class="acc-sub">{{stage.sub}}</text>
           </view>
-          <view class="acc-stage-meta">
-            <text class="acc-phase">{{stage.phase}}</text>
-            <text class="acc-theme">{{stage.theme}}</text>
-          </view>
-          <view class="acc-trait-line" wx:if="{{!stage.empty}}">
+          <view class="acc-trait-line">
             <text class="acc-side-k">人前</text>
             <text class="acc-trait-name">{{stage.outerLayer.name}}</text>
             <text class="acc-side-k acc-side-in">人后</text>
             <text class="acc-trait-name acc-trait-name-last">{{stage.innerLayer.name}}</text>
-          </view>
-          <view class="acc-trait-line" wx:if="{{stage.empty}}">
-            <text class="acc-trait-need">需出生时辰后可见</text>
           </view>
         </view>
         <view class="acc-action">
@@ -129,91 +124,28 @@
 
       <view class="acc-body" wx:if="{{openStageKey === stage.key}}">
         <view class="stage-note">{{stage.note}}</view>
-        <block wx:if="{{stage.empty}}">
-          <view class="comp-empty">这一段需要出生时辰，当前暂不可见。</view>
-        </block>
-        <block wx:else>
-          <template is="layerCard" data="{{ layer: stage.outerLayer, sk: stage.key, lk: 'outer' }}" />
-          <template is="layerCard" data="{{ layer: stage.innerLayer, sk: stage.key, lk: 'inner' }}" />
-        </block>
-      </view>
-    </view>
 
-    <view class="life-lead luck-guide">
-      <view class="life-title serif">岁运叠加</view>
-      <view class="life-note">选择某一段人生和对应年份，查看这一年把哪种心性推到台前。金色气泡表示临时被激活的状态。</view>
-    </view>
-
-    <view class="acc-card luck-card {{openStageKey === 'luck' ? 'open' : ''}}">
-      <view class="acc-head" bindtap="toggleStage" data-key="luck">
-        <view class="acc-index luck-index">运</view>
-        <view class="acc-copy">
-          <view class="acc-title">
-            <text class="acc-name serif">岁运</text>
-            <text class="acc-sub">流动心性</text>
+        <view class="luck-controls" wx:if="{{openYearList.length}}">
+          <view class="luck-control-title">叠加流年（可选，再点取消）</view>
+          <view class="luck-step">
+            <view class="luck-step-btn" bindtap="stepStageYear" data-key="{{stage.key}}" data-d="-1">‹</view>
+            <view class="luck-year-main {{stage.hasYear ? '' : 'luck-year-off'}}">{{stage.hasYear ? stage.luckYear : '未叠加'}}</view>
+            <view class="luck-step-btn" bindtap="stepStageYear" data-key="{{stage.key}}" data-d="1">›</view>
           </view>
-          <view class="acc-pills">
-            <text class="acc-pill luck-pill">选择阶段</text>
-            <text class="acc-pill luck-pill">选择年份</text>
-            <text class="acc-pill luck-pill">金色泡泡叠加</text>
-          </view>
-        </view>
-        <view class="acc-action">
-          <text class="acc-action-tip">{{openStageKey === 'luck' ? '收起' : '查看'}}</text>
-          <text class="acc-plus">{{openStageKey === 'luck' ? '−' : '+'}}</text>
-        </view>
-      </view>
-
-      <view class="acc-body" wx:if="{{openStageKey === 'luck'}}">
-        <view class="stage-note">先选择要叠加的阶段，再选择对应年份。金色泡泡会混进这一阶段的心性星团里，表示当年更容易被激活的状态。</view>
-
-        <view class="luck-controls">
-          <view class="luck-control-title">选择阶段</view>
-          <view class="luck-stage-row">
-            <view class="luck-stage {{luckStageIndex === idx ? 'on' : ''}}" wx:for="{{stagePortraits}}" wx:for-item="st" wx:for-index="idx" wx:key="key" bindtap="selectLuckStage" data-index="{{idx}}">
-              <text>{{st.label}}</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="luck-controls">
-          <view class="luck-control-title">选择年份</view>
-          <block wx:if="{{luckYearList.length}}">
-            <view class="luck-step">
-              <view class="luck-step-btn" bindtap="stepLuckYear" data-d="-1">‹</view>
-              <view class="luck-year-main">{{luckYear}}</view>
-              <view class="luck-step-btn" bindtap="stepLuckYear" data-d="1">›</view>
-            </view>
-            <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}"
-              scroll-into-view="y{{luckYear}}" scroll-with-animation>
-              <view class="luck-year-strip">
-                <view class="luck-year {{item.active ? 'on' : ''}}" id="y{{item.year}}"
-                  wx:for="{{luckYearList}}" wx:key="year" bindtap="selectLuckYear" data-year="{{item.year}}">
-                  <text class="luck-y">{{item.year}}</text>
-                  <text class="luck-a">{{item.age}}岁</text>
-                </view>
+          <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}"
+            scroll-into-view="y{{stage.luckYear}}" scroll-with-animation>
+            <view class="luck-year-strip">
+              <view class="luck-year {{item.active ? 'on' : ''}}" id="y{{item.year}}"
+                wx:for="{{openYearList}}" wx:key="year" bindtap="selectStageYear" data-key="{{stage.key}}" data-year="{{item.year}}">
+                <text class="luck-y">{{item.year}}</text>
+                <text class="luck-a">{{item.age}}岁</text>
               </view>
-            </scroll-view>
-          </block>
-          <view class="comp-empty" wx:else>这个阶段暂无可选年份。</view>
+            </view>
+          </scroll-view>
         </view>
 
-        <view class="luck-block" wx:if="{{luckFlow}}">
-          <view class="luck-head">
-            <image class="luck-cat" wx:if="{{luckFlow.catImage}}" src="{{luckFlow.catImage}}" mode="aspectFit" />
-            <text class="luck-badge">{{luckYear}}心性</text>
-            <text class="luck-name serif">{{luckFlow.name}}</text>
-            <text class="luck-lbls" wx:if="{{luckFlow.lbl}}">{{luckFlow.lbl}} · {{luckFlow.rbl}}</text>
-          </view>
-          <view class="luck-lead" wx:if="{{luckFlow.lead}}">{{luckFlow.lead}}</view>
-          <view class="luck-desc">{{luckFlow.desc}}</view>
-        </view>
-
-        <block wx:if="{{luckPortrait && !luckPortrait.empty}}">
-          <template is="layerCard" data="{{ layer: luckPortrait.outerLayer, sk: 'luck', lk: 'outer' }}" />
-          <template is="layerCard" data="{{ layer: luckPortrait.innerLayer, sk: 'luck', lk: 'inner' }}" />
-        </block>
-        <view class="comp-empty" wx:if="{{luckPortrait && luckPortrait.empty}}">这一段需要出生时辰，当前暂不可见。</view>
+        <template is="layerCard" data="{{ layer: stage.outerLayer, sk: stage.key, lk: 'outer' }}" />
+        <template is="layerCard" data="{{ layer: stage.innerLayer, sk: stage.key, lk: 'inner' }}" />
       </view>
     </view>
   </view>

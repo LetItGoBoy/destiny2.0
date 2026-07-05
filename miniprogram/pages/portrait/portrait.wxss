@@ -63,11 +63,6 @@
   color: var(--ink-2);
 }
 
-.luck-guide {
-  margin-top: 28rpx;
-  padding-top: 4rpx;
-}
-
 /* 命局结构（食神制杀 / 羊刃驾杀 / 身杀两停） */
 .pattern {
   display: flex;
@@ -398,25 +393,25 @@
   padding: 22rpx 26rpx;
 }
 
-.acc-index {
+/* 卡头大运干支：两字竖排小牌 */
+.acc-gz {
   flex: none;
-  width: 62rpx;
-  height: 58rpx;
-  border-radius: 16rpx;
+  width: 60rpx;
+  border-radius: 14rpx;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  background: linear-gradient(135deg, #8A2B27, #A3382F);
-  font-size: 20rpx;
-  font-weight: 800;
+  padding: 10rpx 0;
   margin-right: 20rpx;
-  box-shadow: 0 8rpx 18rpx rgba(138, 43, 39, 0.22);
+  background: var(--fill);
+  border: 1rpx solid var(--line);
 }
 
-.luck-index {
-  color: #FFF7E4;
-  background: linear-gradient(135deg, #8A2B27, #A3382F);
+.acc-gz-c {
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.12;
 }
 
 .acc-copy {
@@ -475,18 +470,6 @@
   border-radius: 100rpx;
 }
 
-.acc-sub {
-  flex: none;
-  font-size: 20rpx;
-  font-weight: 700;
-  line-height: 1;
-  color: #1D2638;
-  background: rgba(29, 38, 56, 0.07);
-  border: 1rpx solid rgba(29, 38, 56, 0.10);
-  padding: 6rpx 12rpx;
-  border-radius: 100rpx;
-}
-
 .acc-now {
   flex: none;
   font-size: 19rpx;
@@ -497,13 +480,6 @@
   padding: 6rpx 12rpx;
   border-radius: 100rpx;
   letter-spacing: 1rpx;
-}
-
-.acc-stage-meta {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  margin-top: 10rpx;
 }
 
 /* 卡头个性化：该阶段的心性名 + 来源干支字 */
@@ -547,55 +523,6 @@
 .acc-side-in {
   color: #08746F;
   background: rgba(8, 116, 111, 0.10);
-}
-
-.acc-trait-need {
-  font-size: 21rpx;
-  color: var(--ink-3);
-}
-
-.acc-phase {
-  flex: none;
-  min-width: 34rpx;
-  height: 34rpx;
-  line-height: 34rpx;
-  text-align: center;
-  border-radius: 50%;
-  color: #fff;
-  background: #6F5A3B;
-  font-size: 20rpx;
-  font-weight: 800;
-  margin-right: 12rpx;
-}
-
-.acc-theme {
-  flex: 1;
-  min-width: 0;
-  font-size: 22rpx;
-  line-height: 1.35;
-  color: var(--ink-2);
-}
-
-.acc-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 8rpx;
-}
-
-.acc-pill {
-  font-size: 20rpx;
-  color: var(--ink-2);
-  background: var(--fill);
-  border: 1rpx solid var(--line);
-  padding: 3rpx 12rpx;
-  border-radius: 100rpx;
-}
-
-.luck-pill {
-  color: #9A6B12;
-  background: rgba(201, 162, 39, 0.12);
-  border-color: rgba(201, 162, 39, 0.28);
 }
 
 .acc-body {
@@ -766,26 +693,6 @@
   margin-bottom: 14rpx;
 }
 
-.luck-stage-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-}
-
-.luck-stage {
-  padding: 10rpx 22rpx;
-  border-radius: 100rpx;
-  color: var(--ink-2);
-  background: #fff;
-  border: 1rpx solid var(--line);
-  font-size: 24rpx;
-}
-
-.luck-stage.on {
-  color: #fff;
-  background: #1D2638;
-  border-color: #1D2638;
-}
 
 .luck-step {
   display: flex;
@@ -820,6 +727,14 @@
   border: 1rpx solid rgba(201, 162, 39, 0.28);
   font-size: 28rpx;
   font-weight: 800;
+}
+
+/* 未叠加流年态：淡灰占位 */
+.luck-year-off {
+  color: var(--ink-3);
+  background: var(--fill);
+  border-color: var(--line);
+  font-weight: 600;
 }
 
 .luck-year-scroll {
@@ -948,67 +863,12 @@
    避免有的字特大、有的字还是原来的小字，看起来乱。
    结构性单字徽标（日主印章、阶段序号、阶段圈号、刑冲合害圆标、
    加减号、翻页箭头）不在此列，保持原有尺寸以免撑坏固定容器。 */
-.fs-xl .core-title, .fs-xl .core-text, .fs-xl .life-title, .fs-xl .life-note, .fs-xl .pattern-badge, .fs-xl .pattern-k, .fs-xl .pattern-t, .fs-xl .pol-t, .fs-xl .pol-sub, .fs-xl .pol-zheng, .fs-xl .pol-pian, .fs-xl .pol-verdict, .fs-xl .pol-explain-k, .fs-xl .pol-explain-t, .fs-xl .pol-legend, .fs-xl .comp-t, .fs-xl .comp-sub, .fs-xl .comp-tip, .fs-xl .sl-lbl, .fs-xl .tcl, .fs-xl .pc, .fs-xl .pc-key, .fs-xl .comp-empty, .fs-xl .acc-name, .fs-xl .acc-age, .fs-xl .acc-sub, .fs-xl .acc-now, .fs-xl .acc-side-k, .fs-xl .acc-trait-name, .fs-xl .acc-trait-need, .fs-xl .acc-theme, .fs-xl .acc-pill, .fs-xl .acc-action-tip, .fs-xl .stage-note, .fs-xl .layer-k, .fs-xl .layer-tap-name, .fs-xl .layer-tap-luck, .fs-xl .layer-help, .fs-xl .luck-control-title, .fs-xl .luck-stage, .fs-xl .luck-year-main, .fs-xl .luck-y, .fs-xl .luck-a, .fs-xl .rel-tag, .fs-xl .rel-luck, .fs-xl .rel-zhis, .fs-xl .rel-zhis-luck, .fs-xl .foot, .fs-xl .luck-badge, .fs-xl .luck-name, .fs-xl .luck-lbls, .fs-xl .luck-lead, .fs-xl .luck-desc {
+.fs-xl .core-title, .fs-xl .core-text, .fs-xl .life-title, .fs-xl .life-note, .fs-xl .pattern-badge, .fs-xl .pattern-k, .fs-xl .pattern-t, .fs-xl .pol-t, .fs-xl .pol-sub, .fs-xl .pol-zheng, .fs-xl .pol-pian, .fs-xl .pol-verdict, .fs-xl .pol-explain-k, .fs-xl .pol-explain-t, .fs-xl .pol-legend, .fs-xl .comp-t, .fs-xl .comp-sub, .fs-xl .comp-tip, .fs-xl .sl-lbl, .fs-xl .tcl, .fs-xl .pc, .fs-xl .pc-key, .fs-xl .comp-empty, .fs-xl .acc-gz-c, .fs-xl .acc-name, .fs-xl .acc-age, .fs-xl .acc-sub, .fs-xl .acc-now, .fs-xl .acc-side-k, .fs-xl .acc-trait-name, .fs-xl .acc-trait-need, .fs-xl .acc-theme, .fs-xl .acc-pill, .fs-xl .acc-action-tip, .fs-xl .stage-note, .fs-xl .layer-k, .fs-xl .layer-tap-name, .fs-xl .layer-tap-luck, .fs-xl .layer-help, .fs-xl .luck-control-title, .fs-xl .luck-stage, .fs-xl .luck-year-main, .fs-xl .luck-y, .fs-xl .luck-a, .fs-xl .rel-tag, .fs-xl .rel-luck, .fs-xl .rel-zhis, .fs-xl .rel-zhis-luck, .fs-xl .foot, .fs-xl .luck-badge, .fs-xl .luck-name, .fs-xl .luck-lbls, .fs-xl .luck-lead, .fs-xl .luck-desc {
   font-size: 30rpx;
   font-weight: 700;
 }
 
 /* 固定宽度的小容器随统一字号适度放宽，避免挤压 */
 .fs-xl .luck-year { width: 140rpx; }
-
-/* 今年心性（流年/大运叠加）· 气泡与主心性细读之间，无特殊卡框 */
-.luck-block {
-  padding: 18rpx 0 6rpx;
-  border-bottom: 1rpx solid var(--line);
-}
-
-.luck-head {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  margin-bottom: 10rpx;
-}
-
-.luck-cat {
-  flex: none;
-  width: 64rpx;
-  height: 64rpx;
-  margin-right: -2rpx;
-}
-
-.luck-badge {
-  font-size: 22rpx;
-  font-weight: 700;
-  color: #fff;
-  background: #C9A227;
-  border-radius: 8rpx;
-  padding: 3rpx 14rpx;
-}
-
-.luck-name {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #9A6B12;
-  letter-spacing: 2rpx;
-}
-
-.luck-lbls {
-  margin-left: auto;
-  font-size: 22rpx;
-  color: #B08A2E;
-}
-
-.luck-lead {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #8A5E12;
-  margin-bottom: 10rpx;
-}
-
-.luck-desc {
-  font-size: 25rpx;
-  line-height: 1.7;
-  color: var(--ink-2);
-}
 
 .fs-l .luck-desc { font-size: 27rpx; }
