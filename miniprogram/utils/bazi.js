@@ -235,7 +235,7 @@ function getLiuRi(ctx, liuYueGanZhi, year) {
   for (var k = 0; k < 430; k++) {
     var cur = s.next(k);
     var lun = cur.getLunar();
-    if (lun.getMonthInGanZhi() === liuYueGanZhi) {
+    if (lun.getMonthInGanZhiExact() === liuYueGanZhi) {
       started = true;
       var dgz = lun.getDayInGanZhi();
       list.push({
@@ -259,7 +259,7 @@ function todayGanZhi() {
   var lun = solar.getLunar();
   return {
     year: solar.getYear(),
-    monthGZ: lun.getMonthInGanZhi(),
+    monthGZ: lun.getMonthInGanZhiExact(),
     dayGZ: lun.getDayInGanZhi(),
     label: solar.getMonth() + '/' + solar.getDay()
   };
