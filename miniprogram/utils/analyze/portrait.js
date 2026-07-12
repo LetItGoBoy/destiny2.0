@@ -71,6 +71,7 @@ function buildTraitBubbles(list, luck, kind) {
     (kw.pro || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw, lean: lean }); });
     (kw.neu || []).slice(0, 3).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: lean }); });
     (kw.con || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: lean }); });
+    (t.extraCon || []).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: lean }); });
   });
   // 岁运叠加（金色）：取一组优缺关键词，叠在主心性之上，不顶替
   // 若岁运十神与原局主心性相同，能量本就一样，不再加多余的圆
@@ -656,6 +657,7 @@ function build(chart, opts) {
   function makeStageItem(src, side, luck, allowPianTurn) {
     var t = TEMP[src.god] || { name: src.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
     var effective = stageDir(src, luck, allowPianTurn);
+    var isExcessShangGuan = src.god === '伤官' && (xiji.subtypes || []).indexOf('伤官过旺') >= 0;
     return {
       god: src.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
       catImage: tenGodCatImage(src.god),
@@ -667,6 +669,7 @@ function build(chart, opts) {
       traitDir: effective.dir,
       traitOverride: effective.reason,
       activation: src.activation || '',
+      extraCon: isExcessShangGuan ? ['对抗权威', '漠视规则'] : [],
       copyKind: side,
       sourceChar: src.char,
       side: side,
