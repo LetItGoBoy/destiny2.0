@@ -44,9 +44,7 @@ function tenGodCatImage(god) {
 
 function wordCopy(god, kind) {
   if (kind === 'luck') return YEAR_TRAIT_WORDS[god] || {};
-  var kw = traitWords[god];
-  if (!kw) return {};
-  return kw[kind] || kw.outer || kw;
+  return traitWords[god] || {};
 }
 
 function wordText(god, kind, side) {
