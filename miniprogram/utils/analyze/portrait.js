@@ -153,7 +153,7 @@ function decideXiji(p, dmEl, rootEls, godEnergy) {
         else if ((partyGod(dmEl, e) === '官杀' || partyGod(dmEl, e) === '食伤') && bodyWeak) v = '-'; // 攻弱身
         else v = '+';
       } else if (keI(di) === i) {                             // 病克：受害者
-        v = (p[e] >= 20 && rootEls[e]) ? '+' : '-';          // 有根且能量够→反制成格
+        v = (p[e] >= 20 && rootEls[e]) ? '+' : '0';          // 有根且能量够→反制成格；无力反制时先判中性
       } else v = '-';
       dir[e] = v;
     });
