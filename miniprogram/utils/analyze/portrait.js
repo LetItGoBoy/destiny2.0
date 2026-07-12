@@ -639,6 +639,8 @@ function build(chart, opts) {
     var hides = LunarUtil.ZHI_HIDE_GAN[p.zhi.text] || [];
     var seen = {}, out = [];
     hides.forEach(function (ch, rank) {
+      // 只有月令允许本气之外的透干心性；日支、时支一律只取本气。
+      if (rank > 0 && pillar !== 1) return;
       if (rank > 0 && !visibleGan[ch] && ch !== luckGanChar) return;
       var src = hiddenSource(pillar, ch, rank);
       if (ch === luckGanChar) src.activation = '大运天干透出';
