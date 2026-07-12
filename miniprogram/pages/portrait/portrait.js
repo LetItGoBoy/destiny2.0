@@ -68,41 +68,53 @@ Page({
       dateStr: chart.meta.clockStr
     });
 
-    // 起运后的大运列表（去童限）
-    this._luckList = (chart.daYun || []).filter(function (d) {
-      return d.ganZhi && d.ganZhi.length >= 2 && !d.isQian;
-    });
+    this._luckList = chart.daYun || [];
+    this._luckByStage = {};
+    this._yearByStage = {};
 
-    // 当前所处大运（按当前年份）
+    // 当前阶段默认打开，并选中当前大运与今年流年。
     var currentYear = new Date().getFullYear();
-    var curKey = '', firstKey = '';
-    var yearByStage = {};
+    var birthYear = new Date(chart.meta.timestamp).getFullYear();
+    var age = currentYear - birthYear;
+    var currentDy = null;
     for (var i = 0; i < this._luckList.length; i++) {
       var d = this._luckList[i];
-      var key = 'dy' + d.index;
-      if (i === 0) firstKey = key;
       if (currentYear >= d.startYear && currentYear <= d.endYear) {
-        curKey = key;
-        yearByStage[key] = currentYear;   // 当前大运默认叠加今年
+        currentDy = d;
+        for (var j = 0; j < (d.liuNian || []).length; j++) {
+          if (d.liuNian[j].year === currentYear) { age = d.liuNian[j].age; break; }
+        }
+        break;
       }
     }
-    this._yearByStage = yearByStage;
-    var openKey = curKey || firstKey;
-
-    this.setData({ loaded: true, meta: chart.meta, openStageKey: openKey, currentStageKey: curKey });
+    var curKey = age < 20 ? 'youth' : age < 35 ? 'young' : age < 50 ? 'middle' : 'old';
+    if (currentDy) {
+      this._luckByStage[curKey] = currentDy.index;
+      this._yearByStage[curKey] = currentYear;
+    }
+    this.setData({ loaded: true, meta: chart.meta, openStageKey: curKey, currentStageKey: curKey });
     this.recompute();
   },
 
-  dyByKey: function (key) {
+  dyByIndex: function (index) {
     for (var i = 0; i < this._luckList.length; i++) {
-      if ('dy' + this._luckList[i].index === key) return this._luckList[i];
+      if (this._luckList[i].index === index) return this._luckList[i];
     }
     return null;
   },
 
-  // 某大运的流年列表（可选叠加）
+  selectedLuckIndex: function (key) {
+    if (this._luckByStage[key] != null) return this._luckByStage[key];
+    var stages = this._lastStages || [];
+    for (var i = 0; i < stages.length; i++) {
+      if (stages[i].key === key) return stages[i].selectedLuckIndex;
+    }
+    return null;
+  },
+
+  // 当前阶段所选大运的流年列表（可选叠加）
   yearListForKey: function (key, activeYear) {
-    var d = this.dyByKey(key);
+    var d = this.dyByIndex(this.selectedLuckIndex(key));
     if (!d || !d.liuNian) return [];
     return d.liuNian.map(function (ln) {
       return { year: ln.year, age: ln.age, gz: ln.ganZhi, active: ln.year === activeYear };
@@ -142,6 +154,15 @@ Page({
     this.recompute();
   },
 
+  selectStageLuck: function (e) {
+    var key = e.currentTarget.dataset.key;
+    var index = Number(e.currentTarget.dataset.index);
+    if (!key || isNaN(index)) return;
+    this._luckByStage[key] = index;
+    delete this._yearByStage[key];
+    this.recompute();
+  },
+
   // 选某大运卡片里的流年（叠加金色）
   selectStageYear: function (e) {
     var key = e.currentTarget.dataset.key;
@@ -157,24 +178,25 @@ Page({
     var delta = Number(e.currentTarget.dataset.d);
     var list = this.yearListForKey(key, this._yearByStage[key]);
     if (!list.length) return;
-    var cur = 0;
+    var cur = -1;
     for (var i = 0; i < list.length; i++) {
       if (list[i].year === this._yearByStage[key]) { cur = i; break; }
     }
-    var next = Math.max(0, Math.min(list.length - 1, cur + delta));
+    var next = cur < 0
+      ? (delta < 0 ? list.length - 1 : 0)
+      : Math.max(0, Math.min(list.length - 1, cur + delta));
     this._yearByStage[key] = list[next].year;
     this.recompute();
   },
 
   recompute: function () {
     var openKey = this.data.openStageKey;
-    var openDy = openKey ? this.dyByKey(openKey) : null;
     var selYear = openKey ? this._yearByStage[openKey] : null;
-
-    var opts = {};
-    if (openDy && selYear) opts = { luckIndex: openDy.index, luckYear: selYear };
-
-    var p = portrait.build(this._chart, opts);
+    var p = portrait.build(this._chart, {
+      luckByStage: this._luckByStage,
+      yearByStage: this._yearByStage
+    });
+    this._lastStages = p.stagePortraits || [];
     this.applyLayerOpen(p.stagePortraits || []);
 
     this.setData({

@@ -1,9 +1,5 @@
-// 性格画像（外显·天干版）
-// 大部分人身上都有不止一种心性，只是配比不同。
-// 「两种底色」（守正/求变）取天干地支所有十神（含藏干）统计；
-// 「心性构成」取天干（最外显的一层）的十神，每种心性以一条优点(左)←→缺点(右)的轴呈现：
-//   方向（偏优/偏缺）随身强身弱而定，幅度 = 失衡度 |P-50|×2 × 该心性在天干的相对能量，
-//   故各心性会随大运/流年各自此消彼长，而非同步。措辞保持中立、收敛。
+// 性格画像：原局固定喜忌 + 四阶段心性 + 大运方向 + 流年行为叠加。
+// 天干关键词表达可观察的行为方式，地支关键词表达内在心性。
 var energy = require('./energy.js');
 var base = require('./base.js');
 var relations = require('./relations.js');
@@ -11,6 +7,7 @@ var traitWords = require('./traitWords.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
 var KE = base.KE;
+var SHENG = base.SHENG;
 
 // 临时叠加心性气泡：只用于时间阶段/年份，不作为稳定性格文案。
 var YEAR_TRAIT_WORDS = {
@@ -105,13 +102,28 @@ function partyGod(dmEl, e) {
   return '印';
 }
 
+function dominantGod(godEnergy, left, right) {
+  return (godEnergy[left] || 0) > (godEnergy[right] || 0) ? left : right;
+}
+
+function diseaseSubtype(party, godEnergy) {
+  if (party === '食伤') return dominantGod(godEnergy, '伤官', '食神') + '过旺';
+  if (party === '印') return dominantGod(godEnergy, '偏印', '正印') + '过旺';
+  if (party === '比劫') return dominantGod(godEnergy, '劫财', '比肩') + '过旺';
+  if (party === '官杀') return dominantGod(godEnergy, '七杀', '正官') + '过旺';
+  if (party === '财') return dominantGod(godEnergy, '偏财', '正财') + '过旺';
+  return '';
+}
+
 // p: {木:pct,...}；dmEl 日主五行；rootEls: {五行:1} 有本气根的五行集合
-// 返回 { dir:{木:'+'/'-',...}, mode, disease }
-function decideXiji(p, dmEl, rootEls) {
+// godEnergy: 原局十神能量，用于病重和食伤偏旺的正偏细分。
+// 返回 { dir, mode, disease, diseaseEls, subtypes }
+function decideXiji(p, dmEl, rootEls, godEnergy) {
   rootEls = rootEls || {};
+  godEnergy = godEnergy || {};
   var top = WX[0];
   WX.forEach(function (e) { if (p[e] > p[top]) top = e; });
-  var dir = {}, mode, disease = null;
+  var dir = {}, mode, disease = null, subtype = '';
   var ti = 0, shiShang = 0, biJie = 0;
   WX.forEach(function (e) {
     var g = partyGod(dmEl, e);
@@ -119,13 +131,17 @@ function decideXiji(p, dmEl, rootEls) {
     if (g === '比劫') { ti += p[e]; biJie += p[e]; }
   });
 
-  if (ti >= 40 && shiShang > biJie) {
-    mode = '食伤偏旺'; // 输出太过：比劫转为喜用，食伤仍为忌，财官印沿用体旺取法。
-    WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '食伤') ? '-' : '+'; });
-  } else if (p[top] >= 40) {
+  var diseaseEls = WX.filter(function (e) { return (p[e] || 0) >= 40; });
+  var subtypes = diseaseEls.map(function (e) {
+    return diseaseSubtype(partyGod(dmEl, e), godEnergy);
+  }).filter(function (s) { return !!s; });
+
+  // 任何单一五行达到 40% 都先判病重；最高者作为病药基础判断的主病。
+  if (diseaseEls.length) {
     // 病重型：围绕病 D 的生克五位
     mode = '病重';
     disease = top;
+    subtype = diseaseSubtype(partyGod(dmEl, top), godEnergy);
     var D = top, di = wxIdx(D), diseaseIsBi = (partyGod(dmEl, D) === '比劫');
     var bodyWeak = (p[dmEl] < p[top]) && !diseaseIsBi;
     WX.forEach(function (e) {
@@ -142,21 +158,33 @@ function decideXiji(p, dmEl, rootEls) {
       } else v = '-';
       dir[e] = v;
     });
-  } else {
-    // 均衡型：看体 = 食伤 + 比劫
-    if (ti >= 40) {
-      mode = '体旺';   // 喜财官印，忌食伤比劫
+  } else if (ti >= 40) {
+    // 非病重结构：体 = 食伤 + 比劫，谁占主导就制衡谁。
+    if (shiShang > biJie) {
+      subtype = dominantGod(godEnergy, '伤官', '食神') + '偏旺';
+      mode = subtype;
       WX.forEach(function (e) {
-        var g = partyGod(dmEl, e);
-        if (g === '印' && biJie > shiShang) dir[e] = '-';
-        else dir[e] = (g === '财' || g === '官杀' || g === '印') ? '+' : '-';
+        dir[e] = partyGod(dmEl, e) === '食伤' ? '-' : '+';
       });
     } else {
-      mode = '体弱';   // 喜比劫印，忌财官食伤
-      WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '比劫' || g === '印') ? '+' : '-'; });
+      mode = '体旺';
+      WX.forEach(function (e) {
+        var g = partyGod(dmEl, e);
+        dir[e] = (g === '食伤' || g === '财' || g === '官杀') ? '+' : '-';
+      });
     }
+  } else {
+    mode = '体弱';
+    WX.forEach(function (e) { var g = partyGod(dmEl, e); dir[e] = (g === '比劫' || g === '印') ? '+' : '-'; });
   }
-  return { dir: dir, mode: mode, disease: disease };
+  return {
+    dir: dir,
+    mode: mode,
+    disease: disease,
+    diseaseEls: diseaseEls,
+    subtype: subtype,
+    subtypes: subtypes
+  };
 }
 
 // 五行滑标位置：喜(+)→左、忌(-)→右；强度 = |五行占比−20| 限幅 [0,25] → 钳到 [25%,75%]
@@ -177,13 +205,6 @@ function capTraitRight(god, pos) {
 
 function traitSliderPos(d, godPct, god) {
   var mag = Math.min(25, Math.max(10, Math.round(Math.max(0, godPct - 10))));
-  if (d === '+') return 50 - mag;
-  if (d === '-') return capTraitRight(god, 50 + mag);
-  return 50;
-}
-
-function luckSliderPos(d, godPct, god) {
-  var mag = Math.min(25, Math.max(10, Math.round(Math.max(0, godPct) * 2)));
   if (d === '+') return 50 - mag;
   if (d === '-') return capTraitRight(god, 50 + mag);
   return 50;
@@ -327,8 +348,8 @@ function direction(party, p) {
 
 /**
  * @param {object} chart bazi.computeChart 返回值
- * @param {object} opts  { luckIndex, luckYear, liuNianGZ }
- *   大运驱动：人生阶段=逐个大运；opts 只用于给选中大运叠加某个流年。
+ * @param {object} opts  { luckByStage, yearByStage }
+ *   固定四阶段；每个阶段选择一段大运，可选流年天干叠加行为。
  *   两种底色/主心性列表/心结张力等全局板块固定用原局，不随岁运变。
  */
 function build(chart, opts) {
@@ -339,9 +360,16 @@ function build(chart, opts) {
   var P = m.pNow;
   var inten = intensity(P);
 
-  // —— 占比决策树（原局）：全池五行占比 → 各五行喜忌 ——
+  // —— 占比决策树（原局）：岁运不进池，喜忌终身固定 ——
+  var natalGodEnergy = {};
+  (m.ganCells || []).forEach(function (c) {
+    if (!c.isDay) natalGodEnergy[c.god] = (natalGodEnergy[c.god] || 0) + c.val;
+  });
+  (m.hiddenUnits || []).forEach(function (u) {
+    natalGodEnergy[u.god] = (natalGodEnergy[u.god] || 0) + u.val;
+  });
   var rootEls = rootElsOf(chart, {});
-  var xiji = decideXiji(m.poolXiji || m.pool || {}, dmEl, rootEls);
+  var xiji = decideXiji(m.poolXiji || m.pool || {}, dmEl, rootEls, natalGodEnergy);
 
   // 全局板块固定原局口径
   var lnGan = null;
@@ -534,109 +562,264 @@ function build(chart, opts) {
 
   var coreInfo = CORE[dayGan] || { title: dayGan, text: '' };
 
-  // —— 大运驱动的人生阶段 ——
-  // 每个非童限大运 = 一段人生：天干十神→人前（社交形象），地支本气十神→人后（亲近之人）。
-  // 滑标方向取「该大运干/支的五行在原局中的喜忌」（用固定的原局决策树 xiji），
-  // 强度取一个稳健的偏移量（喜忌方向明确，不做虚假的精细分级）。
-  var DYU_MAG = 20;
-  function dyuSlider(dir, god) {
-    if (dir === '+') return 50 - DYU_MAG;
-    if (dir === '-') return capTraitRight(god, 50 + DYU_MAG);
+  // —— 固定四阶段：大运只作为阶段内的岁运选择，不再充当阶段本身 ——
+  var SPECIAL_PIAN = { 劫财: true, 伤官: true, 七杀: true, 偏印: true };
+  var EXCESS_CONFLICTS = {
+    伤官过旺: { 正官: '伤官见官' },
+    偏印过旺: { 食神: '枭神夺食' },
+    劫财过旺: { 正财: '劫财夺财', 偏财: '劫财夺财' },
+    七杀过旺: { 比肩: '七杀制身' }
+  };
+  function fixedLuckDir(god, el) {
+    var dir = xiji.dir[el] || '0';
+    for (var i = 0; i < (xiji.subtypes || []).length; i++) {
+      var hit = EXCESS_CONFLICTS[xiji.subtypes[i]];
+      if (hit && hit[god]) return { dir: '-', reason: hit[god] };
+    }
+    return { dir: dir, reason: '' };
+  }
+  function stageDir(target, luck, allowPianTurn) {
+    var result = fixedLuckDir(luck.god, luck.el);
+    if (allowPianTurn && SPECIAL_PIAN[target.god] && xiji.dir[target.el] === '-') {
+      var controlled = KE[luck.el] === target.el;
+      var drained = SHENG[target.el] === luck.el;
+      if (controlled || drained) {
+        return { dir: '+', reason: controlled ? '偏神受大运克制，转为喜用' : '偏神生大运得泄，转为喜用' };
+      }
+    }
+    return result;
+  }
+  function baseStageSlider(dir, god, side) {
+    if (dir === '+') return 35;
+    if (dir === '-') return side === 'outer' && !SPECIAL_PIAN[god] ? 50 : 65;
     return 50;
   }
-  // 单面心性层（人前/人后）
-  function makeSideLayer(char, god, el, side) {
-    var t = TEMP[god] || { name: god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
-    var copyKind = side === 'outer' ? 'outer' : 'inner';
-    var dir = traitDir(god, el);
+  function overlayYearSlider(pos, yearDir) {
+    var shifted = pos + (yearDir === '+' ? -15 : yearDir === '-' ? 15 : 0);
+    return Math.max(25, Math.min(75, shifted));
+  }
+  function sourceOfGan(pillar) {
+    var p = chart.pillars[pillar];
+    if (!p || p.empty || !p.gan) return null;
+    var ch = p.gan.text;
+    return { char: ch, god: LunarUtil.SHI_SHEN[dayGan + ch], el: base.ganWx(ch), pillar: pillar, sourceKind: 'gan' };
+  }
+  function hiddenSource(pillar, ch, rank) {
+    var val = 1;
+    for (var i = 0; i < (m.hiddenUnits || []).length; i++) {
+      var u = m.hiddenUnits[i];
+      if (u.pillar === pillar && u.rank === rank) { val = u.val; break; }
+    }
     return {
-      god: god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
-      catImage: tenGodCatImage(god),
-      desc: narrativeText(god, copyKind, 'desc'),
-      con: narrativeText(god, copyKind, 'con'),
-      descLabel: '优点', conLabel: '留意',
-      cls: base.WX_CLS[el],
-      slider: dyuSlider(dir, god),
-      traitDir: dir,
-      copyKind: copyKind,
-      sourceChar: char,
-      side: side
+      char: ch,
+      god: LunarUtil.SHI_SHEN[dayGan + ch],
+      el: base.ganWx(ch),
+      energy: val,
+      pillar: pillar,
+      sourceKind: rank === 0 ? 'zhiMain' : 'zhiVisible'
     };
   }
-  // 叠加的流年层（金色气泡用）：讲这一年，方向同样取原局喜忌
-  function makeYearOverlay(char, god, el) {
-    var L0 = LIUNIAN[god] || { lbl: '', rbl: '', desc: '' };
-    var dir = traitDir(god, el);
+  var visibleGan = {};
+  [0, 1, 3].forEach(function (pillar) {
+    var src = sourceOfGan(pillar);
+    if (src) visibleGan[src.char] = true;
+  });
+  function sourcesOfBranch(pillar) {
+    var p = chart.pillars[pillar];
+    if (!p || p.empty || !p.zhi) return [];
+    var hides = LunarUtil.ZHI_HIDE_GAN[p.zhi.text] || [];
+    var seen = {}, out = [];
+    hides.forEach(function (ch, rank) {
+      if (rank > 0 && !visibleGan[ch]) return;
+      var src = hiddenSource(pillar, ch, rank);
+      if (!seen[src.god]) { seen[src.god] = true; out.push(src); }
+    });
+    return out;
+  }
+  function luckGanSource(dy) {
+    var ch = dy.ganZhi.charAt(0);
+    return { char: ch, god: LunarUtil.SHI_SHEN[dayGan + ch], el: base.ganWx(ch), sourceKind: 'luckGan' };
+  }
+  function luckZhiSource(dy) {
+    var zhi = dy.ganZhi.charAt(1);
+    var ch = LunarUtil.ZHI_HIDE_GAN[zhi][0];
+    return { char: ch, zhi: zhi, god: LunarUtil.SHI_SHEN[dayGan + ch], el: base.ganWx(ch), sourceKind: 'luckZhi' };
+  }
+  var natalGodSet = {};
+  stems.forEach(function (c) { natalGodSet[c.god] = true; });
+  (m.hiddenUnits || []).forEach(function (u) { natalGodSet[u.god] = true; });
+
+  function makeStageItem(src, side, luck, allowPianTurn) {
+    var t = TEMP[src.god] || { name: src.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
+    var effective = stageDir(src, luck, allowPianTurn);
     return {
-      god: god, name: god,
-      catImage: tenGodCatImage(god),
-      slider: dyuSlider(dir, god),
+      god: src.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
+      catImage: tenGodCatImage(src.god),
+      desc: narrativeText(src.god, side, 'desc'),
+      con: narrativeText(src.god, side, 'con'),
+      descLabel: '优点', conLabel: '留意',
+      cls: base.WX_CLS[src.el],
+      slider: baseStageSlider(effective.dir, src.god, side),
+      traitDir: effective.dir,
+      traitOverride: effective.reason,
+      copyKind: side,
+      sourceChar: src.char,
+      side: side,
+      energy: src.energy || 1
+    };
+  }
+  function makeYearOverlay(year, gz) {
+    if (!gz || gz.length < 2) return null;
+    var ch = gz.charAt(0);
+    var god = LunarUtil.SHI_SHEN[dayGan + ch];
+    var el = base.ganWx(ch);
+    var L0 = LIUNIAN[god] || { lbl: '', rbl: '', desc: '' };
+    var effective = fixedLuckDir(god, el);
+    return {
+      god: god,
+      name: year + ' · ' + god,
+      slider: effective.dir === '+' ? 35 : effective.dir === '-' ? 65 : 50,
       bubbleWeight: 0.7,
       lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
-      traitDir: dir, char: char
+      traitDir: effective.dir,
+      reason: effective.reason,
+      char: ch
     };
   }
-  function decorateSide(layer, side, overlay) {
-    if (!layer) return null;
-    if (side === 'outer') {
-      layer.title = '人前 · 社交形象';
-      layer.help = '社交场合、初见与共事时，这步大运里你自然拿出来的姿态。';
-    } else {
-      layer.title = '人后 · 亲近之人';
-      layer.help = '在家人、伴侣和至交面前，这步大运里流露的真实心性。';
+  function makeStageLayer(sources, side, luck, overlay, allowPianTurn) {
+    if (!sources || !sources.length) return null;
+    var items = sources.map(function (src) { return makeStageItem(src, side, luck, allowPianTurn); });
+    if (side === 'outer' && overlay) {
+      items.forEach(function (it) { it.slider = overlayYearSlider(it.slider, overlay.traitDir); });
     }
-    layer.bubbles = buildTraitBubbles([layer], overlay, layer.copyKind);
-    if (overlay) {
-      layer.luckName = overlay.name;
-      layer.luckSlider = overlay.slider;
-      layer.luckLbl = overlay.lbl;
-      layer.luckRbl = overlay.rbl;
-    }
+    var main = items[0];
+    var layer = {};
+    for (var k in main) layer[k] = main[k];
+    layer.items = items;
+    layer.name = items.map(function (it) { return it.name; }).join(' · ');
+    layer.title = side === 'outer' ? '人前 · 行为模式' : '内在 · 心性底色';
+    layer.help = side === 'outer'
+      ? '在表达、选择与做事时自然呈现的行为方式。'
+      : '在独处、亲密关系和压力之下更真实的内在倾向。';
+    layer.bubbles = buildTraitBubbles(items, side === 'outer' ? overlay : null, side);
+    if (side === 'outer' && overlay) layer.luckName = overlay.name;
     return layer;
   }
 
-  // 逐大运（起运后，去童限）成段
-  var luckList = (chart.daYun || []).filter(function (d) {
-    return d.ganZhi && d.ganZhi.length >= 2 && !d.isQian;
+  var STAGES = [
+    { key: 'youth', label: '少年', age: '0-19岁', min: 0, max: 19 },
+    { key: 'young', label: '青年', age: '20-34岁', min: 20, max: 34 },
+    { key: 'middle', label: '中年', age: '35-49岁', min: 35, max: 49 },
+    { key: 'old', label: '老年', age: '50岁以后', min: 50, max: 200 }
+  ];
+  var currentYear = new Date().getFullYear();
+  var birthYear = new Date(chart.meta.timestamp).getFullYear();
+  var currentAge = currentYear - birthYear;
+  (chart.daYun || []).forEach(function (dy) {
+    if (currentYear < dy.startYear || currentYear > dy.endYear) return;
+    (dy.liuNian || []).forEach(function (ln) {
+      if (ln.year === currentYear) currentAge = ln.age;
+    });
   });
-  var stagePortraits = luckList.map(function (dy, idx) {
-    var gz = dy.ganZhi;
-    var dyGan = gz.charAt(0), dyZhi = gz.charAt(1);
-    var ganGod = LunarUtil.SHI_SHEN[dayGan + dyGan], ganEl = base.ganWx(dyGan);
-    var zhiMain = LunarUtil.ZHI_HIDE_GAN[dyZhi][0];
-    var zhiGod = LunarUtil.SHI_SHEN[dayGan + zhiMain], zhiEl = base.ganWx(zhiMain);
+  var currentStageKey = currentAge < 20 ? 'youth' : currentAge < 35 ? 'young' : currentAge < 50 ? 'middle' : 'old';
+  var luckByStage = opts.luckByStage || {};
+  var yearByStage = opts.yearByStage || {};
 
-    // 选中该大运时可叠加某个流年（gold）
-    var lnGZ = null, selYear = null;
-    if (opts.luckIndex === dy.index && opts.luckYear && dy.liuNian) {
-      for (var i = 0; i < dy.liuNian.length; i++) {
-        if (dy.liuNian[i].year === opts.luckYear) { lnGZ = dy.liuNian[i].ganZhi; selYear = opts.luckYear; break; }
+  function intersectLuck(def) {
+    var out = [];
+    (chart.daYun || []).forEach(function (dy) {
+      var start = dy.isQian ? 0 : dy.startAge;
+      var end = dy.endAge;
+      var a = Math.max(def.min, start), b = Math.min(def.max, end);
+      if (a > b) return;
+      out.push({
+        index: dy.index,
+        label: a + '-' + b + '岁',
+        gz: dy.isQian ? '童限' : dy.ganZhi,
+        isQian: !!dy.isQian,
+        startAge: a,
+        endAge: b,
+        dy: dy
+      });
+    });
+    return out;
+  }
+  function selectedSegment(def, segments) {
+    var wanted = luckByStage[def.key];
+    for (var i = 0; i < segments.length; i++) if (segments[i].index === wanted) return segments[i];
+    if (def.key === currentStageKey) {
+      for (var j = 0; j < segments.length; j++) {
+        if (currentYear >= segments[j].dy.startYear && currentYear <= segments[j].dy.endYear) return segments[j];
       }
     }
-    var outerOverlay = null, innerOverlay = null;
-    if (lnGZ && lnGZ.length >= 2) {
-      var lnGanC = lnGZ.charAt(0), lnZhiC = lnGZ.charAt(1);
-      outerOverlay = makeYearOverlay(lnGanC, LunarUtil.SHI_SHEN[dayGan + lnGanC], base.ganWx(lnGanC));
-      var lnZhiMain = LunarUtil.ZHI_HIDE_GAN[lnZhiC][0];
-      innerOverlay = makeYearOverlay(lnZhiC, LunarUtil.SHI_SHEN[dayGan + lnZhiMain], base.ganWx(lnZhiMain));
+    return segments[0] || null;
+  }
+
+  var stagePortraits = STAGES.map(function (def, idx) {
+    var segments = intersectLuck(def);
+    var segment = selectedSegment(def, segments);
+    segments.forEach(function (s) { s.active = !!segment && s.index === segment.index; });
+    if (!segment || segment.isQian) {
+      return {
+        key: def.key, label: def.label, age: def.age,
+        index: idx + 1, indexText: '0' + (idx + 1),
+        ganText: '童', zhiText: '限', ganCls: 'muted', zhiCls: 'muted',
+        luckSegments: segments, selectedLuckIndex: segment ? segment.index : null,
+        empty: true, qian: true,
+        note: '童限阶段不展示行为与心性气泡。',
+        summary: '童限不展示心性', outerLayer: null, innerLayer: null
+      };
     }
 
+    var dy = segment.dy;
+    var dyGanSrc = luckGanSource(dy), dyZhiSrc = luckZhiSource(dy);
+    var outerSources, innerSources, allowPianTurn = def.key !== 'youth';
+    if (def.key === 'youth') {
+      outerSources = natalGodSet[dyGanSrc.god] ? [dyGanSrc] : [sourceOfGan(1)];
+      innerSources = natalGodSet[dyZhiSrc.god] ? [dyZhiSrc] : sourcesOfBranch(1);
+    } else if (def.key === 'young') {
+      outerSources = [sourceOfGan(1)];
+      innerSources = sourcesOfBranch(1);
+    } else if (def.key === 'middle') {
+      outerSources = [sourceOfGan(1)];
+      innerSources = sourcesOfBranch(2);
+    } else {
+      outerSources = [sourceOfGan(3)];
+      innerSources = sourcesOfBranch(3);
+    }
+    outerSources = outerSources.filter(function (s) { return !!s; });
+    innerSources = innerSources.filter(function (s) { return !!s; });
+
+    var selYear = yearByStage[def.key];
+    var lnGZ = '';
+    (dy.liuNian || []).forEach(function (ln) {
+      if (ln.year === selYear) lnGZ = ln.ganZhi;
+    });
+    var overlay = lnGZ ? makeYearOverlay(selYear, lnGZ) : null;
+    var outerLayer = makeStageLayer(outerSources, 'outer', dyGanSrc, overlay, allowPianTurn);
+    var innerLayer = makeStageLayer(innerSources, 'inner', dyZhiSrc, null, allowPianTurn);
+    var missingTime = def.key === 'old' && chart.meta.unknownTime;
+    if (missingTime) { outerLayer = null; innerLayer = null; }
+
     return {
-      key: 'dy' + dy.index,
-      dyIndex: dy.index,
-      label: dy.startAge + '-' + dy.endAge + '岁',
-      age: dy.startYear + '-' + dy.endYear,
-      gz: gz,
-      ganText: dyGan, zhiText: dyZhi,
-      ganCls: dy.gan ? dy.gan.cls : base.WX_CLS[ganEl],
-      zhiCls: dy.zhi ? dy.zhi.cls : base.WX_CLS[zhiEl],
-      theme: ganGod + ' · ' + zhiGod,
-      note: '这步大运走「' + gz + '」：天干' + ganGod + '主外在姿态，地支' + zhiGod + '主内在状态；滑标由' + gz + '在原局中的喜忌决定。',
-      index: idx + 1, indexText: idx < 9 ? '0' + (idx + 1) : String(idx + 1),
-      hasYear: !!lnGZ, luckYear: selYear,
-      empty: false,
-      outerLayer: decorateSide(makeSideLayer(dyGan, ganGod, ganEl, 'outer'), 'outer', outerOverlay),
-      innerLayer: decorateSide(makeSideLayer(zhiMain, zhiGod, zhiEl, 'inner'), 'inner', innerOverlay)
+      key: def.key, label: def.label, age: def.age,
+      index: idx + 1, indexText: '0' + (idx + 1),
+      dyIndex: dy.index, selectedLuckIndex: dy.index,
+      luckSegments: segments,
+      gz: dy.ganZhi,
+      ganText: dy.ganZhi.charAt(0), zhiText: dy.ganZhi.charAt(1),
+      ganCls: dy.gan ? dy.gan.cls : base.WX_CLS[dyGanSrc.el],
+      zhiCls: dy.zhi ? dy.zhi.cls : base.WX_CLS[dyZhiSrc.el],
+      luckLabel: segment.label,
+      hasYear: !!overlay, luckYear: overlay ? selYear : null,
+      empty: missingTime,
+      missingTime: missingTime,
+      summary: missingTime ? '缺少时柱' : '人前 ' + outerLayer.name + ' · 内在 ' + innerLayer.name,
+      note: missingTime
+        ? '缺少时柱（出生时辰未知），无法判断老年阶段的时干行为与时支心性。'
+        : segment.label + '行「' + dy.ganZhi + '」大运。阶段文案由原局主导，大运决定喜忌方向；流年天干只叠加行为滑标。',
+      outerLayer: outerLayer,
+      innerLayer: innerLayer
     };
   });
 
@@ -714,6 +897,8 @@ function build(chart, opts) {
     branchList: branchList,
     relations: rels,
     stagePortraits: stagePortraits,
+    currentStageKey: currentStageKey,
+    xiji: xiji,
     zhengNow: zhengNow, pianNow: 100 - zhengNow,
     hasLuck: m.hasLuck,
     hasTime: !chart.meta.unknownTime

@@ -24,13 +24,6 @@
           </view>
           <text class="sl-lbl sl-lbl-r">{{layer.rbl}}</text>
         </view>
-        <view class="slider-row flow-slider" wx:if="{{layer.luckName}}">
-          <text class="sl-lbl sl-lbl-l">{{layer.luckLbl}}</text>
-          <view class="sl-track">
-            <view class="sl-thumb luck-thumb" style="left:{{layer.luckSlider}}%"></view>
-          </view>
-          <text class="sl-lbl sl-lbl-r">{{layer.luckRbl}}</text>
-        </view>
         <traitcluster wx:if="{{layer.bubbles.length}}" bubbles="{{layer.bubbles}}" />
         <view class="tc-legend" wx:if="{{layer.bubbles.length}}">
           <text class="tcl tcl-pro">顺的一面</text>
@@ -92,8 +85,8 @@
   </view>
 
   <view class="life-lead">
-    <view class="life-title serif">大运人生</view>
-    <view class="life-note">每一步大运一段。天干管人前的社交形象，地支管人后在亲近之人面前的真实心性；心性滑标由这步大运在你原局中的喜忌决定。点开某段可叠加当年流年。</view>
+    <view class="life-title serif">四阶段心性</view>
+    <view class="life-note">少年、青年、中年、老年各有稳定的心性来源。阶段内切换岁运年龄段查看变化；流年天干只叠加当年的行为表现。</view>
   </view>
 
   <view class="stage-acc">
@@ -109,11 +102,14 @@
             <text class="acc-now" wx:if="{{stage.key === currentStageKey}}">当前</text>
             <text class="acc-age">{{stage.age}}</text>
           </view>
-          <view class="acc-trait-line">
+          <view class="acc-trait-line" wx:if="{{!stage.empty}}">
             <text class="acc-side-k">人前</text>
             <text class="acc-trait-name">{{stage.outerLayer.name}}</text>
             <text class="acc-side-k acc-side-in">人后</text>
             <text class="acc-trait-name acc-trait-name-last">{{stage.innerLayer.name}}</text>
+          </view>
+          <view class="acc-trait-line" wx:else>
+            <text class="acc-trait-empty">{{stage.summary}}</text>
           </view>
         </view>
         <view class="acc-action">
@@ -125,7 +121,21 @@
       <view class="acc-body" wx:if="{{openStageKey === stage.key}}">
         <view class="stage-note">{{stage.note}}</view>
 
-        <view class="luck-controls" wx:if="{{openYearList.length}}">
+        <view class="luck-controls" wx:if="{{stage.luckSegments.length}}">
+          <view class="luck-control-title">岁运年龄段</view>
+          <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}">
+            <view class="luck-year-strip">
+              <view class="luck-year luck-period {{item.active ? 'on' : ''}}"
+                wx:for="{{stage.luckSegments}}" wx:key="index" bindtap="selectStageLuck"
+                data-key="{{stage.key}}" data-index="{{item.index}}">
+                <text class="luck-y">{{item.gz}}</text>
+                <text class="luck-a">{{item.label}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+
+        <view class="luck-controls" wx:if="{{!stage.empty && openYearList.length}}">
           <view class="luck-control-title">叠加流年（可选，再点取消）</view>
           <view class="luck-step">
             <view class="luck-step-btn" bindtap="stepStageYear" data-key="{{stage.key}}" data-d="-1">‹</view>
@@ -144,8 +154,8 @@
           </scroll-view>
         </view>
 
-        <template is="layerCard" data="{{ layer: stage.outerLayer, sk: stage.key, lk: 'outer' }}" />
-        <template is="layerCard" data="{{ layer: stage.innerLayer, sk: stage.key, lk: 'inner' }}" />
+        <template wx:if="{{stage.outerLayer}}" is="layerCard" data="{{ layer: stage.outerLayer, sk: stage.key, lk: 'outer' }}" />
+        <template wx:if="{{stage.innerLayer}}" is="layerCard" data="{{ layer: stage.innerLayer, sk: stage.key, lk: 'inner' }}" />
       </view>
     </view>
   </view>
