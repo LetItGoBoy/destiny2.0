@@ -72,8 +72,8 @@ Component({
     targetR: function (kind, w, lean) {
       var base = 13 + (w || 0.6) * 15;
       if (kind === 'neu') return base;
-      if (kind === 'con') return base * (0.50 + lean);
-      return base * (1.50 - lean);
+      if (kind === 'con') return base * (0.55 + 0.90 * lean);
+      return base * (1.45 - 0.90 * lean);
     },
 
     loop: function () {
