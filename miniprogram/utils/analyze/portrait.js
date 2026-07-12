@@ -583,12 +583,15 @@ function build(chart, opts) {
       ? fixedGodDir(target.god, target.el)
       : fixedGodDir(luck.god, luck.el);
     var excessName = target.god + '过旺';
+    var controlled = allowPianTurn && KE[luck.el] === target.el;
+    var drained = allowPianTurn && SHENG[target.el] === luck.el;
     if (allowPianTurn && (xiji.subtypes || []).indexOf(excessName) >= 0) {
+      if (SPECIAL_PIAN[target.god] && (controlled || drained)) {
+        return { dir: '0', reason: '病重主体' + excessName + (controlled ? '受大运克制' : '生大运得泄') + '，先转中性' };
+      }
       return { dir: '-', reason: '病重主体' + excessName + '，锁定为忌' };
     }
     if (allowPianTurn && SPECIAL_PIAN[target.god] && xiji.dir[target.el] === '-') {
-      var controlled = KE[luck.el] === target.el;
-      var drained = SHENG[target.el] === luck.el;
       if (controlled || drained) {
         return { dir: '+', reason: controlled ? '偏神受大运克制，转为喜用' : '偏神生大运得泄，转为喜用' };
       }
