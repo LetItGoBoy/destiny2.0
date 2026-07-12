@@ -582,6 +582,10 @@ function build(chart, opts) {
     var result = allowPianTurn
       ? fixedGodDir(target.god, target.el)
       : fixedGodDir(luck.god, luck.el);
+    var excessName = target.god + '过旺';
+    if (allowPianTurn && (xiji.subtypes || []).indexOf(excessName) >= 0) {
+      return { dir: '-', reason: '病重主体' + excessName + '，锁定为忌' };
+    }
     if (allowPianTurn && SPECIAL_PIAN[target.god] && xiji.dir[target.el] === '-') {
       var controlled = KE[luck.el] === target.el;
       var drained = SHENG[target.el] === luck.el;
