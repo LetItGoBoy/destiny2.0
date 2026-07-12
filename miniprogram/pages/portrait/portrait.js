@@ -112,11 +112,26 @@ Page({
     return null;
   },
 
+  selectedLuckSegment: function (key) {
+    var stages = this._lastStages || [];
+    for (var i = 0; i < stages.length; i++) {
+      if (stages[i].key !== key) continue;
+      var segments = stages[i].luckSegments || [];
+      for (var j = 0; j < segments.length; j++) {
+        if (segments[j].active) return segments[j];
+      }
+    }
+    return null;
+  },
+
   // 当前阶段所选大运的流年列表（可选叠加）
   yearListForKey: function (key, activeYear) {
     var d = this.dyByIndex(this.selectedLuckIndex(key));
+    var segment = this.selectedLuckSegment(key);
     if (!d || !d.liuNian) return [];
-    return d.liuNian.map(function (ln) {
+    return d.liuNian.filter(function (ln) {
+      return !segment || (ln.age >= segment.startAge && ln.age <= segment.endAge);
+    }).map(function (ln) {
       return { year: ln.year, age: ln.age, gz: ln.ganZhi, active: ln.year === activeYear };
     });
   },
