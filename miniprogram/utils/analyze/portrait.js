@@ -72,20 +72,21 @@ function visibleConWords(god, words, limit) {
   return out;
 }
 
-// 正神气泡显示规则：喜用隐藏缺点；中性缺点缩小；为忌时优缺等大。
-// 病重主体十神必须保留缺点，不能被“正神喜用”规则隐藏。
+// 气泡显示规则：正偏神为喜都隐藏缺点；正神中性缺点缩小、为忌时优缺等大。
+// 病重主体十神必须保留缺点，不能被“喜用隐藏缺点”规则覆盖。
 function bubblePolicy(t) {
   var pos = t && t.slider != null ? t.slider : 50;
   var lean = pos / 100;
   var policy = { proLean: lean, conLean: lean, hideCon: false };
-  if (!t || !t.isZhengGod) return policy;
+  if (!t) return policy;
 
   // 流年只叠加主滑标，不改写阶段十神自身的优缺显示资格。
-  // 因此正神是否隐藏缺点看原始喜忌方向，不能看叠加后的 slider。
+  // 因此是否隐藏缺点看原始喜忌方向，不能看叠加后的 slider。
   if (!t.isDiseaseGod && t.traitDir === '+') {
     policy.hideCon = true;
     return policy;
   }
+  if (!t.isZhengGod) return policy;
 
   if (t.traitDir === '-' || pos >= 65) {
     policy.proLean = 0.5;
