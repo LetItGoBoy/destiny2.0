@@ -107,7 +107,7 @@ function buildTraitBubbles(list, luck, kind) {
     var policy = bubblePolicy(t);
     var bw = idx === 0 ? 0.95 : 0.78;
     (kw.pro || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw, lean: policy.proLean }); });
-    (kw.neu || []).slice(0, 3).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: 0.5 }); });
+    (kw.neu || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: 0.5 }); });
     if (!policy.hideCon) {
       visibleConWords(t.god, kw.con, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
       (t.extraCon || []).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
