@@ -623,6 +623,9 @@ function build(chart, opts) {
   function isDiseaseGod(god) {
     return (xiji.subtypes || []).indexOf(god + '过旺') >= 0;
   }
+  function diseaseExtraCon(god) {
+    return god === '伤官' && isDiseaseGod(god) ? ['对抗权威', '漠视规则'] : [];
+  }
   function fixedGodDir(god, el) {
     var dir = xiji.dir[el] || '0';
     for (var i = 0; i < (xiji.subtypes || []).length; i++) {
@@ -707,7 +710,6 @@ function build(chart, opts) {
   function makeStageItem(src, side, modifier) {
     var t = TEMP[src.god] || { name: src.god, pol: '', lbl: '', rbl: '', desc: '', con: '' };
     var effective = stageDir(src, modifier);
-    var isExcessShangGuan = src.god === '伤官' && (xiji.subtypes || []).indexOf('伤官过旺') >= 0;
     var copyKind = natalGodSet[src.god] ? 'natal' : 'transit';
     return {
       god: src.god, name: t.name, pol: t.pol, lbl: t.lbl, rbl: t.rbl,
@@ -723,7 +725,7 @@ function build(chart, opts) {
       isNatalGod: !!natalGodSet[src.god],
       traitOverride: effective.reason,
       activation: src.activation || '',
-      extraCon: isExcessShangGuan ? ['对抗权威', '漠视规则'] : [],
+      extraCon: diseaseExtraCon(src.god),
       copyKind: copyKind,
       sourceChar: src.char,
       side: side,
@@ -750,6 +752,35 @@ function build(chart, opts) {
       char: ch
     };
   }
+  function persistentDiseaseBubbles(items, bubbles) {
+    if (xiji.mode !== '病重') return [];
+    var mainGods = {};
+    var used = {};
+    (items || []).forEach(function (it) { mainGods[it.god] = true; });
+    (bubbles || []).forEach(function (it) { used[it.label] = true; });
+
+    var out = [];
+    (xiji.subtypes || []).forEach(function (subtype) {
+      var god = String(subtype || '').replace(/过旺$/, '');
+      if (!god || mainGods[god]) return;
+      var kw = traitWords[god] || {};
+      var words = visibleConWords(god, kw.con, 5).concat(diseaseExtraCon(god));
+      words.forEach(function (word) {
+        if (!word || used[word]) return;
+        used[word] = true;
+        out.push({
+          label: word,
+          kind: 'con',
+          src: 'natal',
+          w: 0.55,
+          lean: 0.5,
+          persistentDisease: true,
+          diseaseGod: god
+        });
+      });
+    });
+    return out;
+  }
   function makeStageLayer(sources, side, modifier, overlay) {
     if (!sources || !sources.length) return null;
     var items = sources.map(function (src) { return makeStageItem(src, side, modifier); });
@@ -766,6 +797,9 @@ function build(chart, opts) {
       ? '这段大运在表达、选择与做事时呈现的行为方式。'
       : '这段大运在独处、亲密关系和压力之下呈现的内在倾向。';
     layer.bubbles = buildTraitBubbles(items, side === 'outer' ? overlay : null, side);
+    if (side === 'inner') {
+      layer.bubbles = layer.bubbles.concat(persistentDiseaseBubbles(items, layer.bubbles));
+    }
     if (side === 'outer' && overlay) layer.luckName = overlay.name;
     return layer;
   }
