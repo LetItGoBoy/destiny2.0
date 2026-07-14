@@ -86,7 +86,7 @@
 
   <view class="life-lead">
     <view class="life-title serif">四阶段心性</view>
-    <view class="life-note">少年、青年、中年、老年各有稳定的心性来源。阶段内切换岁运年龄段查看变化；流年天干只叠加当年的行为表现。</view>
+    <view class="life-note">各阶段以所行大运呈现当时心性，年、月、日、时柱依次修正少年、青年、中年与老年；流年天干只叠加当年的行为表现。</view>
   </view>
 
   <view class="stage-acc">
