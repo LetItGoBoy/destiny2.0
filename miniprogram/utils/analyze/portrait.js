@@ -57,29 +57,55 @@ function narrativeText(god, kind, side) {
   return side === 'desc' ? t.desc : t.con;
 }
 
+// 正神气泡显示规则：喜用隐藏缺点；中性缺点缩小；为忌时优缺等大。
+// 病重主体十神必须保留缺点，不能被“正神喜用”规则隐藏。
+function bubblePolicy(t) {
+  var pos = t && t.slider != null ? t.slider : 50;
+  var lean = pos / 100;
+  var policy = { proLean: lean, conLean: lean, hideCon: false };
+  if (!t || !t.isZhengGod) return policy;
+
+  if (!t.isDiseaseGod && pos <= 35) {
+    policy.hideCon = true;
+    return policy;
+  }
+
+  if (t.traitDir === '-' || pos >= 65) {
+    policy.proLean = 0.5;
+    policy.conLean = 0.5;
+  } else if (pos === 50) {
+    policy.proLean = 0.5;
+    policy.conLean = 0.35;
+  }
+  return policy;
+}
+
 // 心性 → 气泡星团数据（原局 src=natal 红蓝 + 岁运叠加 src=luck 金）
 function buildTraitBubbles(list, luck, kind) {
   var out = [];
   (list || []).forEach(function (t, idx) {
     var kw = wordCopy(t.god, t.copyKind || kind || 'outer');
     if (!kw) return;
-    // 该心性算出的滑标位置(25-75) → lean(0顺…1偏)，驱动这组泡泡优缺涨缩
-    var lean = (t.slider != null ? t.slider : 50) / 100;
+    var policy = bubblePolicy(t);
     var bw = idx === 0 ? 0.95 : 0.78;
-    (kw.pro || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw, lean: lean }); });
-    (kw.neu || []).slice(0, 3).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: lean }); });
-    (kw.con || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: lean }); });
-    (t.extraCon || []).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: lean }); });
+    (kw.pro || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw, lean: policy.proLean }); });
+    (kw.neu || []).slice(0, 3).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: 0.5 }); });
+    if (!policy.hideCon) {
+      (kw.con || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
+      (t.extraCon || []).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
+    }
   });
   // 岁运叠加（金色）：取一组优缺关键词，叠在主心性之上，不顶替
   // 若岁运十神与原局主心性相同，能量本就一样，不再加多余的圆
   if (luck && luck.god) {
     var lkw = wordCopy(luck.god, 'luck');
     if (lkw) {
-      var ll = (luck.slider != null ? luck.slider : 50) / 100;
+      var luckPolicy = bubblePolicy(luck);
       var lw = luck.bubbleWeight || 0.7;
-      (lkw.pro || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'luck', w: lw, lean: ll }); });
-      (lkw.con || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'luck', w: lw, lean: ll }); });
+      (lkw.pro || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'luck', w: lw, lean: luckPolicy.proLean }); });
+      if (!luckPolicy.hideCon) {
+        (lkw.con || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'luck', w: lw, lean: luckPolicy.conLean }); });
+      }
     }
   }
   return out;
@@ -569,6 +595,9 @@ function build(chart, opts) {
     劫财过旺: { 正财: '劫财夺财', 偏财: '劫财夺财' },
     七杀过旺: { 比肩: '七杀制身' }
   };
+  function isDiseaseGod(god) {
+    return (xiji.subtypes || []).indexOf(god + '过旺') >= 0;
+  }
   function fixedGodDir(god, el) {
     var dir = xiji.dir[el] || '0';
     for (var i = 0; i < (xiji.subtypes || []).length; i++) {
@@ -674,6 +703,8 @@ function build(chart, opts) {
       cls: base.WX_CLS[src.el],
       slider: baseStageSlider(effective.dir, src.god, side),
       traitDir: effective.dir,
+      isZhengGod: !SPECIAL_PIAN[src.god],
+      isDiseaseGod: isDiseaseGod(src.god),
       traitOverride: effective.reason,
       activation: src.activation || '',
       extraCon: isExcessShangGuan ? ['对抗权威', '漠视规则'] : [],
@@ -697,6 +728,8 @@ function build(chart, opts) {
       bubbleWeight: 0.7,
       lbl: L0.lbl, rbl: L0.rbl, desc: L0.desc,
       traitDir: effective.dir,
+      isZhengGod: !SPECIAL_PIAN[god],
+      isDiseaseGod: isDiseaseGod(god),
       reason: effective.reason,
       char: ch
     };
