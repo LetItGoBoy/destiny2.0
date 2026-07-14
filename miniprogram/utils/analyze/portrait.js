@@ -14,8 +14,8 @@ var SHENG = base.SHENG;
 var YEAR_TRAIT_WORDS = {
   比肩: { pro: ['自主', '硬气', '稳住', '自己来'], con: ['较劲', '固执', '不服软', '单扛'] },
   劫财: { pro: ['敢冲', '有人气', '讲义气', '会争取'], con: ['上头', '攀比', '冲动花钱', '替人扛'] },
-  食神: { pro: ['松弛', '好相处', '有口福', '会享受'], con: ['拖延', '贪舒服', '不想卷', '放松过头'] },
-  伤官: { pro: ['敢说', '有灵感', '表现力', '出作品'], con: ['嘴快', '不服管', '太锋利', '自律差'] },
+  食神: { pro: ['松弛', '好相处', '有口福', '会享受'], con: ['拖延', '贪舒服', '不想卷', '放松过头', '爱吃爱玩'] },
+  伤官: { pro: ['敢说', '有灵感', '表现力', '出作品'], con: ['嘴快', '不服管', '太锋利', '自律差', '爱吃爱玩'] },
   正财: { pro: ['务实', '会规划', '能执行', '重承诺'], con: ['压力大', '太现实', '瞎忙', '怕变动'] },
   偏财: { pro: ['机会感', '会变通', '出手快', '人脉活'], con: ['分心', '花钱快', '投机', '边界松'] },
   正官: { pro: ['自律', '负责', '守分寸', '要名分'], con: ['顾虑多', '放不开', '怕出错', '太拘谨'] },
@@ -63,6 +63,15 @@ function narrativeText(god, kind, side) {
   return side === 'desc' ? t.desc : t.con;
 }
 
+function visibleConWords(god, words, limit) {
+  var all = words || [];
+  var out = all.slice(0, limit);
+  if ((god === '食神' || god === '伤官') && all.indexOf('爱吃爱玩') >= 0 && out.indexOf('爱吃爱玩') < 0) {
+    out.push('爱吃爱玩');
+  }
+  return out;
+}
+
 // 正神气泡显示规则：喜用隐藏缺点；中性缺点缩小；为忌时优缺等大。
 // 病重主体十神必须保留缺点，不能被“正神喜用”规则隐藏。
 function bubblePolicy(t) {
@@ -97,7 +106,7 @@ function buildTraitBubbles(list, luck, kind) {
     (kw.pro || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'natal', w: bw, lean: policy.proLean }); });
     (kw.neu || []).slice(0, 3).forEach(function (w) { out.push({ label: w, kind: 'neu', src: 'natal', w: 0.55, lean: 0.5 }); });
     if (!policy.hideCon) {
-      (kw.con || []).slice(0, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
+      visibleConWords(t.god, kw.con, 5).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
       (t.extraCon || []).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'natal', w: bw, lean: policy.conLean }); });
     }
   });
@@ -110,7 +119,7 @@ function buildTraitBubbles(list, luck, kind) {
       var lw = luck.bubbleWeight || 0.7;
       (lkw.pro || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'pro', src: 'luck', w: lw, lean: luckPolicy.proLean }); });
       if (!luckPolicy.hideCon) {
-        (lkw.con || []).slice(0, 4).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'luck', w: lw, lean: luckPolicy.conLean }); });
+        visibleConWords(luck.god, lkw.con, 4).forEach(function (w) { out.push({ label: w, kind: 'con', src: 'luck', w: lw, lean: luckPolicy.conLean }); });
       }
     }
   }
@@ -189,6 +198,11 @@ function decideXiji(p, dmEl, rootEls, godEnergy) {
       } else v = '-';
       dir[e] = v;
     });
+    // 只要病重五行中包含食伤，生扶食伤的比劫就是喂病，统一锁定为忌。
+    var hasDiseaseShiShang = diseaseEls.some(function (e) {
+      return partyGod(dmEl, e) === '食伤';
+    });
+    if (hasDiseaseShiShang) dir[dmEl] = '-';
   } else if (ti >= 40) {
     // 非病重结构：体 = 食伤 + 比劫，谁占主导就制衡谁。
     if (shiShang > biJie) {
