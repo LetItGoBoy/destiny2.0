@@ -198,11 +198,13 @@ function decideXiji(p, dmEl, rootEls, godEnergy) {
       } else v = '-';
       dir[e] = v;
     });
-    // 只要病重五行中包含食伤，生扶食伤的比劫就是喂病，统一锁定为忌。
-    var hasDiseaseShiShang = diseaseEls.some(function (e) {
-      return partyGod(dmEl, e) === '食伤';
+    // 病重是硬约束：病五行及所有生病五行一律为忌，后续岁运不得按普通偏神规则翻转。
+    diseaseEls.forEach(function (diseaseEl) {
+      dir[diseaseEl] = '-';
+      WX.forEach(function (e) {
+        if (SHENG[e] === diseaseEl) dir[e] = '-';
+      });
     });
-    if (hasDiseaseShiShang) dir[dmEl] = '-';
   } else if (ti >= 40) {
     // 非病重结构：体 = 食伤 + 比劫，谁占主导就制衡谁。
     if (shiShang > biJie) {
@@ -626,6 +628,15 @@ function build(chart, opts) {
     }
     return { dir: dir, reason: '' };
   }
+  function diseaseSupportOf(target) {
+    if (xiji.mode !== '病重') return null;
+    for (var i = 0; i < (xiji.diseaseEls || []).length; i++) {
+      var diseaseEl = xiji.diseaseEls[i];
+      if (target.el === diseaseEl) return { el: diseaseEl, kind: '扶' };
+      if (SHENG[target.el] === diseaseEl) return { el: diseaseEl, kind: '生' };
+    }
+    return null;
+  }
   function stageDir(target, modifier) {
     var result = fixedGodDir(target.god, target.el);
     var excessName = target.god + '过旺';
@@ -637,6 +648,15 @@ function build(chart, opts) {
         return { dir: '0', reason: '病重主体' + excessName + (controlled ? '受' + modifierName + '克制' : '生' + modifierName + '得泄') + '，先转中性' };
       }
       return { dir: '-', reason: '病重主体' + excessName + '，锁定为忌' };
+    }
+    var diseaseSupport = diseaseSupportOf(target);
+    if (diseaseSupport) {
+      return {
+        dir: '-',
+        reason: diseaseSupport.kind === '生'
+          ? target.god + '生扶病重五行' + diseaseSupport.el + '，锁定为忌'
+          : target.god + '与病重五行' + diseaseSupport.el + '同气扶病，锁定为忌'
+      };
     }
     if (SPECIAL_PIAN[target.god] && result.dir === '-') {
       if (controlled || drained) {
