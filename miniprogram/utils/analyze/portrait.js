@@ -80,7 +80,9 @@ function bubblePolicy(t) {
   var policy = { proLean: lean, conLean: lean, hideCon: false };
   if (!t || !t.isZhengGod) return policy;
 
-  if (!t.isDiseaseGod && pos <= 35) {
+  // 流年只叠加主滑标，不改写阶段十神自身的优缺显示资格。
+  // 因此正神是否隐藏缺点看原始喜忌方向，不能看叠加后的 slider。
+  if (!t.isDiseaseGod && t.traitDir === '+') {
     policy.hideCon = true;
     return policy;
   }
