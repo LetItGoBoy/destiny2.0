@@ -1,5 +1,6 @@
-// 疗愈空间：呼吸放松 / 电子木鱼 / 烦恼焚化 / 静心雨声 / 每日抄经
+// 修炼空间：每日练习 / 呼吸定心 / 电子木鱼 / 烦恼焚化 / 静心雨声 / 每日抄经
 // 留存机制：连续打卡 + 今日心语 + 累计成就
+var practiceCopy = require('../../utils/practiceCopy.js');
 var MERIT_KEY = 'tl_merit';        // 累计功德
 var POINTS_KEY = 'tl_points';      // 打卡积分
 var STREAK_KEY = 'tl_streak';      // 当前连续天数
@@ -10,6 +11,8 @@ var SUTRA_KEY = 'tl_sutraDone';    // 累计完成抄经次数
 var SUTRADATE_KEY = 'tl_sutraDate';// 今日是否已抄经（日期串）
 var MUYU_DATE_KEY = 'tl_muyuDate'; // 今日木鱼计数日期
 var MUYU_COUNT_KEY = 'tl_muyuCount';// 今日木鱼次数
+var PRACTICE_DATE_KEY = 'tl_practiceDate';
+var PRACTICE_COUNT_KEY = 'tl_practiceCount';
 var MUYU_CHECKIN_TARGET = 10;
 var CHECKIN_POINTS = 10;
 
@@ -112,6 +115,12 @@ Page({
     sutraCount: 0,
     achievements: [],
     achGot: 0,
+    // 今日一练
+    practiceTracks: practiceCopy.tracks,
+    activePracticeKey: '',
+    activePractice: {},
+    practiceDone: false,
+    practiceCount: 0,
     // 呼吸
     breathPhase: '准备',
     breathScale: 0.9,
@@ -141,6 +150,11 @@ Page({
     this._audio = null;
     this._rainSource = null;
     this._floatId = 0;
+    var dailyPractice = practiceCopy.tracks[dayIndex() % practiceCopy.tracks.length];
+    this.setData({
+      activePracticeKey: dailyPractice.key,
+      activePractice: dailyPractice
+    });
     this.refreshStats();
   },
 
@@ -168,6 +182,8 @@ Page({
     var sutraDate = wx.getStorageSync(SUTRADATE_KEY) || '';
     var muyuDate = wx.getStorageSync(MUYU_DATE_KEY) || '';
     var muyuTodayCount = muyuDate === dateStr() ? (wx.getStorageSync(MUYU_COUNT_KEY) || 0) : 0;
+    var practiceDate = wx.getStorageSync(PRACTICE_DATE_KEY) || '';
+    var practiceCount = wx.getStorageSync(PRACTICE_COUNT_KEY) || 0;
 
     var today = dateStr();
     var yest = dateStr(new Date(Date.now() - 86400000));
@@ -191,12 +207,36 @@ Page({
       sutraCount: sutra,
       achievements: achs,
       achGot: got,
+      practiceDone: practiceDate === today,
+      practiceCount: practiceCount,
       todayQuote: QUOTES[dayIndex() % QUOTES.length],
       sutraTodayDone: sutraDate === today
     });
   },
 
-  // 打卡：每日一次，仅由木鱼当日达标触发，断一天归零
+  selectPractice: function (e) {
+    var key = e.currentTarget.dataset.key;
+    this.setData({
+      activePracticeKey: key,
+      activePractice: practiceCopy.findTrack(key)
+    });
+  },
+
+  completePractice: function () {
+    var today = dateStr();
+    if (wx.getStorageSync(PRACTICE_DATE_KEY) === today) {
+      wx.showToast({ title: '今日修炼已经完成', icon: 'none' });
+      return;
+    }
+    wx.setStorageSync(PRACTICE_DATE_KEY, today);
+    wx.setStorageSync(PRACTICE_COUNT_KEY, (wx.getStorageSync(PRACTICE_COUNT_KEY) || 0) + 1);
+    if (!this.doCheckin()) {
+      this.refreshStats();
+      wx.showToast({ title: '今日修炼完成', icon: 'success' });
+    }
+  },
+
+  // 打卡：每日一次，今日一练或木鱼达标均可触发，断一天归零
   doCheckin: function () {
     var today = dateStr();
     var last = wx.getStorageSync(LASTDATE_KEY) || '';
@@ -442,10 +482,10 @@ Page({
   },
 
   onShareAppMessage: function () {
-    return { title: '疗愈空间 · 木鱼抄经，慢下来给心一点空隙', path: '/pages/healing/healing' };
+    return { title: '修炼空间 · 每天做一件真正改变自己的小事', path: '/pages/healing/healing' };
   },
 
   onShareTimeline: function () {
-    return { title: '疗愈空间 · 木鱼抄经，慢下来给心一点空隙' };
+    return { title: '修炼空间 · 每天做一件真正改变自己的小事' };
   }
 });

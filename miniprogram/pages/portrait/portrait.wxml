@@ -1,41 +1,54 @@
-<!-- 人前/人后 心性卡：stage 与岁运两处复用（sk 阶段键 / lk outer|inner） -->
-<template name="layerCard">
-  <view class="layer-card stage-layer">
-    <view class="layer-tap" bindtap="toggleLayer" data-stage="{{sk}}" data-layer="{{lk}}">
-      <text class="layer-k {{layer.side === 'inner' ? 'layer-k-inner' : ''}}">{{layer.title}}</text>
-      <text class="layer-tap-name serif">{{layer.name}}</text>
-      <text class="layer-tap-luck" wx:if="{{layer.luckName}}">{{layer.luckName}}</text>
-      <text class="layer-arrow {{layer.open ? 'layer-arrow-up' : ''}}">▾</text>
+<template name="traitLayerCard">
+  <view class="layer-card luck-layer">
+    <view class="year-insight" wx:if="{{layer.yearCard && layer.yearCard.desc}}">
+      <view class="year-insight-copy">
+        <text class="year-insight-k">{{layer.yearCard.name}}</text>
+        <text class="year-insight-t">{{layer.yearCard.desc}}</text>
+      </view>
+      <view class="year-insight-cat-wrap" wx:if="{{layer.yearCard.catImage}}">
+        <image class="year-insight-cat" src="{{layer.yearCard.catImage}}" mode="aspectFit" />
+      </view>
     </view>
-    <block wx:if="{{layer.open}}">
-      <view class="layer-head">
-        <view class="layer-copy">
-          <view class="layer-help {{layer.side === 'inner' ? 'layer-help-inner' : ''}}">{{layer.help}}</view>
+    <view class="layer-body">
+      <traitcluster wx:if="{{layer.bubbles.length}}" bubbles="{{layer.bubbles}}" refresh-key="{{layer.clusterKey}}" />
+      <view class="tc-legend" wx:if="{{layer.bubbles.length}}">
+        <text class="tcl tcl-pro">力量</text>
+        <text class="tcl tcl-neu">本色</text>
+        <text class="tcl tcl-con">留意</text>
+        <text class="tcl tcl-year" wx:if="{{layer.luckName}}">所选年份</text>
+      </view>
+    </view>
+    <view class="dual-axis" wx:if="{{layer.ganAxis.visible || layer.zhiAxis.visible}}">
+      <view class="axis-block" wx:if="{{layer.ganAxis.visible}}">
+        <view class="axis-head">
+          <text class="axis-name serif">{{layer.ganAxis.name}}</text>
+          <text class="axis-energy">影响程度 {{layer.ganAxis.share}}%</text>
         </view>
-        <view class="trait-cat-wrap" wx:if="{{layer.catImage}}">
-          <image class="trait-cat" src="{{layer.catImage}}" mode="aspectFit" />
+        <view class="slider-row">
+          <text class="sl-lbl sl-lbl-l">{{layer.ganAxis.lbl}}</text>
+          <view class="sl-track"><view class="sl-thumb" style="left:{{layer.ganAxis.slider}}%"></view></view>
+          <text class="sl-lbl sl-lbl-r">{{layer.ganAxis.rbl}}</text>
         </view>
       </view>
-      <view class="layer-body">
-        <view class="slider-row" wx:if="{{layer.lbl && layer.rbl}}">
-          <text class="sl-lbl sl-lbl-l">{{layer.lbl}}</text>
-          <view class="sl-track">
-            <view class="sl-thumb" style="left:{{layer.slider}}%"></view>
-          </view>
-          <text class="sl-lbl sl-lbl-r">{{layer.rbl}}</text>
+      <view class="axis-block" wx:if="{{layer.zhiAxis.visible}}">
+        <view class="axis-head">
+          <text class="axis-name serif">{{layer.zhiAxis.name}}</text>
+          <text class="axis-energy">影响程度 {{layer.zhiAxis.share}}%</text>
         </view>
-        <traitcluster wx:if="{{layer.bubbles.length}}" bubbles="{{layer.bubbles}}" />
-        <view class="tc-legend" wx:if="{{layer.bubbles.length}}">
-          <text class="tcl tcl-pro">顺的一面</text>
-          <text class="tcl tcl-con">偏的一面</text>
-          <text class="tcl tcl-luck" wx:if="{{layer.luckName}}">当年激活</text>
-        </view>
-        <view class="trait-pc">
-          <view class="pc pc-on"><text class="pc-key pc-key-pro">{{layer.descLabel}}</text>{{layer.desc}}</view>
-          <view class="pc pc-on pc-con" wx:if="{{layer.con}}"><text class="pc-key pc-key-con">{{layer.conLabel}}</text>{{layer.con}}</view>
+        <view class="slider-row">
+          <text class="sl-lbl sl-lbl-l">{{layer.zhiAxis.lbl}}</text>
+          <view class="sl-track"><view class="sl-thumb" style="left:{{layer.zhiAxis.slider}}%"></view></view>
+          <text class="sl-lbl sl-lbl-r">{{layer.zhiAxis.rbl}}</text>
         </view>
       </view>
-    </block>
+    </view>
+    <view class="layer-body layer-notes" wx:if="{{layer.notes.length}}">
+      <view class="trait-source" wx:for="{{layer.notes}}" wx:key="key">
+        <view class="trait-source-title serif">{{item.label}}</view>
+        <view class="pc pc-on"><text class="pc-key pc-key-pro">{{item.descLabel}}</text>{{item.desc}}</view>
+        <view class="pc pc-on pc-con" wx:if="{{item.con}}"><text class="pc-key pc-key-con">{{item.conLabel}}</text>{{item.con}}</view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -51,9 +64,8 @@
   </view>
 
   <view class="card pattern" wx:if="{{traitPattern}}">
-    <view class="pattern-badge serif">{{traitPattern.name}}</view>
+    <view class="pattern-badge serif">性格组合</view>
     <view class="pattern-body">
-      <view class="pattern-k">命局结构</view>
       <view class="pattern-t">{{traitPattern.note}}</view>
     </view>
   </view>
@@ -85,95 +97,72 @@
   </view>
 
   <view class="life-lead">
-    <view class="life-title serif">四阶段心性</view>
-    <view class="life-note">各阶段以所行大运呈现当时心性，年、月、日、时柱依次修正少年、青年、中年与老年；流年天干只叠加当年的行为表现。</view>
+    <view class="life-title serif">不同年龄的你</view>
+    <view class="life-note">人的性格会随着经历呈现出不同侧面。选择一个年龄段，看看那时的你更容易怎样想、怎样回应外界。</view>
+    <view class="time-missing" wx:if="{{!hasTime}}">出生时间未填写，部分性格细节可能不完整。</view>
   </view>
 
-  <view class="stage-acc">
-    <view class="acc-card {{openStageKey === stage.key ? 'open' : ''}}" wx:for="{{stagePortraits}}" wx:for-item="stage" wx:key="key">
-      <view class="acc-head" bindtap="toggleStage" data-key="{{stage.key}}">
-        <view class="acc-gz serif">
-          <text class="acc-gz-c wx-{{stage.ganCls}}">{{stage.ganText}}</text>
-          <text class="acc-gz-c wx-{{stage.zhiCls}}">{{stage.zhiText}}</text>
-        </view>
-        <view class="acc-copy">
-          <view class="acc-title">
-            <text class="acc-name serif">{{stage.label}}</text>
-            <text class="acc-now" wx:if="{{stage.key === currentStageKey}}">当前</text>
-            <text class="acc-age">{{stage.age}}</text>
-          </view>
-          <view class="acc-trait-line" wx:if="{{!stage.empty}}">
-            <text class="acc-side-k">人前</text>
-            <text class="acc-trait-name">{{stage.outerLayer.name}}</text>
-            <text class="acc-side-k acc-side-in">人后</text>
-            <text class="acc-trait-name acc-trait-name-last">{{stage.innerLayer.name}}</text>
-          </view>
-          <view class="acc-trait-line" wx:else>
-            <text class="acc-trait-empty">{{stage.summary}}</text>
-          </view>
-        </view>
-        <view class="acc-action">
-          <text class="acc-action-tip">{{openStageKey === stage.key ? '收起' : '查看'}}</text>
-          <text class="acc-plus">{{openStageKey === stage.key ? '−' : '+'}}</text>
+  <view class="elder-period-nav" wx:if="{{fs === 'xl' && luckPortrait}}">
+    <view class="elder-period-btn {{hasPrevLuck ? '' : 'disabled'}}" bindtap="stepLuck" data-d="-1"><text class="elder-period-arrow">‹</text><text>上一段</text></view>
+    <view class="elder-period-current">
+      <text class="elder-period-age">{{luckPortrait.luckLabel}}</text>
+      <text class="elder-period-caption">{{luckPortrait.summary}}</text>
+    </view>
+    <view class="elder-period-btn {{hasNextLuck ? '' : 'disabled'}}" bindtap="stepLuck" data-d="1"><text>下一段</text><text class="elder-period-arrow">›</text></view>
+  </view>
+
+  <view class="luck-timeline" wx:else>
+    <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}" scroll-into-view="luck{{selectedLuckIndex}}" scroll-with-animation>
+      <view class="luck-year-strip">
+        <view class="luck-year luck-period {{item.active ? 'on' : ''}} {{item.current ? 'current' : ''}}"
+          id="luck{{item.index}}" wx:for="{{luckSegments}}" wx:key="index"
+          bindtap="selectLuck" data-index="{{item.index}}">
+          <text class="luck-y">{{item.label}}</text>
+          <text class="luck-a luck-period-summary" wx:if="{{item.summary}}">{{item.summary}}</text>
+          <text class="luck-current" wx:if="{{item.current}}">当前</text>
         </view>
       </view>
+    </scroll-view>
+  </view>
 
-      <view class="acc-body" wx:if="{{openStageKey === stage.key}}">
-        <view class="stage-note">{{stage.note}}</view>
+  <view class="acc-card luck-detail" wx:if="{{luckPortrait}}">
+    <view class="acc-body">
+      <view class="qian-empty" wx:if="{{luckPortrait.qian}}">这个年龄段暂不展示相关内容。</view>
 
-        <view class="luck-controls" wx:if="{{stage.luckSegments.length}}">
-          <view class="luck-control-title">岁运年龄段</view>
-          <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}">
-            <view class="luck-year-strip">
-              <view class="luck-year luck-period {{item.active ? 'on' : ''}}"
-                wx:for="{{stage.luckSegments}}" wx:key="index" bindtap="selectStageLuck"
-                data-key="{{stage.key}}" data-index="{{item.index}}">
-                <text class="luck-y">{{item.gz}}</text>
-                <text class="luck-a">{{item.label}}</text>
-              </view>
-            </view>
-          </scroll-view>
-        </view>
-
-        <view class="luck-controls" wx:if="{{!stage.empty && openYearList.length}}">
-          <view class="luck-control-title">叠加流年（可选，再点取消）</view>
+      <view class="luck-controls" wx:if="{{!luckPortrait.qian && openYearList.length}}">
+        <view class="luck-control-head">
+          <view class="luck-control-title">具体年份</view>
           <view class="luck-step">
-            <view class="luck-step-btn" bindtap="stepStageYear" data-key="{{stage.key}}" data-d="-1">‹</view>
-            <view class="luck-year-main {{stage.hasYear ? '' : 'luck-year-off'}}">{{stage.hasYear ? stage.luckYear : '未叠加'}}</view>
-            <view class="luck-step-btn" bindtap="stepStageYear" data-key="{{stage.key}}" data-d="1">›</view>
+            <view class="luck-step-btn" bindtap="stepYear" data-d="-1">‹</view>
+            <view class="luck-year-main {{selectedYear ? '' : 'luck-year-off'}}">{{selectedYear ? selectedYear + '年' : '未选择'}}</view>
+            <view class="luck-step-btn" bindtap="stepYear" data-d="1">›</view>
           </view>
-          <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}"
-            scroll-into-view="y{{stage.luckYear}}" scroll-with-animation>
-            <view class="luck-year-strip">
-              <view class="luck-year {{item.active ? 'on' : ''}}" id="y{{item.year}}"
-                wx:for="{{openYearList}}" wx:key="year" bindtap="selectStageYear" data-key="{{stage.key}}" data-year="{{item.year}}">
-                <text class="luck-y">{{item.year}}</text>
-                <text class="luck-a">{{item.age}}岁</text>
-              </view>
-            </view>
-          </scroll-view>
         </view>
-
-        <template wx:if="{{stage.outerLayer}}" is="layerCard" data="{{ layer: stage.outerLayer, sk: stage.key, lk: 'outer' }}" />
-        <template wx:if="{{stage.innerLayer}}" is="layerCard" data="{{ layer: stage.innerLayer, sk: stage.key, lk: 'inner' }}" />
+        <scroll-view class="luck-year-scroll" scroll-x show-scrollbar="{{false}}" scroll-into-view="year{{selectedYear}}" scroll-with-animation>
+          <view class="luck-year-strip">
+            <view class="luck-year {{item.active ? 'on' : ''}}" id="year{{item.year}}"
+              wx:for="{{openYearList}}" wx:key="year" bindtap="selectYear" data-year="{{item.year}}">
+              <text class="luck-y">{{item.year}}</text>
+              <text class="luck-a">{{item.age}}岁</text>
+            </view>
+          </view>
+        </scroll-view>
       </view>
+
+      <template wx:if="{{luckPortrait.traitLayer}}" is="traitLayerCard" data="{{layer: luckPortrait.traitLayer}}" />
     </view>
   </view>
 
   <view class="card comp" wx:if="{{relations.length}}">
     <view class="comp-head">
       <text class="comp-t serif">心结与张力</text>
-      <text class="comp-sub">内在的牵动</text>
+      <text class="comp-sub">成长经历与所选年份带来的牵动</text>
     </view>
     <view class="comp-tip">有些组合会让内心更容易被牵动：可能是放不下的牵挂，也可能是冲突、拉扯或压力。</view>
     <view class="rel" wx:for="{{relations}}" wx:key="type">
       <view class="rel-head-line">
-        <text class="rel-badge rel-{{item.cls}}">{{item.type}}</text>
-        <text class="rel-tag">{{item.tag}}</text>
-        <text class="rel-luck" wx:if="{{item.anyLuck}}">阶段引动</text>
-      </view>
-      <view class="rel-zhis-row">
-        <text class="rel-zhis serif" wx:for="{{item.items}}" wx:for-item="it" wx:key="zhis">{{it.zhis}}<text wx:if="{{it.luck}}" class="rel-zhis-luck">↑</text>  </text>
+        <text class="rel-tag rel-tag-main">{{item.tag}}</text>
+        <text class="rel-luck" wx:if="{{item.anyLuck}}">当前更明显</text>
       </view>
       <view class="pc pc-on">{{item.text}}</view>
     </view>

@@ -2,18 +2,16 @@ var bazi = require('../../utils/bazi.js');
 var portrait = require('../../utils/analyze/portrait.js');
 var prefs = require('../../utils/prefs.js');
 
-// 守正/求变配比 → 个性化判词（>=58 守正主导，<=42 求变主导，其余均衡）
 function polVerdictOf(zheng) {
   if (zheng >= 58) return '你更偏「守正」：遇事先求稳、讲规则、重积累，可靠是你的默认姿态；变化来临时习惯先想清楚再动。';
   if (zheng <= 42) return '你更偏「求变」：不安于重复，天然想突破、想表达，机会感比稳定感更让你安心；顺境里冲劲十足。';
   return '你在守正与求变之间较为均衡：能稳能闯，会按场合切换姿态，既守得住基本盘，也接得住新机会。';
 }
 
-// 命局特殊结构一句话解读（检测逻辑见 utils/analyze/portrait.js detectTraitPattern）
 var PATTERN_NOTES = {
   食神制杀: '温和的输出与强悍的压力势均力敌、互相制衡：能把危机感转成章法，是很有张力的组合。',
   羊刃驾杀: '刚劲与魄力互相咬合：敢扛硬仗、关键时刻压得住阵，但需要分寸来驾驭这股狠劲。',
-  身杀两停: '自我与挑战势均力敌：抗压耐打，压力越大越能被激发，越有目标越有劲。'
+  身杀两停: '自我与挑战势均力敌：抗压耐打，压力越大越能被激发，越有目标越有力。'
 };
 
 Page({
@@ -27,12 +25,14 @@ Page({
     pianNow: 50,
     polVerdict: '',
     hasTime: true,
-    stagePortraits: [],
-    openStageKey: '',
-    currentStageKey: '',
-    openLayers: {},
+    luckSegments: [],
+    luckPortrait: null,
+    selectedLuckIndex: null,
+    currentLuckIndex: null,
+    hasPrevLuck: false,
+    hasNextLuck: false,
+    selectedYear: null,
     openYearList: [],
-    hasLuck: false,
     relations: []
   },
 
@@ -58,8 +58,10 @@ Page({
       return;
     }
     this._chart = chart;
+    this._luckList = chart.daYun || [];
+    this._selectedLuckIndex = null;
+    this._selectedYear = new Date().getFullYear();
 
-    // 一键画像也是一次排盘，记入「最近排盘」历史
     prefs.pushHistory({
       input: input,
       name: chart.meta.name,
@@ -68,31 +70,7 @@ Page({
       dateStr: chart.meta.clockStr
     });
 
-    this._luckList = chart.daYun || [];
-    this._luckByStage = {};
-    this._yearByStage = {};
-
-    // 当前阶段默认打开，并选中当前大运与今年流年。
-    var currentYear = new Date().getFullYear();
-    var birthYear = new Date(chart.meta.timestamp).getFullYear();
-    var age = currentYear - birthYear;
-    var currentDy = null;
-    for (var i = 0; i < this._luckList.length; i++) {
-      var d = this._luckList[i];
-      if (currentYear >= d.startYear && currentYear <= d.endYear) {
-        currentDy = d;
-        for (var j = 0; j < (d.liuNian || []).length; j++) {
-          if (d.liuNian[j].year === currentYear) { age = d.liuNian[j].age; break; }
-        }
-        break;
-      }
-    }
-    var curKey = age < 20 ? 'youth' : age < 35 ? 'young' : age < 50 ? 'middle' : 'old';
-    if (currentDy) {
-      this._luckByStage[curKey] = currentDy.index;
-      this._yearByStage[curKey] = currentYear;
-    }
-    this.setData({ loaded: true, meta: chart.meta, openStageKey: curKey, currentStageKey: curKey });
+    this.setData({ loaded: true, meta: chart.meta });
     this.recompute();
   },
 
@@ -103,129 +81,103 @@ Page({
     return null;
   },
 
-  selectedLuckIndex: function (key) {
-    if (this._luckByStage[key] != null) return this._luckByStage[key];
-    var stages = this._lastStages || [];
-    for (var i = 0; i < stages.length; i++) {
-      if (stages[i].key === key) return stages[i].selectedLuckIndex;
-    }
-    return null;
+  yearListForSelected: function (activeYear) {
+    var daYun = this.dyByIndex(this._selectedLuckIndex);
+    if (!daYun || daYun.isQian || !daYun.liuNian) return [];
+    return daYun.liuNian.map(function (item) {
+      return {
+        year: item.year,
+        age: item.age,
+        gz: item.ganZhi,
+        active: item.year === activeYear
+      };
+    });
   },
 
-  selectedLuckSegment: function (key) {
-    var stages = this._lastStages || [];
-    for (var i = 0; i < stages.length; i++) {
-      if (stages[i].key !== key) continue;
-      var segments = stages[i].luckSegments || [];
-      for (var j = 0; j < segments.length; j++) {
-        if (segments[j].active) return segments[j];
+  selectLuck: function (e) {
+    var index = Number(e.currentTarget.dataset.index);
+    if (isNaN(index) || index === this._selectedLuckIndex) return;
+    this._selectedLuckIndex = index;
+    this._selectedYear = null;
+    this.recompute();
+  },
+
+  stepLuck: function (e) {
+    var delta = Number(e.currentTarget.dataset.d);
+    var list = this.data.luckSegments || [];
+    if (!list.length || !delta) return;
+    var current = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].index === this._selectedLuckIndex) {
+        current = i;
+        break;
       }
     }
-    return null;
-  },
-
-  // 当前阶段所选大运的流年列表（可选叠加）
-  yearListForKey: function (key, activeYear) {
-    var d = this.dyByIndex(this.selectedLuckIndex(key));
-    var segment = this.selectedLuckSegment(key);
-    if (!d || !d.liuNian) return [];
-    return d.liuNian.filter(function (ln) {
-      return !segment || (ln.age >= segment.startAge && ln.age <= segment.endAge);
-    }).map(function (ln) {
-      return { year: ln.year, age: ln.age, gz: ln.ganZhi, active: ln.year === activeYear };
-    });
-  },
-
-  layerOpen: function (stageKey, layerKey) {
-    var key = stageKey + ':' + layerKey;
-    return this.data.openLayers[key] !== false;
-  },
-
-  applyLayerOpen: function (stages) {
-    var self = this;
-    (stages || []).forEach(function (st) {
-      if (!st) return;
-      if (st.outerLayer) st.outerLayer.open = self.layerOpen(st.key, 'outer');
-      if (st.innerLayer) st.innerLayer.open = self.layerOpen(st.key, 'inner');
-    });
-  },
-
-  toggleStage: function (e) {
-    var key = e.currentTarget.dataset.key;
-    var next = this.data.openStageKey === key ? '' : key;
-    this.setData({ openStageKey: next });
+    var next = Math.max(0, Math.min(list.length - 1, current + delta));
+    if (next === current) return;
+    this._selectedLuckIndex = list[next].index;
+    this._selectedYear = null;
     this.recompute();
   },
 
-  toggleLayer: function (e) {
-    var stage = e.currentTarget.dataset.stage;
-    var layer = e.currentTarget.dataset.layer;
-    if (!stage || !layer) return;
-    var key = stage + ':' + layer;
-    var next = {};
-    for (var k in this.data.openLayers) next[k] = this.data.openLayers[k];
-    next[key] = this.data.openLayers[key] === false;
-    this.setData({ openLayers: next });
-    this.recompute();
-  },
-
-  selectStageLuck: function (e) {
-    var key = e.currentTarget.dataset.key;
-    var index = Number(e.currentTarget.dataset.index);
-    if (!key || isNaN(index)) return;
-    this._luckByStage[key] = index;
-    delete this._yearByStage[key];
-    this.recompute();
-  },
-
-  // 选某大运卡片里的流年（叠加金色）
-  selectStageYear: function (e) {
-    var key = e.currentTarget.dataset.key;
+  selectYear: function (e) {
     var year = Number(e.currentTarget.dataset.year);
-    // 再点当前已选年份=取消叠加
-    if (this._yearByStage[key] === year) delete this._yearByStage[key];
-    else this._yearByStage[key] = year;
+    if (isNaN(year)) return;
+    this._selectedYear = this._selectedYear === year ? null : year;
     this.recompute();
   },
 
-  stepStageYear: function (e) {
-    var key = e.currentTarget.dataset.key;
+  stepYear: function (e) {
     var delta = Number(e.currentTarget.dataset.d);
-    var list = this.yearListForKey(key, this._yearByStage[key]);
+    var list = this.yearListForSelected(this._selectedYear);
     if (!list.length) return;
-    var cur = -1;
+    var current = -1;
     for (var i = 0; i < list.length; i++) {
-      if (list[i].year === this._yearByStage[key]) { cur = i; break; }
+      if (list[i].year === this._selectedYear) {
+        current = i;
+        break;
+      }
     }
-    var next = cur < 0
+    var next = current < 0
       ? (delta < 0 ? list.length - 1 : 0)
-      : Math.max(0, Math.min(list.length - 1, cur + delta));
-    this._yearByStage[key] = list[next].year;
+      : Math.max(0, Math.min(list.length - 1, current + delta));
+    this._selectedYear = list[next].year;
     this.recompute();
   },
 
   recompute: function () {
-    var openKey = this.data.openStageKey;
-    var selYear = openKey ? this._yearByStage[openKey] : null;
-    var p = portrait.build(this._chart, {
-      luckByStage: this._luckByStage,
-      yearByStage: this._yearByStage
+    var result = portrait.build(this._chart, {
+      selectedLuckIndex: this._selectedLuckIndex,
+      selectedYear: this._selectedYear
     });
-    this._lastStages = p.stagePortraits || [];
-    this.applyLayerOpen(p.stagePortraits || []);
+    this._selectedLuckIndex = result.selectedLuckIndex;
+    this._selectedYear = result.selectedYear;
+    var selectedPosition = 0;
+    for (var i = 0; i < (result.luckSegments || []).length; i++) {
+      if (result.luckSegments[i].index === result.selectedLuckIndex) {
+        selectedPosition = i;
+        break;
+      }
+    }
 
     this.setData({
-      core: p.core,
-      traitPattern: p.traitPattern
-        ? { name: p.traitPattern.name, note: PATTERN_NOTES[p.traitPattern.name] || '' }
+      core: result.core,
+      traitPattern: result.traitPattern
+        ? { name: result.traitPattern.name, note: PATTERN_NOTES[result.traitPattern.name] || '' }
         : null,
-      zhengNow: p.zhengNow,
-      pianNow: p.pianNow,
-      polVerdict: polVerdictOf(p.zhengNow),
-      hasTime: p.hasTime,
-      stagePortraits: p.stagePortraits || [],
-      openYearList: openKey ? this.yearListForKey(openKey, selYear) : [],
-      relations: p.relations || []
+      zhengNow: result.zhengNow,
+      pianNow: result.pianNow,
+      polVerdict: polVerdictOf(result.zhengNow),
+      hasTime: result.hasTime,
+      luckSegments: result.luckSegments || [],
+      luckPortrait: result.luckPortrait,
+      selectedLuckIndex: result.selectedLuckIndex,
+      currentLuckIndex: result.currentLuckIndex,
+      hasPrevLuck: selectedPosition > 0,
+      hasNextLuck: selectedPosition < (result.luckSegments || []).length - 1,
+      selectedYear: result.selectedYear,
+      openYearList: this.yearListForSelected(result.selectedYear),
+      relations: result.relations || []
     });
   },
 
