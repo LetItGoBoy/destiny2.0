@@ -173,7 +173,7 @@ function computeChart(input) {
         var ly = liuYueRaw[m];
         var ygz = ly.getGanZhi();
         liuYueList.push({
-          name: ly.getMonthInChinese() + '月',
+          name: ygz.charAt(1) + '月',
           ganZhi: ygz,
           gan: ganView(ygz.charAt(0)),
           zhi: zhiView(ygz.charAt(1)),
@@ -235,7 +235,7 @@ function getLiuRi(ctx, liuYueGanZhi, year) {
   for (var k = 0; k < 430; k++) {
     var cur = s.next(k);
     var lun = cur.getLunar();
-    if (lun.getMonthInGanZhi() === liuYueGanZhi) {
+    if (lun.getMonthInGanZhiExact() === liuYueGanZhi) {
       started = true;
       var dgz = lun.getDayInGanZhi();
       list.push({
@@ -251,6 +251,18 @@ function getLiuRi(ctx, liuYueGanZhi, year) {
     }
   }
   return list;
+}
+
+// 今天的流月/流日干支（节气月口径），供详盘默认定位到当天
+function todayGanZhi() {
+  var solar = Solar.fromDate(new Date());
+  var lun = solar.getLunar();
+  return {
+    year: solar.getYear(),
+    monthGZ: lun.getMonthInGanZhiExact(),
+    dayGZ: lun.getDayInGanZhi(),
+    label: solar.getMonth() + '/' + solar.getDay()
+  };
 }
 
 // 仅计算四柱（名人库列表用，避免整盘大运流年的开销）
@@ -398,6 +410,7 @@ module.exports = {
   quickBaZi: quickBaZi,
   buildLuckPillar: buildLuckPillar,
   getLiuRi: getLiuRi,
+  todayGanZhi: todayGanZhi,
   getLunarMonths: getLunarMonths,
   getLunarDays: getLunarDays,
   findSolarByBaZi: findSolarByBaZi,

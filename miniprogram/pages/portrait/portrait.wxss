@@ -63,11 +63,6 @@
   color: var(--ink-2);
 }
 
-.luck-guide {
-  margin-top: 28rpx;
-  padding-top: 4rpx;
-}
-
 /* 命局结构（食神制杀 / 羊刃驾杀 / 身杀两停） */
 .pattern {
   display: flex;
@@ -250,28 +245,6 @@
   color: var(--ink-2);
 }
 
-.trait-line {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12rpx;
-}
-
-.trait-name {
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-.trait-main {
-  margin-left: 12rpx;
-  font-size: 18rpx;
-  font-weight: 600;
-  color: #9A6B12;
-  background: rgba(201, 162, 39, 0.14);
-  border: 1rpx solid rgba(201, 162, 39, 0.28);
-  padding: 3rpx 14rpx;
-  border-radius: 100rpx;
-}
-
 /* 滑标轴 */
 .slider-row {
   display: flex;
@@ -323,11 +296,11 @@
   transition: left 0.4s ease;
 }
 
-/* 气泡星团图例（颜色与 traitcluster 组件保持一致） */
+/* 气泡星团图例（颜色只表达词性，与 traitcluster 组件保持一致） */
 .tc-legend {
   display: flex;
   justify-content: center;
-  gap: 28rpx;
+  gap: 24rpx;
   margin: 2rpx 0 6rpx;
 }
 
@@ -348,12 +321,15 @@
 
 .tcl-pro::before { background: #F7DCD9; border: 1rpx solid #E6A89F; }
 
+.tcl-neu::before { background: #F3E8C9; border: 1rpx solid #D8C38E; }
+
 .tcl-con::before { background: #DCE8F7; border: 1rpx solid #9CBEE6; }
 
-.tcl-luck::before { background: #F3E2BC; border: 1rpx solid #D9B45A; }
-
-.trait-pc {
-  margin-top: 12rpx;
+.tcl-year::before {
+  background: #fff;
+  border: 2rpx solid #99958E;
+  border-radius: 4rpx;
+  box-shadow: none;
 }
 
 .pc {
@@ -367,7 +343,7 @@
   color: var(--ink-2);
 }
 
-/* 优点 / 缺点：缺点另起一段 */
+/* 力量 / 留意：留意另起一段 */
 .pc-con {
   margin-top: 12rpx;
 }
@@ -399,11 +375,6 @@
   color: var(--ink-3);
 }
 
-/* 八段人生竖向展开 */
-.stage-acc {
-  margin-top: 18rpx;
-}
-
 .acc-card {
   margin-top: 18rpx;
   overflow: hidden;
@@ -413,67 +384,25 @@
   border: 1rpx solid var(--line);
 }
 
-.acc-head {
-  min-height: 116rpx;
-  display: flex;
-  align-items: center;
-  padding: 22rpx 26rpx;
-}
-
-.acc-index {
+/* 卡头大运干支：两字竖排小牌 */
+.acc-gz {
   flex: none;
-  width: 62rpx;
-  height: 58rpx;
-  border-radius: 16rpx;
+  width: 60rpx;
+  border-radius: 14rpx;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  background: linear-gradient(135deg, #8A2B27, #A3382F);
-  font-size: 20rpx;
-  font-weight: 800;
+  padding: 10rpx 0;
   margin-right: 20rpx;
-  box-shadow: 0 8rpx 18rpx rgba(138, 43, 39, 0.22);
+  background: var(--fill);
+  border: 1rpx solid var(--line);
 }
 
-.luck-index {
-  color: #FFF7E4;
-  background: linear-gradient(135deg, #8A2B27, #A3382F);
-}
-
-.acc-copy {
-  flex: 1;
-  min-width: 0;
-}
-
-.acc-action {
-  flex: none;
-  display: flex;
-  align-items: center;
-  margin-left: 14rpx;
-}
-
-.acc-plus {
-  width: 34rpx;
-  text-align: center;
-  color: var(--primary);
-  font-size: 44rpx;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.acc-title {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 12rpx;
-}
-
-.acc-name {
+.acc-gz-c {
   font-size: 34rpx;
-  font-weight: 800;
-  color: var(--ink);
-  letter-spacing: 1rpx;
+  font-weight: 700;
+  line-height: 1.12;
 }
 
 .acc-age {
@@ -488,295 +417,323 @@
   border-radius: 100rpx;
 }
 
-.acc-sub {
-  flex: none;
-  font-size: 20rpx;
-  font-weight: 700;
-  line-height: 1;
-  color: #1D2638;
-  background: rgba(29, 38, 56, 0.07);
-  border: 1rpx solid rgba(29, 38, 56, 0.10);
-  padding: 6rpx 12rpx;
-  border-radius: 100rpx;
-}
-
-.acc-now {
-  flex: none;
-  font-size: 19rpx;
-  font-weight: 800;
-  line-height: 1;
-  color: #fff;
-  background: linear-gradient(135deg, #8A2B27, #A3382F);
-  padding: 6rpx 12rpx;
-  border-radius: 100rpx;
-  letter-spacing: 1rpx;
-}
-
-.acc-stage-meta {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  margin-top: 10rpx;
-}
-
-/* 卡头个性化：该阶段的心性名 + 来源干支字 */
-.acc-trait-line {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  margin-top: 10rpx;
-  gap: 10rpx;
-}
-
-.acc-trait-char {
-  flex: none;
-  width: 40rpx;
-  height: 40rpx;
-  line-height: 40rpx;
-  text-align: center;
-  font-size: 26rpx;
-  font-weight: 800;
-  background: var(--fill);
-  border: 1rpx solid var(--line);
-  border-radius: 10rpx;
-}
-
-.acc-trait-name {
-  flex: none;
-  font-size: 26rpx;
-  font-weight: 800;
-  color: var(--ink);
-  letter-spacing: 1rpx;
-}
-
-.acc-trait-lbl {
-  flex: 1;
-  min-width: 0;
-  font-size: 20rpx;
+.wx-muted {
   color: var(--ink-3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.acc-trait-need {
-  font-size: 21rpx;
-  color: var(--ink-3);
-}
-
-.acc-phase {
-  flex: none;
-  min-width: 34rpx;
-  height: 34rpx;
-  line-height: 34rpx;
-  text-align: center;
-  border-radius: 50%;
-  color: #fff;
-  background: #6F5A3B;
-  font-size: 20rpx;
-  font-weight: 800;
-  margin-right: 12rpx;
-}
-
-.acc-theme {
-  flex: 1;
-  min-width: 0;
-  font-size: 22rpx;
-  line-height: 1.35;
-  color: var(--ink-2);
-}
-
-.acc-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-  margin-top: 8rpx;
-}
-
-.acc-pill {
-  font-size: 20rpx;
-  color: var(--ink-2);
-  background: var(--fill);
-  border: 1rpx solid var(--line);
-  padding: 3rpx 12rpx;
-  border-radius: 100rpx;
-}
-
-.luck-pill {
-  color: #9A6B12;
-  background: rgba(201, 162, 39, 0.12);
-  border-color: rgba(201, 162, 39, 0.28);
 }
 
 .acc-body {
   padding: 24rpx 26rpx 26rpx;
-  border-top: 1rpx solid var(--line);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.52));
-}
-
-.stage-note {
-  font-size: 24rpx;
-  line-height: 1.7;
-  color: var(--ink-2);
-  margin-bottom: 20rpx;
 }
 
 .layer-card {
   margin-top: 18rpx;
-  padding: 24rpx 22rpx 18rpx;
+  padding: 24rpx 0 8rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.luck-timeline {
+  margin-top: 18rpx;
+  padding: 18rpx;
+  overflow: hidden;
   border: 1rpx solid var(--line);
   border-radius: 18rpx;
   background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow);
 }
 
-.stage-layer {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(20, 21, 60, 0.10);
+.elder-period-nav {
+  min-height: 128rpx;
+  margin-top: 20rpx;
+  padding: 14rpx;
+  display: grid;
+  grid-template-columns: 1fr 1.12fr 1fr;
+  align-items: stretch;
+  gap: 10rpx;
+  border: 2rpx solid rgba(138, 43, 39, 0.24);
+  border-radius: 18rpx;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.elder-period-btn {
+  min-width: 0;
+  min-height: 98rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  color: var(--primary);
+  background: var(--tint);
+  border: 1rpx solid rgba(138, 43, 39, 0.20);
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.elder-period-btn.disabled {
+  color: var(--ink-3);
+  background: var(--fill);
+  border-color: var(--line);
+  opacity: 0.62;
+}
+
+.elder-period-arrow {
+  font-size: 42rpx;
+  line-height: 1;
+}
+
+.elder-period-current {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 12rpx;
+  text-align: center;
+}
+
+.elder-period-age {
+  font-size: 34rpx;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.elder-period-caption {
+  margin-top: 5rpx;
+  max-width: 100%;
+  font-size: 22rpx;
+  font-weight: 700;
+  opacity: 0.88;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.luck-detail {
+  margin-top: 18rpx;
+}
+
+.luck-year.current:not(.on) {
+  border-color: rgba(138, 43, 39, 0.42);
+}
+
+.luck-current {
+  display: block;
+  width: 52rpx;
+  margin: 6rpx auto 0;
+  padding: 2rpx 0;
+  border-radius: 100rpx;
+  color: #fff;
+  background: var(--primary);
+  font-size: 17rpx;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.time-missing {
+  margin-top: 12rpx;
+  padding: 12rpx 16rpx;
+  border-left: 5rpx solid #C9A227;
+  color: #78623A;
+  background: rgba(243, 232, 201, 0.62);
+  font-size: 22rpx;
+  line-height: 1.55;
+}
+
+.qian-empty {
+  padding: 36rpx 20rpx;
+  color: var(--ink-3);
+  text-align: center;
+  font-size: 24rpx;
+}
+
+.luck-layer {
+  background: transparent;
 }
 
 .layer-card:first-of-type {
   margin-top: 0;
 }
 
-.layer-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-bottom: 12rpx;
-}
-
-.trait-cat-wrap {
-  flex: none;
-  width: 216rpx;
-  height: 206rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: -10rpx;
-  margin-left: 10rpx;
-  border-radius: 18rpx;
-  overflow: visible;
-}
-
-.trait-cat {
-  width: 206rpx;
-  height: 206rpx;
-  display: block;
-}
-
-.layer-copy {
-  flex: 1;
-  min-width: 0;
-}
-
 .layer-body {
   padding-top: 2rpx;
 }
 
-.layer-k {
-  display: inline-flex;
-  align-items: center;
-  font-size: 22rpx;
-  font-weight: 800;
-  color: #B86B00;
-  background: rgba(255, 184, 56, 0.18);
-  border: 1rpx solid rgba(255, 184, 56, 0.42);
-  border-radius: 100rpx;
-  padding: 5rpx 14rpx;
-  margin-bottom: 8rpx;
+.year-insight {
+  display: flex;
+  align-items: stretch;
+  gap: 10rpx;
+  margin: 14rpx 0 8rpx;
+  padding: 16rpx 10rpx 16rpx 16rpx;
+  border-left: 5rpx solid #C59A3B;
+  background: rgba(201, 162, 39, 0.09);
 }
 
-.layer-help {
-  font-size: 22rpx;
-  line-height: 1.5;
-  font-weight: 600;
-  margin-bottom: 10rpx;
-  color: var(--ink-2);
+.year-insight-copy {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
 }
 
-.flow-slider .sl-lbl-l, .flow-slider .sl-lbl-r {
+.year-insight-k {
   color: #9A6B12;
+  font-size: 20rpx;
+  font-weight: 800;
+  line-height: 1.55;
+  margin-right: 12rpx;
 }
 
-.flow-slider .sl-track {
-  background: rgba(201, 162, 39, 0.22);
+.year-insight-t {
+  color: var(--ink-2);
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1.55;
 }
 
-.luck-thumb {
-  background: #C9A227;
-  box-shadow: 0 2rpx 8rpx rgba(154, 107, 18, 0.35);
+.year-insight-cat-wrap {
+  flex: none;
+  width: 194rpx;
+  min-height: 190rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.year-insight-cat {
+  width: 190rpx;
+  height: 190rpx;
+  display: block;
+}
+
+.dual-axis {
+  margin: 12rpx 0 4rpx;
+  padding: 0 4rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.axis-block {
+  padding: 12rpx 0 10rpx;
+  border-bottom: 1rpx solid rgba(20, 21, 60, 0.08);
+}
+
+.axis-block:last-child {
+  border-bottom: none;
+}
+
+.axis-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14rpx;
+}
+
+.axis-name {
+  min-width: 0;
+  font-size: 25rpx;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.axis-energy {
+  flex: none;
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+
+.axis-reason {
+  margin-top: 4rpx;
+  color: var(--ink-3);
+  font-size: 19rpx;
+  line-height: 1.45;
+}
+
+.trait-source {
+  padding: 18rpx 0 8rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.layer-notes {
+  padding-top: 0;
+}
+
+.trait-source-title {
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
+  font-weight: 800;
+  color: var(--ink);
 }
 
 .luck-controls {
-  margin-top: 18rpx;
-  padding: 20rpx;
-  border-radius: 18rpx;
-  background: var(--fill);
+  padding: 14rpx;
+  border-radius: 14rpx;
+  background: rgba(246, 243, 236, 0.78);
   border: 1rpx solid var(--line);
 }
 
-.luck-control-title {
-  font-size: 22rpx;
-  font-weight: 700;
-  color: var(--ink-2);
-  margin-bottom: 14rpx;
-}
-
-.luck-stage-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-}
-
-.luck-stage {
-  padding: 10rpx 22rpx;
-  border-radius: 100rpx;
-  color: var(--ink-2);
-  background: #fff;
-  border: 1rpx solid var(--line);
-  font-size: 24rpx;
-}
-
-.luck-stage.on {
-  color: #fff;
-  background: #1D2638;
-  border-color: #1D2638;
-}
-
-.luck-step {
+.luck-control-head {
+  min-height: 48rpx;
   display: flex;
   align-items: center;
   gap: 14rpx;
-  margin-bottom: 14rpx;
+  margin-bottom: 10rpx;
+}
+
+.luck-control-title {
+  font-size: 20rpx;
+  font-weight: 800;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.luck-step {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .luck-step-btn {
   flex: none;
-  width: 58rpx;
-  height: 58rpx;
-  border-radius: 50%;
+  width: 46rpx;
+  height: 46rpx;
+  border-radius: 10rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #9A6B12;
   background: rgba(201, 162, 39, 0.14);
   border: 1rpx solid rgba(201, 162, 39, 0.28);
-  font-size: 38rpx;
+  font-size: 32rpx;
   line-height: 1;
 }
 
 .luck-year-main {
+  min-width: 0;
   flex: 1;
   text-align: center;
-  height: 58rpx;
-  line-height: 58rpx;
-  border-radius: 100rpx;
+  height: 46rpx;
+  line-height: 46rpx;
+  border-radius: 10rpx;
   color: #9A6B12;
   background: rgba(201, 162, 39, 0.12);
   border: 1rpx solid rgba(201, 162, 39, 0.28);
-  font-size: 28rpx;
+  font-size: 23rpx;
   font-weight: 800;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 未叠加流年态：淡灰占位 */
+.luck-year-off {
+  color: var(--ink-3);
+  background: var(--fill);
+  border-color: var(--line);
+  font-weight: 600;
 }
 
 .luck-year-scroll {
@@ -789,7 +746,8 @@
 }
 
 .luck-year {
-  width: 116rpx;
+  width: 136rpx;
+  min-height: 86rpx;
   padding: 12rpx 0;
   border-radius: 16rpx;
   background: #fff;
@@ -800,6 +758,31 @@
 .luck-year.on {
   background: rgba(201, 162, 39, 0.14);
   border-color: #C9A227;
+  box-shadow: inset 0 -4rpx 0 rgba(201, 162, 39, 0.58);
+}
+
+.luck-controls .luck-year-strip {
+  gap: 8rpx;
+}
+
+.luck-controls .luck-year {
+  width: 116rpx;
+  min-height: 66rpx;
+  padding: 7rpx 0 6rpx;
+  border-radius: 10rpx;
+}
+
+.luck-controls .luck-y {
+  font-size: 22rpx;
+}
+
+.luck-controls .luck-a {
+  margin-top: 0;
+  font-size: 18rpx;
+}
+
+.luck-period {
+  width: 146rpx;
 }
 
 .luck-y {
@@ -859,6 +842,22 @@
   color: var(--ink-2);
 }
 
+.luck-period-summary {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #8A641B;
+  font-weight: 700;
+}
+
+.rel-tag-main {
+  margin-left: 0;
+  color: var(--ink);
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
 .rel-luck {
   margin-left: auto;
   flex-shrink: 0;
@@ -901,63 +900,34 @@
 /* 字号档位 */
 .fs-l .core-text, .fs-l .pc { font-size: 26rpx; }
 
-.fs-xl .core-text, .fs-xl .pc { font-size: 29rpx; }
-
-/* 今年心性（流年/大运叠加）· 气泡与主心性细读之间，无特殊卡框 */
-.luck-block {
-  padding: 18rpx 0 6rpx;
-  border-bottom: 1rpx solid var(--line);
-}
-
-.luck-head {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  margin-bottom: 10rpx;
-}
-
-.luck-cat {
-  flex: none;
-  width: 64rpx;
-  height: 64rpx;
-  margin-right: -2rpx;
-}
-
-.luck-badge {
-  font-size: 22rpx;
+/* 长辈模式（特大字）：全部正文/标签统一为一个字号，用加粗代替字号层级，
+   避免有的字特大、有的字还是原来的小字，看起来乱。
+   结构性单字徽标（日主印章、阶段序号、阶段圈号、刑冲合害圆标、
+   加减号、翻页箭头）不在此列，保持原有尺寸以免撑坏固定容器。 */
+.fs-xl .core-title, .fs-xl .core-text, .fs-xl .life-title, .fs-xl .life-note, .fs-xl .time-missing, .fs-xl .pattern-badge, .fs-xl .pattern-k, .fs-xl .pattern-t, .fs-xl .pol-t, .fs-xl .pol-sub, .fs-xl .pol-zheng, .fs-xl .pol-pian, .fs-xl .pol-verdict, .fs-xl .pol-explain-k, .fs-xl .pol-explain-t, .fs-xl .pol-legend, .fs-xl .comp-t, .fs-xl .comp-sub, .fs-xl .comp-tip, .fs-xl .sl-lbl, .fs-xl .tcl, .fs-xl .pc, .fs-xl .pc-key, .fs-xl .comp-empty, .fs-xl .acc-gz-c, .fs-xl .acc-age, .fs-xl .year-insight-k, .fs-xl .year-insight-t, .fs-xl .axis-name, .fs-xl .axis-energy, .fs-xl .axis-reason, .fs-xl .luck-control-title, .fs-xl .luck-year-main, .fs-xl .luck-y, .fs-xl .luck-a, .fs-xl .rel-tag, .fs-xl .rel-luck, .fs-xl .rel-zhis, .fs-xl .rel-zhis-luck, .fs-xl .foot {
+  font-size: 30rpx;
   font-weight: 700;
-  color: #fff;
-  background: #C9A227;
-  border-radius: 8rpx;
-  padding: 3rpx 14rpx;
 }
 
-.luck-name {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #9A6B12;
-  letter-spacing: 2rpx;
-}
-
-.luck-lbls {
-  margin-left: auto;
-  font-size: 22rpx;
-  color: #B08A2E;
-}
-
-.luck-lead {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #8A5E12;
-  margin-bottom: 10rpx;
-}
-
-.luck-desc {
-  font-size: 25rpx;
-  line-height: 1.7;
-  color: var(--ink-2);
-}
+/* 固定宽度的小容器随统一字号适度放宽，避免挤压 */
+.fs-xl .luck-year { width: 140rpx; }
 
 .fs-l .luck-desc { font-size: 27rpx; }
 
-.fs-xl .luck-desc { font-size: 30rpx; }
+.fs-xl .axis-name, .fs-xl .axis-energy, .fs-xl .trait-source-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.fs-xl .life-title {
+  font-size: 38rpx;
+}
+
+.fs-xl .elder-period-btn,
+.fs-xl .elder-period-caption {
+  font-size: 28rpx;
+}
+
+.fs-xl .elder-period-age {
+  font-size: 36rpx;
+}

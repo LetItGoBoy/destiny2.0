@@ -4,7 +4,7 @@
 //   Step1  同柱：全rank同字通根 + 本气(rank0)双向生克（同步初值）
 //   Step3  异柱通根（同字）
 // 岁运不再以"作用力overlay"方式扰动原局，而是当作完整的柱进池：
-//   大运 干0.35/支0.65、流年 干0.45/支0.45（再×藏干权重），约占池 ~20%。
+//   大运 干1.0/支2.5、流年 干0.45/支0.45（再×藏干权重）。
 var base = require('./base.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
@@ -20,9 +20,9 @@ var ZHI_W = [1.0, 2.5, 1.4, 1.0];           // 地支权重（月令当权、日
 var HIDE_W = { 1: [1], 2: [0.7, 0.3], 3: [0.6, 0.3, 0.1] };
 var PLBL = ['年', '月', '日', '时'];
 
-// ── 岁运进池起始能量（约占池 ~20%）──
+// ── 岁运进池起始能量 ──
 var LUCK_POS = { dy: 4, ln: 5 };                          // 大运/流年的合成柱序
-var LUCK_W = { dy: { gan: 0.35, zhi: 0.65 }, ln: { gan: 0.45, zhi: 0.45 } };
+var LUCK_W = { dy: { gan: 1.0, zhi: 2.5 }, ln: { gan: 0.45, zhi: 0.45 } };
 var LUCK_LBL = { 4: '大运', 5: '流年' };
 
 // 作用系数
@@ -379,6 +379,10 @@ function build(chart, opts) {
   // 喜忌决策用池：不把日主天干本身算作病重来源，但保留其他天干与地支根气。
   var poolXiji = poolPct(natalNow, true);
   var poolXijiBase = poolPct(natalBase, true);
+  // 原局受岁运作用后的池：保留被生克、通根、合冲刑害改写的原局能量，
+  // 但不把岁运干支自身的分数并入原局喜忌决策。
+  var poolNatalAfterLuck = poolPctNatal(natalNow, plist.length, natalHidLen);
+  var poolNatalAfterLuckXiji = poolPctNatal(natalNow, plist.length, natalHidLen, true);
 
   // 归一化参考值（含上浮空间，便于看到增长）
   var maxRef = 0;
@@ -398,7 +402,9 @@ function build(chart, opts) {
     pool: poolNow,
     poolBase: poolBase,
     poolXiji: poolXiji,
-    poolXijiBase: poolXijiBase
+    poolXijiBase: poolXijiBase,
+    poolNatalAfterLuck: poolNatalAfterLuck,
+    poolNatalAfterLuckXiji: poolNatalAfterLuckXiji
   };
 }
 
@@ -411,6 +417,25 @@ function poolPct(model, excludeDayStem) {
     sum[s.el] += s.val; tot += s.val;
   });
   model.hidden.forEach(function (h) { sum[h.el] += h.val; tot += h.val; });
+  var p = {};
+  WX.forEach(function (e) { p[e] = tot > 0 ? sum[e] / tot * 100 : 0; });
+  return p;
+}
+
+// 只汇总原局四柱单元；model 可以已经被岁运作用过。
+function poolPctNatal(model, natalStemLen, natalHiddenLen, excludeDayStem) {
+  var WX = ['木', '火', '土', '金', '水'], sum = {}, tot = 0;
+  WX.forEach(function (e) { sum[e] = 0; });
+  for (var i = 0; i < natalStemLen; i++) {
+    var s = model.stems[i];
+    if (!s || (excludeDayStem && s.isDay)) continue;
+    sum[s.el] += s.val; tot += s.val;
+  }
+  for (var j = 0; j < natalHiddenLen; j++) {
+    var h = model.hidden[j];
+    if (!h) continue;
+    sum[h.el] += h.val; tot += h.val;
+  }
   var p = {};
   WX.forEach(function (e) { p[e] = tot > 0 ? sum[e] / tot * 100 : 0; });
   return p;

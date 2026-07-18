@@ -2,29 +2,16 @@ var bazi = require('../../utils/bazi.js');
 var portrait = require('../../utils/analyze/portrait.js');
 var prefs = require('../../utils/prefs.js');
 
-var STAGE_RANGES = [
-  { key: 'life1', start: 0, end: 7 },
-  { key: 'life2', start: 8, end: 16 },
-  { key: 'life3', start: 17, end: 24 },
-  { key: 'life4', start: 25, end: 32 },
-  { key: 'life5', start: 33, end: 40 },
-  { key: 'life6', start: 41, end: 48 },
-  { key: 'life7', start: 49, end: 56 },
-  { key: 'life8', start: 57, end: 120 }
-];
-
-// 守正/求变配比 → 个性化判词（>=58 守正主导，<=42 求变主导，其余均衡）
 function polVerdictOf(zheng) {
   if (zheng >= 58) return '你更偏「守正」：遇事先求稳、讲规则、重积累，可靠是你的默认姿态；变化来临时习惯先想清楚再动。';
   if (zheng <= 42) return '你更偏「求变」：不安于重复，天然想突破、想表达，机会感比稳定感更让你安心；顺境里冲劲十足。';
   return '你在守正与求变之间较为均衡：能稳能闯，会按场合切换姿态，既守得住基本盘，也接得住新机会。';
 }
 
-// 命局特殊结构一句话解读（检测逻辑见 utils/analyze/portrait.js detectTraitPattern）
 var PATTERN_NOTES = {
   食神制杀: '温和的输出与强悍的压力势均力敌、互相制衡：能把危机感转成章法，是很有张力的组合。',
   羊刃驾杀: '刚劲与魄力互相咬合：敢扛硬仗、关键时刻压得住阵，但需要分寸来驾驭这股狠劲。',
-  身杀两停: '自我与挑战势均力敌：抗压耐打，压力越大越能被激发，越有目标越有劲。'
+  身杀两停: '自我与挑战势均力敌：抗压耐打，压力越大越能被激发，越有目标越有力。'
 };
 
 Page({
@@ -36,16 +23,16 @@ Page({
     traitPattern: null,
     zhengNow: 50,
     pianNow: 50,
+    polVerdict: '',
     hasTime: true,
-    stagePortraits: [],
-    openStageKey: 'life1',
-    currentStageKey: '',
-    openLayers: {},
-    luckStageIndex: 1,
-    luckYear: null,
-    luckYearList: [],
+    luckSegments: [],
     luckPortrait: null,
-    luckFlow: null,
+    selectedLuckIndex: null,
+    currentLuckIndex: null,
+    hasPrevLuck: false,
+    hasNextLuck: false,
+    selectedYear: null,
+    openYearList: [],
     relations: []
   },
 
@@ -71,9 +58,10 @@ Page({
       return;
     }
     this._chart = chart;
-    this._birthYear = new Date(chart.meta.timestamp).getFullYear();
+    this._luckList = chart.daYun || [];
+    this._selectedLuckIndex = null;
+    this._selectedYear = new Date().getFullYear();
 
-    // 一键画像也是一次排盘，记入「最近排盘」历史
     prefs.pushHistory({
       input: input,
       name: chart.meta.name,
@@ -82,211 +70,114 @@ Page({
       dateStr: chart.meta.clockStr
     });
 
-    this._dy = (chart.daYun || []).filter(function (d) {
-      return d.ganZhi && !d.isQian;
-    }).map(function (d, i) {
-      return {
-        index: i,
-        gz: d.ganZhi,
-        gan: d.gan,
-        zhi: d.zhi,
-        god: d.shiShenGan,
-        age: d.startAge + '-' + d.endAge,
-        _liuNian: d.liuNian || []
-      };
-    });
-
-    this._yearMap = {};
-    var self = this;
-    this._dy.forEach(function (d) {
-      (d._liuNian || []).forEach(function (x, i) {
-        self._yearMap[x.year] = { dy: d.index, ln: i };
-      });
-    });
-
-    var currentYear = new Date().getFullYear();
-    var defaultStageIndex = this.stageIndexForYear(currentYear);
-    var defaultYear = this.ensureLuckYear(defaultStageIndex, currentYear);
-    this.setData({
-      loaded: true,
-      meta: chart.meta,
-      openStageKey: (STAGE_RANGES[defaultStageIndex] || STAGE_RANGES[0]).key,
-      currentStageKey: (STAGE_RANGES[defaultStageIndex] || STAGE_RANGES[0]).key,
-      luckStageIndex: defaultStageIndex,
-      luckYear: defaultYear
-    });
+    this.setData({ loaded: true, meta: chart.meta });
     this.recompute();
   },
 
-  stageIndexForYear: function (year) {
-    var birthYear = this._birthYear || new Date().getFullYear();
-    var age = year - birthYear;
-    for (var i = 0; i < STAGE_RANGES.length; i++) {
-      if (age >= STAGE_RANGES[i].start && age <= STAGE_RANGES[i].end) return i;
+  dyByIndex: function (index) {
+    for (var i = 0; i < this._luckList.length; i++) {
+      if (this._luckList[i].index === index) return this._luckList[i];
     }
-    return age < 0 ? 0 : STAGE_RANGES.length - 1;
+    return null;
   },
 
-  layerOpen: function (stageKey, layerKey) {
-    var key = stageKey + ':' + layerKey;
-    return this.data.openLayers[key] !== false;
-  },
-
-  applyLayerOpen: function (stages, luckPortrait) {
-    var self = this;
-    (stages || []).forEach(function (stage) {
-      if (stage.layer) stage.layer.open = self.layerOpen(stage.key, 'main');
+  yearListForSelected: function (activeYear) {
+    var daYun = this.dyByIndex(this._selectedLuckIndex);
+    if (!daYun || daYun.isQian || !daYun.liuNian) return [];
+    return daYun.liuNian.map(function (item) {
+      return {
+        year: item.year,
+        age: item.age,
+        gz: item.ganZhi,
+        active: item.year === activeYear
+      };
     });
-    if (luckPortrait) {
-      if (luckPortrait.layer) luckPortrait.layer.open = this.layerOpen('luck', 'main');
-    }
   },
 
-  toggleStage: function (e) {
-    var key = e.currentTarget.dataset.key;
-    var next = this.data.openStageKey === key ? '' : key;
-    var patch = { openStageKey: next };
-    if (next === 'luck') {
-      patch.luckYear = this.ensureLuckYear(this.data.luckStageIndex, this.data.luckYear);
-    }
-    var self = this;
-    this.setData(patch, function () { self.recompute(); });
+  selectLuck: function (e) {
+    var index = Number(e.currentTarget.dataset.index);
+    if (isNaN(index) || index === this._selectedLuckIndex) return;
+    this._selectedLuckIndex = index;
+    this._selectedYear = null;
+    this.recompute();
   },
 
-  toggleLayer: function (e) {
-    var stage = e.currentTarget.dataset.stage;
-    var layer = e.currentTarget.dataset.layer;
-    if (!stage || !layer) return;
-    var key = stage + ':' + layer;
-    var next = {};
-    for (var k in this.data.openLayers) next[k] = this.data.openLayers[k];
-    next[key] = this.data.openLayers[key] === false;
-    var self = this;
-    this.setData({ openLayers: next }, function () { self.recompute(); });
-  },
-
-  selectLuckStage: function (e) {
-    var idx = Number(e.currentTarget.dataset.index);
-    var year = this.ensureLuckYear(idx, this.data.luckYear);
-    var self = this;
-    this.setData({
-      openStageKey: 'luck',
-      luckStageIndex: idx,
-      luckYear: year
-    }, function () { self.recompute(); });
-  },
-
-  selectLuckYear: function (e) {
-    var year = Number(e.currentTarget.dataset.year);
-    var self = this;
-    this.setData({
-      openStageKey: 'luck',
-      luckYear: year
-    }, function () { self.recompute(); });
-  },
-
-  stepLuckYear: function (e) {
+  stepLuck: function (e) {
     var delta = Number(e.currentTarget.dataset.d);
-    var list = this.buildLuckYearList(this.data.luckStageIndex, this.data.luckYear);
+    var list = this.data.luckSegments || [];
+    if (!list.length || !delta) return;
+    var current = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].index === this._selectedLuckIndex) {
+        current = i;
+        break;
+      }
+    }
+    var next = Math.max(0, Math.min(list.length - 1, current + delta));
+    if (next === current) return;
+    this._selectedLuckIndex = list[next].index;
+    this._selectedYear = null;
+    this.recompute();
+  },
+
+  selectYear: function (e) {
+    var year = Number(e.currentTarget.dataset.year);
+    if (isNaN(year)) return;
+    this._selectedYear = this._selectedYear === year ? null : year;
+    this.recompute();
+  },
+
+  stepYear: function (e) {
+    var delta = Number(e.currentTarget.dataset.d);
+    var list = this.yearListForSelected(this._selectedYear);
     if (!list.length) return;
-    var cur = 0;
+    var current = -1;
     for (var i = 0; i < list.length; i++) {
-      if (list[i].year === this.data.luckYear) { cur = i; break; }
+      if (list[i].year === this._selectedYear) {
+        current = i;
+        break;
+      }
     }
-    var next = Math.max(0, Math.min(list.length - 1, cur + delta));
-    var self = this;
-    this.setData({
-      openStageKey: 'luck',
-      luckYear: list[next].year
-    }, function () { self.recompute(); });
-  },
-
-  ensureLuckYear: function (stageIndex, preferredYear) {
-    var list = this.buildLuckYearList(stageIndex, preferredYear);
-    if (!list.length) return null;
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].year === preferredYear) return preferredYear;
-    }
-    return list[0].year;
-  },
-
-  buildLuckYearList: function (stageIndex, activeYear) {
-    var range = STAGE_RANGES[stageIndex] || STAGE_RANGES[1];
-    var birthYear = this._birthYear || new Date().getFullYear();
-    var out = [];
-    var years = Object.keys(this._yearMap || {}).map(function (y) { return Number(y); });
-    years.sort(function (a, b) { return a - b; });
-    for (var i = 0; i < years.length; i++) {
-      var year = years[i];
-      var age = year - birthYear;
-      if (age < range.start || age > range.end) continue;
-      var sel = this._yearMap[year];
-      var dy = this._dy[sel.dy];
-      var ln = dy && dy._liuNian ? dy._liuNian[sel.ln] : null;
-      if (!ln) continue;
-      out.push({
-        year: year,
-        age: age,
-        gz: ln.ganZhi,
-        active: year === activeYear
-      });
-    }
-    return out;
-  },
-
-  selectionForLuckYear: function (year) {
-    if (year == null) return {};
-    var sel = this._yearMap[year];
-    if (!sel) return {};
-    var dy = this._dy[sel.dy];
-    var ln = dy && dy._liuNian ? dy._liuNian[sel.ln] : null;
-    if (!dy || !ln) return {};
-    return {
-      daYunGZ: dy.gz,
-      liuNianGZ: ln.ganZhi
-    };
+    var next = current < 0
+      ? (delta < 0 ? list.length - 1 : 0)
+      : Math.max(0, Math.min(list.length - 1, current + delta));
+    this._selectedYear = list[next].year;
+    this.recompute();
   },
 
   recompute: function () {
-    var luckYear = this.data.luckYear;
-    var luckYearList = this.buildLuckYearList(this.data.luckStageIndex, luckYear);
-    if (this.data.openStageKey === 'luck' && luckYearList.length) {
-      var found = false;
-      for (var i = 0; i < luckYearList.length; i++) {
-        if (luckYearList[i].year === luckYear) found = true;
+    var result = portrait.build(this._chart, {
+      selectedLuckIndex: this._selectedLuckIndex,
+      selectedYear: this._selectedYear
+    });
+    this._selectedLuckIndex = result.selectedLuckIndex;
+    this._selectedYear = result.selectedYear;
+    var selectedPosition = 0;
+    for (var i = 0; i < (result.luckSegments || []).length; i++) {
+      if (result.luckSegments[i].index === result.selectedLuckIndex) {
+        selectedPosition = i;
+        break;
       }
-      if (!found) {
-        luckYear = luckYearList[0].year;
-        luckYearList = this.buildLuckYearList(this.data.luckStageIndex, luckYear);
-      }
     }
-
-    var opts = {};
-    if (this.data.openStageKey === 'luck') {
-      opts = this.selectionForLuckYear(luckYear);
-    }
-    var p = portrait.build(this._chart, opts);
-    var luckPortrait = null;
-    if (this.data.openStageKey === 'luck') {
-      luckPortrait = (p.stagePortraits || [])[this.data.luckStageIndex] || null;
-    }
-    this.applyLayerOpen(p.stagePortraits || [], luckPortrait);
 
     this.setData({
-      core: p.core,
-      traitPattern: p.traitPattern
-        ? { name: p.traitPattern.name, note: PATTERN_NOTES[p.traitPattern.name] || '' }
+      core: result.core,
+      traitPattern: result.traitPattern
+        ? { name: result.traitPattern.name, note: PATTERN_NOTES[result.traitPattern.name] || '' }
         : null,
-      zhengNow: p.zhengNow,
-      pianNow: p.pianNow,
-      polVerdict: polVerdictOf(p.zhengNow),
-      hasTime: p.hasTime,
-      stagePortraits: p.stagePortraits || [],
-      luckYear: luckYear,
-      luckYearList: luckYearList,
-      luckPortrait: luckPortrait,
-      luckFlow: this.data.openStageKey === 'luck' ? (p.luckTrait || null) : null,
-      relations: p.relations || []
+      zhengNow: result.zhengNow,
+      pianNow: result.pianNow,
+      polVerdict: polVerdictOf(result.zhengNow),
+      hasTime: result.hasTime,
+      luckSegments: result.luckSegments || [],
+      luckPortrait: result.luckPortrait,
+      selectedLuckIndex: result.selectedLuckIndex,
+      currentLuckIndex: result.currentLuckIndex,
+      hasPrevLuck: selectedPosition > 0,
+      hasNextLuck: selectedPosition < (result.luckSegments || []).length - 1,
+      selectedYear: result.selectedYear,
+      openYearList: this.yearListForSelected(result.selectedYear),
+      relations: result.relations || []
     });
   },
 
