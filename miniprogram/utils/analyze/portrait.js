@@ -9,6 +9,24 @@ var copy = require('./portraitCopy.js');
 var lunarLib = require('../lunar.js');
 var LunarUtil = lunarLib.LunarUtil;
 
+var TEN_GOD_PAIR = {
+  比肩: ['比肩', '劫财'], 劫财: ['比肩', '劫财'],
+  食神: ['食神', '伤官'], 伤官: ['食神', '伤官'],
+  正财: ['正财', '偏财'], 偏财: ['正财', '偏财'],
+  正官: ['正官', '七杀'], 七杀: ['正官', '七杀'],
+  正印: ['正印', '偏印'], 偏印: ['正印', '偏印']
+};
+
+function dominantNatalPairGod(god, godEnergy) {
+  var pair = TEN_GOD_PAIR[god];
+  if (!pair) return god;
+  var left = godEnergy[pair[0]] || 0;
+  var right = godEnergy[pair[1]] || 0;
+  // 只有原局正偏两类都存在时才替换；能量相同则保留大运实际十神。
+  if (left <= 0 || right <= 0 || left === right) return god;
+  return left > right ? pair[0] : pair[1];
+}
+
 function natalOverview(model) {
   var stems = (model.ganCells || []).filter(function (cell) { return !cell.isDay; });
   var baseTotal = 0, nowTotal = 0, baseZheng = 0, nowZheng = 0;
@@ -49,18 +67,36 @@ function natalOverview(model) {
   };
 }
 
-function natalSets(chart, model) {
-  var elements = rules.rootElsOf(chart, {});
-  chart.pillars.forEach(function (pillar) {
-    if (!pillar || pillar.empty || !pillar.gan) return;
-    elements[base.ganWx(pillar.gan.text)] = 1;
-  });
+function natalSets(chart) {
+  var elements = {};
+  var nativeElements = {};
   var gods = {};
-  (model.ganCells || []).forEach(function (cell) {
-    if (!cell.isDay) gods[cell.god] = true;
-  });
-  (model.hiddenUnits || []).forEach(function (unit) { gods[unit.god] = true; });
-  return { elements: elements, gods: gods };
+
+  function addNativeElement(el) {
+    if (!el) return;
+    elements[el] = 1;
+    nativeElements[el] = 1;
+  }
+
+  // 性格唤醒池取四柱天干 + 四支本气、中气；时辰缺失时跳过空时柱，余气始终不进入。
+  for (var i = 0; i < chart.pillars.length; i++) {
+    var pillar = chart.pillars[i];
+    if (!pillar || pillar.empty || !pillar.gan || !pillar.zhi) continue;
+
+    var gan = pillar.gan.text;
+    addNativeElement(base.ganWx(gan));
+    // 日干只用于确认日主五行，不作为额外的比肩性格来源。
+    if (i !== 2) gods[LunarUtil.SHI_SHEN[chart.meta.dayGan + gan]] = true;
+
+    var hideGans = LunarUtil.ZHI_HIDE_GAN[pillar.zhi.text] || [];
+    if (hideGans[0]) {
+      addNativeElement(base.ganWx(hideGans[0]));
+      gods[LunarUtil.SHI_SHEN[chart.meta.dayGan + hideGans[0]]] = true;
+    }
+    // 第二藏干统一视为中气：可以唤醒；仅在没有透干或本气时使用外来词。
+    if (hideGans[1]) elements[base.ganWx(hideGans[1])] = 1;
+  }
+  return { elements: elements, nativeElements: nativeElements, gods: gods };
 }
 
 function luckGanSource(chart, daYun) {
@@ -73,23 +109,37 @@ function luckGanSource(chart, daYun) {
   };
 }
 
-function luckZhiSource(chart, daYun) {
+function luckZhiSource(chart, daYun, sets) {
   var zhi = daYun.ganZhi.charAt(1);
-  var ch = LunarUtil.ZHI_HIDE_GAN[zhi][0];
+  var hideGans = LunarUtil.ZHI_HIDE_GAN[zhi] || [];
+  var ch = hideGans[0];
+  var sourceRank = 0;
+  var mainEl = base.ganWx(ch);
+
+  // 本气没有原局根基时，只允许原局已有的中气承接；余气不参与。
+  if (sets && !sets.elements[mainEl] && hideGans.length > 1) {
+    var middle = hideGans[1];
+    if (sets.elements[base.ganWx(middle)]) {
+      ch = middle;
+      sourceRank = 1;
+    }
+  }
   return {
     char: ch,
     zhi: zhi,
     god: LunarUtil.SHI_SHEN[chart.meta.dayGan + ch],
     el: base.ganWx(ch),
+    sourceRank: sourceRank,
     sourceKind: 'luckZhi'
   };
 }
 
-function luckUnitEnergy(model, kind, layer) {
+function luckUnitEnergy(model, kind, layer, sourceRank) {
   var units = layer === 'gan' ? model.luckGanUnits : model.luckZhiUnits;
+  var targetRank = sourceRank == null ? 0 : sourceRank;
   for (var i = 0; i < (units || []).length; i++) {
     if (units[i].kind !== kind) continue;
-    if (layer === 'zhi' && units[i].rank !== 0) continue;
+    if (layer === 'zhi' && units[i].rank !== targetRank) continue;
     return units[i].val;
   }
   return 0.02;
@@ -109,7 +159,8 @@ function overlayYearSlider(pos, yearDir) {
 function makeLuckItem(source, side, modifiers, activeXiji, natalXiji, sets) {
   var meta = traits.metaOf(source.god);
   var effective = correction.resolve(source, modifiers, activeXiji, natalXiji);
-  var copyKind = sets.gods[source.god] ? 'natal' : 'transit';
+  // 同一五行只要在年月日天干透出或支本气出现，就使用本命词库；仅中气有根才用外来词。
+  var copyKind = sets.nativeElements[source.el] ? 'natal' : 'transit';
   var slider = baseSlider(effective.dir, source.god, side);
   return {
     god: source.god,
@@ -127,11 +178,10 @@ function makeLuckItem(source, side, modifiers, activeXiji, natalXiji, sets) {
     traitDir: effective.dir,
     isZhengGod: !rules.SPECIAL_PIAN[source.god],
     isDiseaseGod: rules.isDiseaseGod(source.god, activeXiji),
-    isNatalGod: !!sets.gods[source.god],
+    isNatalGod: !!sets.nativeElements[source.el],
     traitOverride: effective.reason,
     traitReasonCode: effective.reasonCode,
     influence: effective.influence || null,
-    extraCon: rules.diseaseExtraCon(source.god, activeXiji),
     copyKind: copyKind,
     sourceChar: source.char,
     sourceZhi: source.zhi || '',
@@ -244,7 +294,7 @@ function luckByIndex(chart, index) {
 function luckSummary(chart, daYun, sets) {
   if (!daYun || daYun.isQian) return '';
   var names = [];
-  [luckGanSource(chart, daYun), luckZhiSource(chart, daYun)].forEach(function (source) {
+  [luckGanSource(chart, daYun), luckZhiSource(chart, daYun, sets)].forEach(function (source) {
     if (!sets.elements[source.el]) return;
     var name = traits.metaOf(source.god).name;
     if (name && names.indexOf(name) < 0) names.push(name);
@@ -298,7 +348,7 @@ function build(chart, opts) {
     natalEnergy.poolXiji || natalEnergy.pool || {},
     bodyRootInfo
   );
-  var sets = natalSets(chart, natalEnergy);
+  var sets = natalSets(chart);
 
   var nowYear = new Date().getFullYear();
   var currentIndex = currentLuckIndex(chart, nowYear);
@@ -332,11 +382,12 @@ function build(chart, opts) {
     };
   } else {
     var dayunEnergy = energy.build(chart, { daYunGZ: selectedLuck.ganZhi });
+    var adjustedNatalGodEnergy = rules.godEnergyOf(dayunEnergy, false);
     var activeXiji = rules.decideXiji(
       dayunEnergy.poolNatalAfterLuckXiji || dayunEnergy.poolXiji || {},
       dmEl,
       rootEls,
-      rules.godEnergyOf(dayunEnergy, false),
+      adjustedNatalGodEnergy,
       dayunEnergy.poolNatalAfterLuckXiji || dayunEnergy.poolXiji || {},
       bodyRootInfo
     );
@@ -344,12 +395,12 @@ function build(chart, opts) {
     var displayEnergy = selectedYearGZ
       ? energy.build(chart, { daYunGZ: selectedLuck.ganZhi, liuNianGZ: selectedYearGZ })
       : dayunEnergy;
+    var ganSource = luckGanSource(chart, selectedLuck);
+    var zhiSource = luckZhiSource(chart, selectedLuck, sets);
     var ganEnergy = luckUnitEnergy(displayEnergy, 'dy', 'gan');
-    var zhiEnergy = luckUnitEnergy(displayEnergy, 'dy', 'zhi');
+    var zhiEnergy = luckUnitEnergy(displayEnergy, 'dy', 'zhi', zhiSource.sourceRank);
     var yearGanEnergy = yearOverlay ? luckUnitEnergy(displayEnergy, 'ln', 'gan') : 0;
     var maxEnergy = Math.max(ganEnergy, zhiEnergy, yearGanEnergy, 0.02);
-    var ganSource = luckGanSource(chart, selectedLuck);
-    var zhiSource = luckZhiSource(chart, selectedLuck);
     ganSource.energy = ganEnergy;
     ganSource.energyWeight = ganEnergy / maxEnergy;
     ganSource.sourceKey = 'dayun:gan:' + ganSource.char;
@@ -379,6 +430,11 @@ function build(chart, opts) {
       natalXiji,
       sets
     );
+    // 普通格局只用原局同组中能量较大的十神提供气泡词；喜忌和滑标仍由大运实际十神决定。
+    if (activeXiji.mode !== '病重') {
+      ganItem.bubbleGod = dominantNatalPairGod(ganItem.god, adjustedNatalGodEnergy);
+      zhiItem.bubbleGod = dominantNatalPairGod(zhiItem.god, adjustedNatalGodEnergy);
+    }
     var chartKey = chart.pillars.filter(function (pillar) { return !pillar.empty; }).map(function (pillar) { return pillar.ganZhi; }).join('');
     var clusterKey = chartKey + ':' + selectedLuck.index + ':' + selectedLuck.ganZhi + ':' + (selectedYearGZ || '');
     var traitLayer = makeCombinedLayer(ganItem, zhiItem, ganShare, zhiShare, yearOverlay, activeXiji, clusterKey);

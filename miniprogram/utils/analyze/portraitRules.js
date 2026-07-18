@@ -253,10 +253,6 @@ function isDiseaseGod(god, activeXiji) {
   return !!activeXiji && (activeXiji.subtypes || []).indexOf(god + '过旺') >= 0;
 }
 
-function diseaseExtraCon(god, activeXiji) {
-  return god === '伤官' && isDiseaseGod(god, activeXiji) ? ['对抗权威', '漠视规则'] : [];
-}
-
 module.exports = {
   WX: WX,
   SPECIAL_PIAN: SPECIAL_PIAN,
@@ -270,6 +266,5 @@ module.exports = {
   godEnergyOf: godEnergyOf,
   fixedGodDir: fixedGodDir,
   diseaseSupportOf: diseaseSupportOf,
-  isDiseaseGod: isDiseaseGod,
-  diseaseExtraCon: diseaseExtraCon
+  isDiseaseGod: isDiseaseGod
 };

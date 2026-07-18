@@ -33,7 +33,7 @@ function narrativeText(god, kind, side) {
 
 function visibleConWords(god, words, limit) {
   var all = words || [];
-  var out = all.slice(0, limit);
+  var out = all.slice(0, limit == null ? all.length : limit);
   if ((god === '食神' || god === '伤官') && all.indexOf('爱吃爱玩') >= 0 && out.indexOf('爱吃爱玩') < 0) {
     out.push('爱吃爱玩');
   }
@@ -42,7 +42,6 @@ function visibleConWords(god, words, limit) {
 
 function bubblePolicy(item) {
   var pos = item && item.slider != null ? item.slider : 50;
-  var basePos = item && item.baseSlider != null ? item.baseSlider : pos;
   var lean = pos / 100;
   var policy = {
     proLean: lean,
@@ -61,39 +60,42 @@ function bubblePolicy(item) {
     policy.hidePro = true;
   }
 
-  // 只有指定十神本身病重时，才保留两枚小力量词；生扶病重的忌神不保留力量词。
-  if (item.traitReasonCode === 'DISEASE_GOD_LOCK') {
-    if (diseaseStrengthWords[item.god]) {
-      policy.proLimit = 2;
-      policy.proEnergyFactor = 0.38;
-      policy.diseaseStrengthOnly = true;
-    } else {
-      policy.hidePro = true;
-    }
+  // 病重主体显示两枚指定小力量词、全部本色和全部留意词。
+  if (item.isDiseaseGod) {
+    policy.proEnergyFactor = 0.38;
+    policy.diseaseStrengthOnly = true;
     policy.neuEnergyFactor = 0.68;
     policy.conEnergyFactor = 1;
+    return policy;
   }
+
+  // 生扶病重主体的忌神沿用上一版，只显示本色和留意。
   if (item.traitReasonCode === 'DISEASE_SUPPORT_LOCK') {
     policy.hidePro = true;
     policy.neuEnergyFactor = 0.68;
     policy.conEnergyFactor = 1;
+    return policy;
   }
 
-  // 偏神为喜仍保留两枚小留意词；正神为喜继续隐藏留意词。
-  if (item.traitDir === '+') {
-    if (rules.SPECIAL_PIAN[item.god]) {
+  // 普通偏神：喜时只保留两枚小留意，忌时隐藏力量词。
+  if (item.traitReasonCode !== 'EXCESS_CONFLICT' && rules.SPECIAL_PIAN[item.god]) {
+    if (item.traitDir === '+') {
       policy.favorablePianConOnly = true;
       policy.conEnergyFactor = 0.38;
       return policy;
     }
-    if (!item.isDiseaseGod) {
-      policy.hideCon = true;
+    if (item.traitDir === '-') {
+      policy.hidePro = true;
       return policy;
     }
   }
-  if (!item.isZhengGod) return policy;
-  // 正神中性时，缺点仍保留但更小；不能把「天干正神为忌、滑标恰在中间」误判为中性。
-  if (!item.isDiseaseGod && item.traitDir === '0') {
+
+  // 普通正神为喜时隐藏留意；中性与忌神沿用上一版大小策略。
+  if (item.traitDir === '+') {
+    policy.hideCon = true;
+    return policy;
+  }
+  if (item.traitDir === '0') {
     policy.proLean = 0.5;
     policy.conLean = 0.35;
     return policy;
@@ -112,12 +114,15 @@ function buildTraitBubbles(items, yearOverlay) {
   var out = [];
   (items || []).forEach(function (item, index) {
     var transitOnly = item.hasNatalBaseElement === false;
-    var words = wordCopy(item.god, transitOnly ? 'transit' : (item.copyKind || 'natal'));
+    var bubbleGod = item.bubbleGod || item.god;
+    // 原局缺少该五行时使用大运实际十神的完整外来词，不参与正偏神词库替换。
+    var copyGod = transitOnly ? item.god : bubbleGod;
+    var words = wordCopy(copyGod, transitOnly ? 'transit' : (item.copyKind || 'natal'));
     var policy = bubblePolicy(item);
     var weight = item.energyWeight == null ? (index === 0 ? 0.95 : 0.78) : item.energyWeight;
     var rawEnergy = item.energy == null ? weight : item.energy;
     var sourceKey = item.sourceKey || ('dayun:' + index + ':' + item.god);
-    // 原局没有该五行时，它只是一段外来的状态，不延伸为稳定力量或需要留意的部分。
+    // 原局完全没有该五行时，沿用上一版，只显示三枚外来本色词。
     if (transitOnly) {
       (words.neu || []).slice(0, 3).forEach(function (word) {
         out.push({ label: word, kind: 'neu', src: 'dayun', sourceKey: sourceKey, rawEnergy: rawEnergy, w: weight, lean: 0.5 });
@@ -154,7 +159,7 @@ function buildTraitBubbles(items, yearOverlay) {
     if (!policy.hideCon) {
       var conWords = policy.favorablePianConOnly
         ? (favorablePianAttentionWords[item.god] || [])
-        : visibleConWords(item.god, words.con, 8);
+        : visibleConWords(bubbleGod, words.con, 8);
       conWords.forEach(function (word) {
         out.push({
           label: word,
@@ -237,7 +242,7 @@ function persistentDiseaseBubbles(items, bubbles, activeXiji) {
         diseaseGod: god
       });
     });
-    (words.neu || []).slice(0, 4).forEach(function (word) {
+    (words.neu || []).forEach(function (word) {
       if (!word || used[word]) return;
       used[word] = true;
       out.push({
@@ -252,7 +257,8 @@ function persistentDiseaseBubbles(items, bubbles, activeXiji) {
         diseaseGod: god
       });
     });
-    visibleConWords(god, words.con, 7).concat(rules.diseaseExtraCon(god, activeXiji)).forEach(function (word) {
+    // 病重常驻层只保留该十神的通用留意词；冲突专属词由当步大运触发。
+    visibleConWords(god, words.con).forEach(function (word) {
       if (!word || used[word]) return;
       used[word] = true;
       out.push({
